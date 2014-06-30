@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra">
+	<info organisation="default"
+		module="class-ninja-backend$sources_javadoc_2.10"
+		revision="1.0"
+		status="integration"
+		publication="20140629130226"
+	/>
+	<configurations>
+		<conf name="compile" visibility="public" description=""/>
+		<conf name="runtime" visibility="public" description="" extends="compile"/>
+		<conf name="test" visibility="public" description="" extends="runtime"/>
+		<conf name="provided" visibility="public" description=""/>
+		<conf name="optional" visibility="public" description=""/>
+		<conf name="compile-internal" visibility="private" description="" extends="compile,optional,provided"/>
+		<conf name="runtime-internal" visibility="private" description="" extends="runtime,optional"/>
+		<conf name="test-internal" visibility="private" description="" extends="test,optional,provided"/>
+		<conf name="plugin" visibility="private" description=""/>
+		<conf name="sources" visibility="public" description=""/>
+		<conf name="docs" visibility="public" description=""/>
+		<conf name="pom" visibility="public" description=""/>
+		<conf name="scala-tool" visibility="private" description=""/>
+	</configurations>
+	<publications>
+	</publications>
+	<dependencies>
+		<dependency org="net.databinder.dispatch" name="dispatch-core_2.10" rev="0.11.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="dispatch-core_2.10" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="dispatch-core_2.10" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.scala-lang" name="scala-library" rev="2.10.4" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)" info.apiURL="http://www.scala-lang.org/api/2.10.4/">
+			<artifact name="scala-library" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="scala-library" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="com.ning" name="async-http-client" rev="1.8.8" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="async-http-client" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="async-http-client" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="io.netty" name="netty" rev="3.9.0.Final" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="netty" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="netty" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="net.databinder.dispatch" name="dispatch-tagsoup_2.10" rev="0.11.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="dispatch-tagsoup_2.10" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="dispatch-tagsoup_2.10" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.ccil.cowan.tagsoup" name="tagsoup" rev="1.2.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="tagsoup" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="tagsoup" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="com.typesafe.slick" name="slick_2.10" rev="2.1.0-M2" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="slick_2.10" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="slick_2.10" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="com.typesafe" name="config" rev="1.2.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="config" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="config" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="com.h2database" name="h2" rev="1.4.179" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="h2" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="h2" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.2" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="logback-classic" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="logback-classic" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="ch.qos.logback" name="logback-core" rev="1.1.2" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="logback-core" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="logback-core" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.6" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="slf4j-api" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="slf4j-api" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.scala-lang" name="scala-compiler" rev="2.10.3" transitive="false" conf="scala-tool->default(compile)">
+			<artifact name="scala-compiler" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="scala-compiler" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.scala-lang" name="scala-library" rev="2.10.3" transitive="false" conf="scala-tool->default(compile)" info.apiURL="http://www.scala-lang.org/api/2.10.3/">
+			<artifact name="scala-library" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="scala-library" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.scala-lang" name="scala-reflect" rev="2.10.3" transitive="false" conf="scala-tool->default(compile)" info.apiURL="http://www.scala-lang.org/api/2.10.3/">
+			<artifact name="scala-reflect" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="scala-reflect" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.scala-lang" name="jline" rev="2.10.3" transitive="false" conf="scala-tool->default(compile)">
+			<artifact name="jline" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jline" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.fusesource.jansi" name="jansi" rev="1.4" transitive="false" conf="scala-tool->default(compile)">
+			<artifact name="jansi" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jansi" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+	</dependencies>
+</ivy-module>
