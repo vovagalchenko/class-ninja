@@ -11,14 +11,11 @@ object HTTPManager {
   def execute[T](request: HTTPRequest)(onSuccess: NodeSeq => T): Future[T] = {
     val req: Req = reqFromHTTPRequest(request)
     // Creating a new HTTP client every time. Here's where we will pick a random proxy to go through
-    val httpDispatch: Http = new Http()
-    val futureResult: Future[NodeSeq] = httpDispatch(req.OK(DNodeSeq(_)))
+    val futureResult: Future[NodeSeq] = Http(req.OK(DNodeSeq(_)))
     futureResult.transform({ nodeSeq: NodeSeq =>
       val result: T = onSuccess(nodeSeq)
-      httpDispatch.shutdown()
       result
     }, { t: Throwable =>
-      httpDispatch.shutdown()
       t
     })
   }
@@ -38,6 +35,8 @@ object HTTPManager {
     }
     url(fullURLString)
   }
+
+  def shutdown() = Http.shutdown()
 }
 
 class HTTPRequestFactory(root: String) {

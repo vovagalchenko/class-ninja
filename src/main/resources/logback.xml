@@ -10,4 +10,7 @@
     <logger name="scala.slick.jdbc" level="WARN">
         <appender-ref ref="CONSOLE"/>
     </logger>
+    <logger name="core.CourseFetch" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </logger>
 </configuration>

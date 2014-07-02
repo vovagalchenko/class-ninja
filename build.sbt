@@ -8,6 +8,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "latest.integration",
   "com.h2database" % "h2" % "latest.integration",
   "mysql" % "mysql-connector-java" % "latest.integration",
-  "ch.qos.logback" % "logback-classic" % "latest.integration"
+  "ch.qos.logback" % "logback-classic" % "latest.integration",
+  "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "latest.integration"
 )
+
 
