@@ -8,8 +8,16 @@ import scala.concurrent.Future
 import scala.xml.NodeSeq
 
 object HTTPManager {
+
   def execute[T](request: HTTPRequest)(onSuccess: NodeSeq => T): Future[T] = {
-    val req: Req = reqFromHTTPRequest(request)
+    this.execute(reqFromHTTPRequest(request))(onSuccess)
+  }
+
+  def get[T](urlString: String)(onSuccess: NodeSeq => T): Future[T] = {
+    this.execute(url(urlString))(onSuccess)
+  }
+
+  private def execute[T](req: Req)(onSuccess: NodeSeq => T): Future[T] = {
     // Creating a new HTTP client every time. Here's where we will pick a random proxy to go through
     val futureResult: Future[NodeSeq] = Http(req.OK(DNodeSeq(_)))
     futureResult.transform({ nodeSeq: NodeSeq =>
@@ -20,7 +28,7 @@ object HTTPManager {
     })
   }
 
-  private def reqFromHTTPRequest(request: HTTPRequest): Req = {
+  def reqFromHTTPRequest(request: HTTPRequest): Req = {
     val fullURLString: String = {
       val qualifiedPath = request.root + request.path
       if (request.queryParams.size > 0) {

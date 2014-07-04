@@ -49,48 +49,15 @@ object CourseFetch extends LazyLogging {
               logger.error(s"There exist duplicate courses in ${school.toString}'s <${freshDepartment.name}> department")
             })
 
-            // Update the MySQL. Technically, it'd be nice to do this transactionally, however, slick doesn't support SELECT FOR UPDATE
-            // and at this point, it's not really necessary for this update to be transactional. There are rarely going to be
-            // multiple writers touching the same rows, and they're all trying to do the same thing, so it's OK if they
-            // step over each other.
-            val existingDepartments = dbManager.departments
-              .filter(_.schoolId === school.id)
-              .filter(_.schoolSpecificId === freshDepartment.schoolSpecificId)
-              .list
-            require(existingDepartments.length <= 1, {
-              logger.error(s"There are duplicate departments in the db: <${school.toString}> <${freshDepartment.schoolSpecificId}>")
-            })
-            val refreshedDepartmentId = if (existingDepartments.length == 0) {
-              val newDepId = (dbManager.departments returning dbManager.departments.map(_.departmentId)) += freshDepartment
-              newDepId.toInt
-            } else {
-              val existingDepartmentId = existingDepartments(0).departmentId.get
-              dbManager.departments
-                .filter(_.departmentId === existingDepartmentId)
-                .map(d => (d.schoolId, d.schoolSpecificId, d.name))
-                .update(freshDepartment.schoolId, freshDepartment.schoolSpecificId, freshDepartment.name)
-              existingDepartmentId
-            }
 
+            // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
+            // really necessary for this update to be transactional. There are rarely going to be multiple writers
+            // touching the same rows, and they're all trying to do the same thing, so it's OK if they
+            // step over each other.
+
+            dbManager.departments.insertOrUpdate(freshDepartment)
             courses foreach { course: Course =>
-              val existingCourses = dbManager.courses
-                .filter(_.departmentId === refreshedDepartmentId)
-                .filter(_.departmentSpecificCourseId === course.departmentSpecificCourseId)
-                .list
-              require(existingCourses.length <= 1, {
-                logger.error(s"There are duplicate courses in the db: department<$refreshedDepartmentId> <${course.departmentSpecificCourseId}>")
-              })
-              val newCourseData = course.copy(departmentId = Option(refreshedDepartmentId))
-              if (existingCourses.length == 0) {
-                val newCourseId = (dbManager.courses returning dbManager.courses.map(_.courseId)) += newCourseData
-                newCourseId.toInt
-              } else {
-                val existingCourseId = existingCourses(0).courseId.get
-                dbManager.courses
-                  .filter(_.courseId === existingCourseId)
-                  .map(c => (c.schoolId, c.departmentId, c.departmentSpecificCourseId, c.name))
-                  .update(course.schoolId, newCourseData.departmentId.get, newCourseData.departmentSpecificCourseId, newCourseData.name)
-              }
+              dbManager.courses.insertOrUpdate(course)
             }
           }
           Await.result(future, Duration(5, TimeUnit.MINUTES))
@@ -107,5 +74,6 @@ object CourseFetch extends LazyLogging {
 abstract class CourseFetchManager {
   def fetchDepartments: Future[Seq[Department]]
   def fetchCourses(term: String, department: Department): Future[Seq[Course]]
+  def fetchEvents(courses: Seq[Course]): Future[Seq[Section]]
 }
 

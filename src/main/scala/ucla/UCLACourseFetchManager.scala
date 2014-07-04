@@ -1,10 +1,11 @@
 package ucla
 
 import core.{HTTPRequestFactory, CourseFetchManager, HTTPManager}
-import model.{Course, Department, SchoolId}
+import model.{Section, Course, Department, SchoolId}
 import core.NodeSeqUtilities._
 import scala.concurrent.Future
 import scala.xml.{Node, NodeSeq}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 object UCLACourseFetchManager extends CourseFetchManager {
@@ -17,7 +18,7 @@ object UCLACourseFetchManager extends CourseFetchManager {
       departmentNodes map { node: Node =>
         val schoolSpecificId = node.attribute("value").get.text
         val name = node.text
-        Department.create(SchoolId.UCLA, schoolSpecificId, name)
+        Department(SchoolId.UCLA, schoolSpecificId, name)
       }
     }
   }
@@ -28,8 +29,22 @@ object UCLACourseFetchManager extends CourseFetchManager {
       val courseNodes: NodeSeq = (nodeSeq \\ "select").filterByAttribute("id", "ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal") \\ "option"
       courseNodes map { node: Node =>
         val departmentSpecificCourseId :: courseName :: _ = node.text.split(" - ", 2).toList
-        Course.create(SchoolId.UCLA, departmentSpecificCourseId, courseName)
+        val request = UCLARequestFactory(
+          path = "/detselect.aspx",
+          queryParams = Map("termsel" -> term, "subareasel" -> department.schoolSpecificId, "idxcrs" -> node.attribute("value").get.text)
+        )
+        Course(SchoolId.UCLA, department.primaryKey, departmentSpecificCourseId, courseName, HTTPManager.reqFromHTTPRequest(request).url)
       }
     }
+  }
+
+  override def fetchEvents(courses: Seq[Course]): Future[Seq[Section]] = {
+    val sectionFutures: Seq[Future[Section]] = courses map { course: Course =>
+      HTTPManager.get(course.context) { nodeSeq: NodeSeq =>
+        println(nodeSeq)
+        Section(None, "Blah", course.primaryKey, Seq.empty, course.schoolId)
+      }
+    }
+    Future sequence sectionFutures
   }
 }
