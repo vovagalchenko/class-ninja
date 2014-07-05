@@ -2,6 +2,8 @@ package model
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
+import com.typesafe.config.{ConfigObject, ConfigValue, Config}
+import java.util.Map.Entry
 
 class DBManager(dbConfig: DBConfig) {
 
@@ -28,7 +30,23 @@ class DBManager(dbConfig: DBConfig) {
     }
   }
 
-  def withSession(work: Session => Unit) = db withSession work
+  def withSession[T](work: Session => T) = db withSession work
 }
 
+object DBConfig {
+  def apply(config: Config): DBConfig = {
+    val dsn = config.getString("dsn")
+    val username = getOptionalConfString(config, "username")
+    val password = getOptionalConfString(config, "password")
+    DBConfig(dsn, username, password)
+  }
+
+  private def getOptionalConfString(config: Config, key: String): Option[String] = {
+    if (config.hasPath(key)) {
+      Option(config.getString(key))
+    } else {
+      None
+    }
+  }
+}
 case class DBConfig(mySqlEndpoint: String, user: Option[String], password: Option[String])

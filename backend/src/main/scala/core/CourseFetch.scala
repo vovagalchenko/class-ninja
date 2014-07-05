@@ -10,6 +10,8 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import ExecutionContext.Implicits.global
 import com.typesafe.scalalogging.slf4j.LazyLogging
+import com.typesafe.config.ConfigFactory
+import java.io.File
 
 object CourseFetch extends LazyLogging {
   def main(args: Array[String]) = {
@@ -27,17 +29,29 @@ object CourseFetch extends LazyLogging {
   }
 
   private def performCourseFetch(school: SchoolId) = {
+
+    val courseFetchConf = {
+      val file = new File("environment.conf")
+      val confFromFile = ConfigFactory.parseFile(file)
+      if (confFromFile.isEmpty) {
+        ConfigFactory.load("environment").getConfig("course-fetch")
+      } else {
+        confFromFile.getConfig("course-fetch")
+      }
+    }
+    logger.info(s"Going to use conf: $courseFetchConf")
     val fetchManager: CourseFetchManager = school match {
       case SchoolId.UCLA => UCLACourseFetchManager
     }
     logger.info(s"Starting the full course fetch for ${school.toString}")
+    val databaseConf = courseFetchConf.getConfig("database")
+    val dbManager = new DBManager(DBConfig(databaseConf))
     val allWorkFuture: Future[Unit] = fetchManager.fetchDepartments map { departments: Seq[Department] =>
       logger.info(s"Fetched the list of <${departments.length}> departments at ${school.toString}")
       val schoolSpecificIds = departments.map(_.schoolSpecificId)
       require(schoolSpecificIds.distinct.size == schoolSpecificIds.size, {
         logger.error(s"There are duplicate departments in school ${school.toString}")
       })
-      val dbManager = new DBManager(DBConfig("localhost:3306/class_ninja", Some("root"), None))
 
       dbManager withSession { implicit session =>
         val currentTermCode = dbManager.schools.filter(_.schoolId === school.id).first.currentTermCode
