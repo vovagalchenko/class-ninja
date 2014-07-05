@@ -10,15 +10,8 @@ class list_school(HTTP_Response_Builder):
         if schools is not None:
             schoolCollection = []
             for school in schools:
-                schoolJSON = str(school.for_api())
+                schoolJSON = school.for_api()
                 schoolCollection.append(schoolJSON)
-            
-            
-            allSchoolsJSON = ",".join(schoolCollection)
-              
-            #schools = School()
-            #schools.__table__.select()
-            
-            return HTTP_Response('200 OK', {'schools' : allSchoolsJSON})
+            return HTTP_Response('200 OK', {'schools' : schoolCollection})
         else:
             return HTTP_Response('404 Not found', 'Failed to list schools.')
