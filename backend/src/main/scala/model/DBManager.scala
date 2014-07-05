@@ -16,12 +16,14 @@ class DBManager(dbConfig: DBConfig) {
   val schools = TableQuery[Schools]
   val departments = TableQuery[Departments]
   val courses = TableQuery[Courses]
+  val sections = TableQuery[Sections]
   initialize()
 
   private def initialize() = {
     createIfNeeded(schools)
     createIfNeeded(departments)
     createIfNeeded(courses)
+    createIfNeeded(sections)
   }
 
   def createIfNeeded[T <: Table[_]](table: TableQuery[T]) = db withSession { implicit session: Session =>

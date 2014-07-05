@@ -58,22 +58,26 @@ object CourseFetch extends LazyLogging {
       val currentTermCode = dbManager.schools.filter(_.schoolId === school.id).first.currentTermCode
 
       val futures = departments map { freshDepartment: Department =>
-        fetchManager.fetchCourses(currentTermCode, freshDepartment) map { courses: Seq[Course] =>
-          logger.info(s"Fetched the list of <${courses.length}> courses at ${school.toString}'s ${freshDepartment.name}")
+        fetchManager.fetchCourses(currentTermCode, freshDepartment) flatMap { courses: Seq[Course] =>
           val departmentSpecificCourseIds = courses.map(_.departmentSpecificCourseId)
           require(departmentSpecificCourseIds.distinct.size == departmentSpecificCourseIds.size, {
             logger.error(s"There exist duplicate courses in ${school.toString}'s <${freshDepartment.name}> department")
           })
 
+          fetchManager.fetchEvents(courses) map { events: Seq[(Section, Seq[Event])] =>
 
-          // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
-          // really necessary for this update to be transactional. There are rarely going to be multiple writers
-          // touching the same rows, and they're all trying to do the same thing, so it's OK if they
-          // step over each other.
-
-          dbManager.departments.insertOrUpdate(freshDepartment)
-          courses foreach { course: Course =>
-            dbManager.courses.insertOrUpdate(course)
+            // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
+            // really necessary for this update to be transactional. There are rarely going to be multiple writers
+            // touching the same rows, and they're all trying to do the same thing, so it's OK if they
+            // step over each other.
+            dbManager.departments.insertOrUpdate(freshDepartment)
+            courses foreach { course: Course =>
+              dbManager.courses.insertOrUpdate(course)
+            }
+            events foreach { case (section: Section, sectionsEvents: Seq[Event]) =>
+              dbManager.sections.insertOrUpdate(section)
+            }
+            logger.info(s"Done updating <${courses.length}> courses at ${school.toString}'s ${freshDepartment.name}")
           }
         }
       }
@@ -88,6 +92,6 @@ object CourseFetch extends LazyLogging {
 abstract class CourseFetchManager {
   def fetchDepartments: Future[Seq[Department]]
   def fetchCourses(term: String, department: Department): Future[Seq[Course]]
-  def fetchEvents(courses: Seq[Course]): Future[Seq[Section]]
+  def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]]
 }
 
