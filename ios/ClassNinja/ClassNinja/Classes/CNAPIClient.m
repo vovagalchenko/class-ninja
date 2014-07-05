@@ -7,7 +7,6 @@
 //
 
 #import "CNAPIClient.h"
-#import "CNModels.h"
 
 @interface CNAPIClient()
 @end
@@ -32,6 +31,27 @@
     return self;
 }
 
+- (void)listDepartmentForSchool:(CNSchool *)school withCompletionBlock:(void (^)(NSArray *departments))block
+{    
+    NSString *path = [@"school" stringByAppendingPathComponent:school.schoolId];
+    [self GET:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        NSMutableArray *departments = [[NSMutableArray alloc] init];
+
+        for (NSDictionary *departmentDict in [responseObject valueForKey:@"school_departments"]) {
+            CNDepartment *department = [self createDepartmentFromAPIDictionary:departmentDict];
+            department.school = school;
+            [departments addObject:department];
+        }
+        if (block) {
+            block(departments);
+        }
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        if (block) {
+            block(nil);
+        }
+    }];
+}
+
 - (void)listSchoolsWithCompletionBlock:(void (^)(NSArray *schools))block
 {
     [self GET:@"school" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
@@ -51,12 +71,20 @@
     }];
 }
 
+ - (CNDepartment *)createDepartmentFromAPIDictionary:(NSDictionary *)departmentDict
+ {
+     CNDepartment *department = [[CNDepartment alloc] init];
+     department.departmentId = [departmentDict valueForKey:@"department_id"];
+     department.name = [departmentDict valueForKey:@"name"];
+     return department;
+ }
+     
 - (CNSchool *)createSchoolFromAPIDictionary:(NSDictionary *)schoolDict
 {
     CNSchool *school = [[CNSchool alloc] init];
     school.currentTermCode = [schoolDict valueForKey:@"current_term_code"];
     school.currentTermName = [schoolDict valueForKey:@"current_term_name"];
-    school.schoolId = [schoolDict valueForKey:@"school_id"];
+    school.schoolId = [NSString stringWithFormat:@"%lu", (unsigned long)[[schoolDict valueForKey:@"school_id"] unsignedIntegerValue]];
     school.name = [schoolDict valueForKey:@"school_name"];
     return school;
 }

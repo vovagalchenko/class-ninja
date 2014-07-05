@@ -8,10 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "AFNetworking.h"
+#import "CNModels.h"
 
 @interface CNAPIClient : AFHTTPSessionManager
 
 + (instancetype)sharedInstance;
+
 - (void)listSchoolsWithCompletionBlock:(void (^)(NSArray *schools))block;
+- (void)listDepartmentForSchool:(CNSchool *)school withCompletionBlock:(void (^)(NSArray *departments))block;
 
 @end

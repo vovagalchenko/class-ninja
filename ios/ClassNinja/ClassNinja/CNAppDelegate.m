@@ -7,6 +7,7 @@
 //
 
 #import "CNAppDelegate.h"
+#import "CNAPIClient.h"
 
 @implementation CNAppDelegate
 
@@ -16,6 +17,18 @@
     // Override point for customization after application launch.
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    CNAPIClient *client = [CNAPIClient sharedInstance];
+    [client listSchoolsWithCompletionBlock:^(NSArray *schools) {
+        for (CNSchool *school in schools) {
+            [client listDepartmentForSchool:school withCompletionBlock:^(NSArray *departments) {
+                for (CNDepartment *department in departments) {
+                    NSLog(@"%@", department);
+                }
+            }];
+        }
+    }];
+    
     return YES;
 }
 
