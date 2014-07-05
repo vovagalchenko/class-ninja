@@ -1,3 +1,3 @@
-[submodule "ios/Class Ninja/Class Ninja/Libraries/AFNetworking"]
-	path = ios/Class Ninja/Class Ninja/Libraries/AFNetworking
+[submodule "ios/ClassNinja/Libraries/AFNetworking"]
+	path = ios/ClassNinja/Libraries/AFNetworking
 	url = git@github.com:AFNetworking/AFNetworking.git

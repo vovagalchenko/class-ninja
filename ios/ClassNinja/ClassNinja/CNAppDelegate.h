@@ -1,8 +1,8 @@
 //
 //  CNAppDelegate.h
-//  Class Ninja
+//  ClassNinja
 //
-//  Created by Boris Suvorov on 7/4/14.
+//  Created by Boris Suvorov on 7/5/14.
 //  Copyright (c) 2014 Bova. All rights reserved.
 //
 
