@@ -26,7 +26,7 @@ server/environment.conf
 */.idea/scala_compiler.xml
 /classes
 /dist
-/out
+/backend/out
 /SDK/*SDK
 /*.bat
 */.idea/workspace.xml
