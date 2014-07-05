@@ -20,16 +20,6 @@ object CourseFetch extends LazyLogging {
     })
     val school: SchoolId = SchoolId(args(0).toInt)
 
-    try {
-      performCourseFetch(school)
-    } finally {
-      // Need to call shutdown to make sure dispatch is dead and the process can exit
-      HTTPManager.shutdown()
-    }
-  }
-
-  private def performCourseFetch(school: SchoolId) = {
-
     val courseFetchConf = {
       val file = new File("environment.conf")
       val confFromFile = ConfigFactory.parseFile(file)
@@ -40,44 +30,54 @@ object CourseFetch extends LazyLogging {
       }
     }
     logger.info(s"Going to use conf: $courseFetchConf")
+
+    try {
+      val databaseConf = courseFetchConf.getConfig("database")
+      implicit val dbManager = new DBManager(DBConfig(databaseConf))
+      dbManager withSession { implicit session =>
+        performCourseFetch(school)
+      }
+    } finally {
+      // Need to call shutdown to make sure dispatch is dead and the process can exit
+      HTTPManager.shutdown()
+    }
+  }
+
+  private def performCourseFetch(school: SchoolId)(implicit dbManager: DBManager, session: Session) = {
     val fetchManager: CourseFetchManager = school match {
       case SchoolId.UCLA => UCLACourseFetchManager
     }
     logger.info(s"Starting the full course fetch for ${school.toString}")
-    val databaseConf = courseFetchConf.getConfig("database")
-    val dbManager = new DBManager(DBConfig(databaseConf))
-    val allWorkFuture: Future[Unit] = fetchManager.fetchDepartments map { departments: Seq[Department] =>
+    val allWorkFuture: Future[Any] = fetchManager.fetchDepartments flatMap { departments: Seq[Department] =>
       logger.info(s"Fetched the list of <${departments.length}> departments at ${school.toString}")
       val schoolSpecificIds = departments.map(_.schoolSpecificId)
       require(schoolSpecificIds.distinct.size == schoolSpecificIds.size, {
         logger.error(s"There are duplicate departments in school ${school.toString}")
       })
 
-      dbManager withSession { implicit session =>
-        val currentTermCode = dbManager.schools.filter(_.schoolId === school.id).first.currentTermCode
-        departments foreach { freshDepartment: Department =>
-          val future = fetchManager.fetchCourses(currentTermCode, freshDepartment) map { courses: Seq[Course] =>
-            logger.info(s"Fetched the list of <${courses.length}> courses at ${school.toString}'s ${freshDepartment.name}")
-            val departmentSpecificCourseIds = courses.map(_.departmentSpecificCourseId)
-            require(departmentSpecificCourseIds.distinct.size == departmentSpecificCourseIds.size, {
-              logger.error(s"There exist duplicate courses in ${school.toString}'s <${freshDepartment.name}> department")
-            })
+      val currentTermCode = dbManager.schools.filter(_.schoolId === school.id).first.currentTermCode
+
+      val futures = departments map { freshDepartment: Department =>
+        fetchManager.fetchCourses(currentTermCode, freshDepartment) map { courses: Seq[Course] =>
+          logger.info(s"Fetched the list of <${courses.length}> courses at ${school.toString}'s ${freshDepartment.name}")
+          val departmentSpecificCourseIds = courses.map(_.departmentSpecificCourseId)
+          require(departmentSpecificCourseIds.distinct.size == departmentSpecificCourseIds.size, {
+            logger.error(s"There exist duplicate courses in ${school.toString}'s <${freshDepartment.name}> department")
+          })
 
 
-            // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
-            // really necessary for this update to be transactional. There are rarely going to be multiple writers
-            // touching the same rows, and they're all trying to do the same thing, so it's OK if they
-            // step over each other.
+          // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
+          // really necessary for this update to be transactional. There are rarely going to be multiple writers
+          // touching the same rows, and they're all trying to do the same thing, so it's OK if they
+          // step over each other.
 
-            dbManager.departments.insertOrUpdate(freshDepartment)
-            courses foreach { course: Course =>
-              dbManager.courses.insertOrUpdate(course)
-            }
+          dbManager.departments.insertOrUpdate(freshDepartment)
+          courses foreach { course: Course =>
+            dbManager.courses.insertOrUpdate(course)
           }
-          Await.result(future, Duration(5, TimeUnit.MINUTES))
         }
-        Unit
       }
+      Future sequence futures
     }
 
     Await.result(allWorkFuture, Duration(1, TimeUnit.HOURS))
