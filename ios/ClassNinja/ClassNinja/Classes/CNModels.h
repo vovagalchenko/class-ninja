@@ -8,10 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface CNModels : NSObject
-
-@end
-
 @interface CNSchool : NSObject
 
 @property (nonatomic) NSString *schoolId;

@@ -7,7 +7,11 @@
 //
 
 #import "CNModels.h"
+@implementation CNSchool
+@end
 
-@implementation CNModels
+@implementation CNDepartment
+@end
 
+@implementation CNCourse
 @end
