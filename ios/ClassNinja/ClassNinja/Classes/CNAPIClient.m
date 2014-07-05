@@ -7,6 +7,7 @@
 //
 
 #import "CNAPIClient.h"
+#import "CNModels.h"
 
 @interface CNAPIClient()
 @end
@@ -34,10 +35,29 @@
 - (void)listSchoolsWithCompletionBlock:(void (^)(NSArray *schools))block
 {
     [self GET:@"school" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        NSLog(@"JSON: %@", responseObject);        
+        NSMutableArray *schools = [[NSMutableArray alloc] init];
+        for(NSDictionary *schoolDict in [responseObject valueForKey:@"schools"]) {
+            CNSchool *school = [self createSchoolFromAPIDictionary:schoolDict];
+            [schools addObject:school];
+        }
+
+        if (block) {
+            block([schools copy]);
+        }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"Error: %@", error);        
+        if (block) {
+            block(nil);
+        }
     }];
 }
 
+- (CNSchool *)createSchoolFromAPIDictionary:(NSDictionary *)schoolDict
+{
+    CNSchool *school = [[CNSchool alloc] init];
+    school.currentTermCode = [schoolDict valueForKey:@"current_term_code"];
+    school.currentTermName = [schoolDict valueForKey:@"current_term_name"];
+    school.schoolId = [schoolDict valueForKey:@"school_id"];
+    school.name = [schoolDict valueForKey:@"school_name"];
+    return school;
+}
 @end
