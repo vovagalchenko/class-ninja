@@ -31,6 +31,28 @@
     return self;
 }
 
+- (void)listCoursesForDepartment:(CNDepartment *)department withCompletionBlock:(void (^)(NSArray *courses))block
+{
+    NSString *path = [@"department" stringByAppendingPathComponent:department.departmentId];
+    [self GET:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        NSMutableArray *courses = [[NSMutableArray alloc] init];
+        
+        for (NSDictionary *courseDict in [responseObject valueForKey:@"department_courses"]) {
+            CNCourse *course = [self createCourseFromAPIDictionary:courseDict];
+            course.department = department;
+            [courses addObject:course];
+        }
+        
+        if (block) {
+            block(courses);
+        }
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        if (block) {
+            block(nil);
+        }
+    }];
+}
+
 - (void)listDepartmentForSchool:(CNSchool *)school withCompletionBlock:(void (^)(NSArray *departments))block
 {    
     NSString *path = [@"school" stringByAppendingPathComponent:school.schoolId];
@@ -69,6 +91,17 @@
             block(nil);
         }
     }];
+}
+
+- (CNCourse *)createCourseFromAPIDictionary:(NSDictionary *)coursesDict
+{
+    CNCourse *course = [[CNCourse alloc] init];
+    
+    course.courseId = [coursesDict valueForKey:@"course_id"];
+    course.name = [coursesDict valueForKey:@"name"];
+    course.departmentSpecificCourseId = [coursesDict valueForKey:@"department_specific_course_id"];
+
+    return course;
 }
 
  - (CNDepartment *)createDepartmentFromAPIDictionary:(NSDictionary *)departmentDict

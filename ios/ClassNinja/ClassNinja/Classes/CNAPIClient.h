@@ -16,5 +16,6 @@
 
 - (void)listSchoolsWithCompletionBlock:(void (^)(NSArray *schools))block;
 - (void)listDepartmentForSchool:(CNSchool *)school withCompletionBlock:(void (^)(NSArray *departments))block;
+- (void)listCoursesForDepartment:(CNDepartment *)department withCompletionBlock:(void (^)(NSArray *courses))block;
 
 @end

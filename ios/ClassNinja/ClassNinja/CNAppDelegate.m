@@ -23,7 +23,14 @@
         for (CNSchool *school in schools) {
             [client listDepartmentForSchool:school withCompletionBlock:^(NSArray *departments) {
                 for (CNDepartment *department in departments) {
-                    NSLog(@"%@", department);
+                    if ([department.departmentId isEqualToString:@"UCLA_COMPTNG"]) {
+                        [client listCoursesForDepartment:department withCompletionBlock:^(NSArray *courses) {
+                            for (CNCourse *course in courses) {
+                                NSLog(@"%@", course);
+                            }
+                                
+                        }];
+                    }
                 }
             }];
         }
