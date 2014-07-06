@@ -76,6 +76,9 @@ object CourseFetch extends LazyLogging {
             }
             events foreach { case (section: Section, sectionsEvents: Seq[Event]) =>
               dbManager.sections.insertOrUpdate(section)
+              sectionsEvents foreach { event: Event =>
+                dbManager.events.insertOrUpdate(event)
+              }
             }
             logger.info(s"Done updating <${courses.length}> courses at ${school.toString}'s ${freshDepartment.name}")
           }

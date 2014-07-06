@@ -14,6 +14,10 @@ object NodeSeqUtilities {
       })
     }
 
+    def filterByLackOfAttribute(attrName: String): NodeSeq = {
+      nodeSeq.filter(_.attribute(attrName).isEmpty)
+    }
+
     def filterByAttribute(attrName: String, filter: (String => Boolean)): NodeSeq = {
       nodeSeq filter { node: Node =>
         node.attribute(attrName) match {

@@ -2,8 +2,7 @@ package model
 
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
-import com.typesafe.config.{ConfigObject, ConfigValue, Config}
-import java.util.Map.Entry
+import com.typesafe.config.Config
 
 class DBManager(dbConfig: DBConfig) {
 
@@ -17,6 +16,7 @@ class DBManager(dbConfig: DBConfig) {
   val departments = TableQuery[Departments]
   val courses = TableQuery[Courses]
   val sections = TableQuery[Sections]
+  val events = TableQuery[Events]
   initialize()
 
   private def initialize() = {
@@ -24,6 +24,7 @@ class DBManager(dbConfig: DBConfig) {
     createIfNeeded(departments)
     createIfNeeded(courses)
     createIfNeeded(sections)
+    createIfNeeded(events)
   }
 
   def createIfNeeded[T <: Table[_]](table: TableQuery[T]) = db withSession { implicit session: Session =>
