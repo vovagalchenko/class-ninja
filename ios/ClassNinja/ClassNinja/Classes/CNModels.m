@@ -30,3 +30,21 @@
 }
 
 @end
+
+@implementation CNSection
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Section %@, id = %@, staff name = %@, course id = %@\n\nlist of events = %@", self.name, self.sectionid, self.staffName, self.courseId, self.events];
+}
+
+@end
+
+@implementation CNEvent
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Event id %@, type = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.eventType, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
+}
+@end
+
+
+

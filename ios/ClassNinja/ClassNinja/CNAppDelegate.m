@@ -26,7 +26,11 @@
                     if ([department.departmentId isEqualToString:@"UCLA_COMPTNG"]) {
                         [client listCoursesForDepartment:department withCompletionBlock:^(NSArray *courses) {
                             for (CNCourse *course in courses) {
-                                NSLog(@"%@", course);
+                                if ([course.courseId isEqualToString:@"UCLA_COMPTNG_COMPTNG_10B"]) {
+                                    [client listSectionsInfoForCourse:course withCompletionBlock:^(NSArray *sectionInfo) {
+                                        NSLog(@"%@", sectionInfo);
+                                    }];
+                                }
                             }
                                 
                         }];

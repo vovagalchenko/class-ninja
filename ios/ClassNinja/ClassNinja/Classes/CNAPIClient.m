@@ -31,6 +31,29 @@
     return self;
 }
 
+- (void)listSectionsInfoForCourse:(CNCourse *)course  withCompletionBlock:(void (^)(NSArray *sectionInfo))block
+{
+    NSString *path = [@"course" stringByAppendingPathComponent:course.courseId];
+    [self GET:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        NSMutableArray *sections = [[NSMutableArray alloc] init];
+        
+        for (NSDictionary *sectionDict in [responseObject valueForKey:@"course_sections"]) {
+            CNSection *section = [self createSectionFromAPIDictionary:sectionDict];
+            [sections addObject:section];
+        }
+        
+        if (block) {
+            block(sections);
+        }
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        if (block) {
+            block(nil);
+        }
+    }];
+
+    
+}
+
 - (void)listCoursesForDepartment:(CNDepartment *)department withCompletionBlock:(void (^)(NSArray *courses))block
 {
     NSString *path = [@"department" stringByAppendingPathComponent:department.departmentId];
@@ -91,6 +114,43 @@
             block(nil);
         }
     }];
+}
+
+
+- (CNEvent *)createEventFromAPIDictionary:(NSDictionary *)eventDict
+{
+    CNEvent *event = [[CNEvent alloc] init];
+    event.sectionId = [eventDict valueForKey:@"section_id"];
+    event.eventId = [eventDict valueForKey:@"event_id"];
+    event.status = [eventDict valueForKey:@"status"];
+    event.eventType = [eventDict valueForKey:@"event_type"];
+    event.schoolSpecificEventId = [eventDict valueForKey:@"school_specific_event_id"];
+    event.timesAndLocations = [eventDict valueForKey:@"times_and_locations"];
+    event.enrollmentCap = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"enrollment_cap"] unsignedIntegerValue]];
+    event.numberWaitlisted = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"number_waitlisted"] unsignedIntegerValue]];
+    event.numberEnrolled = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"number_enrolled"] unsignedIntegerValue]];
+    event.waitlistCapacity = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"waitlist_capacity"] unsignedIntegerValue]];
+    return event;
+}
+
+
+- (CNSection *)createSectionFromAPIDictionary:(NSDictionary *)sectionDict
+{
+    CNSection *section = [[CNSection alloc] init];
+    section.courseId = [sectionDict valueForKey:@"course_id"];
+    section.sectionid = [sectionDict valueForKey:@"section_id"];
+
+    section.staffName = [sectionDict valueForKey:@"staff_name"];
+    section.name = [sectionDict valueForKey:@"section_name"];
+    NSMutableArray *events = [[NSMutableArray alloc] init];
+    for (NSDictionary *eventDict in [sectionDict valueForKey:@"events"]) {
+        CNEvent *event = [self createEventFromAPIDictionary:eventDict];
+        [events addObject:event];
+    }
+
+    section.events = [events copy];
+    
+    return section;
 }
 
 - (CNCourse *)createCourseFromAPIDictionary:(NSDictionary *)coursesDict
