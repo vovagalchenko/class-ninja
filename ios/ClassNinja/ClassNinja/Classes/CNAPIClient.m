@@ -62,7 +62,6 @@
         
         for (NSDictionary *courseDict in [responseObject valueForKey:@"department_courses"]) {
             CNCourse *course = [self createCourseFromAPIDictionary:courseDict];
-            course.department = department;
             [courses addObject:course];
         }
         
@@ -84,7 +83,6 @@
 
         for (NSDictionary *departmentDict in [responseObject valueForKey:@"school_departments"]) {
             CNDepartment *department = [self createDepartmentFromAPIDictionary:departmentDict];
-            department.school = school;
             [departments addObject:department];
         }
         if (block) {

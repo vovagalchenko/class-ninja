@@ -19,7 +19,7 @@
 
 @interface CNDepartment : NSObject
 
-@property (nonatomic) CNSchool *school;
+@property (nonatomic) NSString *schoolId;
 
 @property (nonatomic) NSString *departmentId;
 @property (nonatomic) NSString *name;
@@ -28,7 +28,7 @@
 
 @interface CNCourse : NSObject
 
-@property (nonatomic) CNDepartment *department;
+@property (nonatomic) NSString *departmentId;
 @property (nonatomic) NSString *departmentSpecificCourseId;
 @property (nonatomic) NSString *courseId;
 @property (nonatomic) NSString *name;
@@ -50,7 +50,6 @@
 
 // Q: Why there is no pointer to CNSection?
 // A: Because CNSection contains array of CNEvents. That would cause reference loop.
-// FIXME: removes strong references from objects above. use NSString *<>Id instead;
 
 @property (nonatomic) NSString *sectionId;
 @property (nonatomic) NSString *eventId;

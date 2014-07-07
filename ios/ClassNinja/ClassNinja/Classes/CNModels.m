@@ -18,7 +18,7 @@
 @implementation CNDepartment
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Department %@, id = %@, school name = %@", self.name, self.departmentId, self.school.name];
+    return [NSString stringWithFormat:@"Department %@, id = %@, school id = %@", self.name, self.departmentId, self.schoolId];
 }
 
 @end
@@ -26,7 +26,7 @@
 @implementation CNCourse
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Course %@, id = %@,  dept spec course id = %@, dept name = %@, ", self.name, self.courseId, self.departmentSpecificCourseId, self.department.name];
+    return [NSString stringWithFormat:@"Course %@, id = %@,  dept spec course id = %@, deptId = %@, ", self.name, self.courseId, self.departmentSpecificCourseId, self.departmentId];
 }
 
 @end
@@ -42,7 +42,7 @@
 @implementation CNEvent
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Event id %@, type = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.eventType, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
+    return [NSString stringWithFormat:@"Event id %@, type = %@, times / location = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.eventType, self.timesAndLocations, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
 }
 @end
 
