@@ -43,7 +43,7 @@
         }
         
         if (block) {
-            block(sections);
+            block([sections copy]);
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (block) {
@@ -66,7 +66,7 @@
         }
         
         if (block) {
-            block(courses);
+            block([courses copy]);
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (block) {
@@ -86,7 +86,7 @@
             [departments addObject:department];
         }
         if (block) {
-            block(departments);
+            block([departments copy]);
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (block) {
