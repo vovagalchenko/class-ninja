@@ -36,6 +36,7 @@ class create_user(HTTP_Response_Builder):
             else:
                 print >> error_log, user
                 user.confirmation_token = self.generate_confirmation_token()
+                user.confirmation_deadline = current_ts + timedelta(minutes = 5)
                 user.last_request_ts = current_ts
                 # is it really add???
                 db_session.add(user)

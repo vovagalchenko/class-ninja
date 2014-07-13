@@ -13,6 +13,9 @@ xcuserdata
 *.class
 *.log
 
+# python compiled files
+*.pyc
+
 # sbt specific
 .cache/
 .history/
