@@ -39,6 +39,41 @@
             }];
         }
     }];
+
+//    NSString *confirmationCode=@"865595";
+//    [client exchangeConfirmationCodeInAuthCode:confirmationCode forPhoneNumber:@"4089126890" completionBlock:^(NSString *authToken) {
+//        NSLog(@"authToken = %@", authToken);
+//    }];
+
+    
+//    NSString *phonenumber = @"TEST_PHONE_#";
+//    [client requestPhoneNumberVerification:phonenumber withVendorId:nil completionBlock:^(BOOL success) {
+//        if (success) {
+//            NSLog(@"Succeeded!");
+//        } else {
+//            NSLog(@"Failure");
+//        }
+//    }];
+//    [client listSchoolsWithCompletionBlock:^(NSArray *schools) {
+//        for (CNSchool *school in schools) {
+//            [client listDepartmentForSchool:school withCompletionBlock:^(NSArray *departments) {
+//                for (CNDepartment *department in departments) {
+//                    if ([department.departmentId isEqualToString:@"UCLA_COMPTNG"]) {
+//                        [client listCoursesForDepartment:department withCompletionBlock:^(NSArray *courses) {
+//                            for (CNCourse *course in courses) {
+//                                if ([course.courseId isEqualToString:@"UCLA_COMPTNG_COMPTNG_10B"]) {
+//                                    [client listSectionsInfoForCourse:course withCompletionBlock:^(NSArray *sectionInfo) {
+//                                        NSLog(@"%@", sectionInfo);
+//                                    }];
+//                                }
+//                            }
+//                                
+//                        }];
+//                    }
+//                }
+//            }];
+//        }
+//    }];
     
     return YES;
 }

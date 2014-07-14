@@ -28,7 +28,69 @@
 {
     NSURL *baseURL = [NSURL URLWithString:@"http://boris.class-ninja.com/api"];
     self = [super initWithBaseURL:baseURL sessionConfiguration:nil];;
+    [self setRequestSerializer:[[AFJSONRequestSerializer alloc] init]];
+    
     return self;
+}
+
+- (void)requestPhoneNumberVerification:(NSString *)phoneNumber withVendorId:(NSString *)deviceVendorId completionBlock:(void (^)(BOOL success))block
+{
+    // phone number must be set for us to attempt registration
+    if (phoneNumber == nil) {
+        if (block) {
+            block(NO);
+        }
+    }
+
+    NSString *path = @"user";
+    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:phoneNumber,@"phone", nil];
+    // user might or might not set device ID to notify him of push notificaitons.
+    if (deviceVendorId) {
+        [parameters setObject:deviceVendorId forKey:@"device_vendor_id"];
+    }
+
+    [self POST:path
+    parameters:parameters
+       success:^(NSURLSessionDataTask *task, id responseObject) {
+           NSLog(@"Received request and will send SMS");
+           if (block) {
+               block(YES);
+           }
+       }
+       failure:^(NSURLSessionDataTask *task, NSError *error) {
+           NSLog(@"Failed to process request with error %@", error);
+           if (block) {
+               block(NO);
+           }
+       }];
+}
+
+- (void)exchangeConfirmationCodeInAuthCode:(NSString *)confirmationToken forPhoneNumber:(NSString *)phoneNumber completionBlock:(void (^)(NSString *accessToken))block
+{
+    // phone number must be set for us to attempt registration
+    if (phoneNumber == nil || confirmationToken == nil) {
+        if (block) {
+            block(nil);
+        }
+    }
+    
+    NSString *path = [@"user" stringByAppendingPathComponent:phoneNumber];
+    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:confirmationToken,@"confirmation_token", nil];
+
+    [self POST:path parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
+        NSString *accessToken = [responseObject valueForKey:@"access_token"];
+        NSLog(@"We're given authorization token %@", accessToken);
+        if (block) {
+            block(accessToken);
+        }
+
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"Failed with error %@", error);
+        if (block) {
+            block(nil);
+        }
+
+    }];
 }
 
 - (void)listSectionsInfoForCourse:(CNCourse *)course  withCompletionBlock:(void (^)(NSArray *sectionInfo))block

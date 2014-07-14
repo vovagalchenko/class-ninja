@@ -19,4 +19,7 @@
 - (void)listCoursesForDepartment:(CNDepartment *)department withCompletionBlock:(void (^)(NSArray *courses))block;
 - (void)listSectionsInfoForCourse:(CNCourse *)course  withCompletionBlock:(void (^)(NSArray *sectionInfo))block;
 
+- (void)requestPhoneNumberVerification:(NSString *)phoneNumber withVendorId:(NSString *)deviceVendorId completionBlock:(void (^)(BOOL success))block;
+- (void)exchangeConfirmationCodeInAuthCode:(NSString *)confirmationToken forPhoneNumber:(NSString *)phoneNumber completionBlock:(void (^)(NSString *accessToken))block;
+
 @end
