@@ -7,6 +7,16 @@
         </encoder>
     </appender>
 
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>warn</level>
+        </filter>
+        <encoder>
+            <pattern>%date{HH:mm:ss} %-5level[%-11.11thread] %logger{1} %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily -->
@@ -39,4 +49,12 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ROLLING"/>
     </logger>
+    <logger name="notifications" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROLLING"/>
+    </logger>
+    <root level="WARN">
+        <appender-ref ref="STDERR"/>
+    </root>
+
 </configuration>

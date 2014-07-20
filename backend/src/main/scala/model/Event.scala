@@ -73,7 +73,7 @@ class Events(tag: Tag) extends Table[Event](tag, "events") {
   def schoolId = column[Int]("school_id")
 
   def school = foreignKey("evt_school_fk", schoolId, TableQuery[Schools])(_.schoolId)
-  def course = foreignKey("evt_section_fk", sectionId, TableQuery[Sections])(_.sectionId)
+  def section = foreignKey("evt_section_fk", sectionId, TableQuery[Sections])(_.sectionId)
 
   def * = (
     eventId,

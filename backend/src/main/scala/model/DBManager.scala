@@ -19,6 +19,8 @@ class DBManager(dbConfig: DBConfig) extends LazyLogging {
   val courses = TableQuery[Courses]
   val sections = TableQuery[Sections]
   val events = TableQuery[Events]
+  val users = TableQuery[Users]
+  val targets = TableQuery[Targets]
   initialize()
 
   private def initialize() = {
@@ -27,6 +29,8 @@ class DBManager(dbConfig: DBConfig) extends LazyLogging {
     createIfNeeded(courses)
     createIfNeeded(sections)
     createIfNeeded(events)
+    createIfNeeded(users)
+    createIfNeeded(targets)
   }
 
   def createIfNeeded[T <: Table[_]](table: TableQuery[T]) = db withSession { implicit session: Session =>

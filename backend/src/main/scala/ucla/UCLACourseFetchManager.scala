@@ -3,7 +3,7 @@ package ucla
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import course_refresh.NodeSeqUtilities._
 import course_refresh.StringUtilities._
-import course_refresh.{CourseFetchManager, HTTPManager, HTTPRequestFactory}
+import course_refresh.{SchoolManager, HTTPManager, HTTPRequestFactory}
 import model._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -11,7 +11,7 @@ import scala.concurrent.Future
 import scala.xml.{Node, NodeSeq}
 
 
-object UCLACourseFetchManager extends CourseFetchManager with LazyLogging {
+object UCLACourseFetchManager extends SchoolManager with LazyLogging {
   private val UCLARequestFactory: HTTPRequestFactory = new HTTPRequestFactory("http://www.registrar.ucla.edu/schedule")
 
   override def fetchDepartments: Future[Seq[Department]] = {
@@ -146,4 +146,7 @@ object UCLACourseFetchManager extends CourseFetchManager with LazyLogging {
       ""
     }
   }
+
+  override def shouldAlert(oldEvent: Event, newEvent: Event): Boolean = (newEvent.status == "Open" && oldEvent.status != "Open") ||
+                                                                        (newEvent.status == "W-List" && oldEvent.status != "Open" && oldEvent.status != "W-List")
 }

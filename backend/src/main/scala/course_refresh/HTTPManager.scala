@@ -55,7 +55,7 @@ object HTTPManager extends LazyLogging {
   }
 
   def shutdown() = {
-    logger.info("Shutting down the HTTP executor.")
+    logger.info("Shutting down the HTTP executor")
     httpExecutor.shutdown()
     Http.shutdown()
   }

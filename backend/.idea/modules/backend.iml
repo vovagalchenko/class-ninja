@@ -45,6 +45,8 @@
     <orderEntry type="library" name="SBT: com.h2database:h2:1.4.180" level="project" />
     <orderEntry type="library" name="SBT: com.typesafe:config:1.2.1" level="project" />
     <orderEntry type="library" name="SBT: com.typesafe.slick:slick_2.10:2.1.0-RC1" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-pickling_2.10:0.9.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="SBT: org.scalamacros:quasiquotes_2.10:2.0.0-M8" level="project" />
   </component>
 </module>
 

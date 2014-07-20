@@ -6,13 +6,13 @@ import com.typesafe.scalalogging.slf4j.LazyLogging
 import conf.{DBConfig, Environment}
 import model.SchoolId.SchoolId
 import model._
+import notifications.{MessageExchange, NotificationQueue}
 import ucla.UCLACourseFetchManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.slick.driver.MySQLDriver.simple._
-
 
 object CourseFetch extends LazyLogging {
   def main(args: Array[String]) = {
@@ -31,11 +31,14 @@ object CourseFetch extends LazyLogging {
     val courseFetchConf = Environment("course-fetch")
     logger.info(s"Going to use conf: $courseFetchConf")
 
+    val startTime = System.currentTimeMillis
     try {
       val databaseConf = courseFetchConf.getConfig("database")
       implicit val dbManager = new DBManager(DBConfig(databaseConf))
       dbManager withSession { implicit session =>
-        performCourseFetch(school, shouldRefreshOfferedCourses, shouldRefreshAllEvents)
+        NotificationQueue withMessageExchange { implicit messageExchange =>
+          performCourseFetch(school, shouldRefreshOfferedCourses, shouldRefreshAllEvents)
+        }
       }
       logger.info(s"Finished course fetch for $school refreshing <${args(1)}>")
     } catch {
@@ -45,23 +48,42 @@ object CourseFetch extends LazyLogging {
     } finally {
       // Need to call shutdown to make sure dispatch is dead and the process can exit
       HTTPManager.shutdown()
+      val endTime = System.currentTimeMillis
+      val duration = Duration(endTime - startTime, TimeUnit.MILLISECONDS)
+      logger.info(s"Execution took ${duration.toMinutes} m ${duration.toSeconds - Duration(duration.toMinutes, TimeUnit.MINUTES).toSeconds} s")
       System.exit(1)
     }
   }
 
   private def performCourseFetch(school: SchoolId, refreshOfferedCourses: Boolean, refreshAllEvents: Boolean)
-                                (implicit dbManager: DBManager, session: Session) = {
-    val fetchManager: CourseFetchManager = school match {
+                                (implicit dbManager: DBManager, session: Session, messageExchange: MessageExchange) = {
+    val schoolManager: SchoolManager = school match {
       case SchoolId.UCLA => UCLACourseFetchManager
     }
 
     val departmentAndCourseFetchManager = if (refreshOfferedCourses) {
-      Some(fetchManager)
+      Some(schoolManager)
     } else {
       None
     }
     val allWorkFuture = withDepartmentsAndCourses(departmentAndCourseFetchManager, school) { case (department: Department, courses: Seq[Course]) =>
-      fetchManager.fetchEvents(courses) map { events: Seq[(Section, Seq[Event])] =>
+
+      val sectionIds: Seq[String] = dbManager.sections
+        .filter(_.courseId inSet courses.map(_.primaryKey))
+        .map(_.sectionId)
+        .list
+      val eventIds: Seq[String] = dbManager.events
+        .filter(_.sectionId inSet sectionIds)
+        .map(_.eventId)
+        .list
+      val targetEventQuery = for {
+        t <- dbManager.targets.filter(_.eventId inSet eventIds)
+        e <- dbManager.events if t.eventId === e.eventId
+      } yield (t, e)
+      val targetEvents: Seq[(Target, Event)] = targetEventQuery.list
+      val targetEventTuplesByEventId: Map[String, Seq[(Target, Event)]] = targetEvents.groupBy(_._2.primaryKey)
+
+      schoolManager.fetchEvents(courses) map { events: Seq[(Section, Seq[Event])] =>
         // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
         // really necessary for this update to be transactional. There are rarely going to be multiple writers
         // touching the same rows, and they're all trying to do the same thing, so it's OK if they
@@ -76,6 +98,14 @@ object CourseFetch extends LazyLogging {
           dbManager.sections.insertOrUpdate(section)
           sectionsEvents foreach { event: Event =>
             dbManager.events.insertOrUpdate(event)
+            targetEventTuplesByEventId.get(event.primaryKey) map { targetEventTuples: Seq[(Target, Event)] =>
+              targetEventTuples foreach { case (target: Target, oldEvent: Event) =>
+                if (schoolManager.shouldAlert(oldEvent, event)) {
+                  logger.info(s"Queuing notifications about $target")
+                  messageExchange.sendNotification(target, event)
+                }
+              }
+            }
           }
         }
         logger.info(s"Done updating <${courses.length}> courses at ${school.toString}'s ${department.name}")
@@ -84,7 +114,7 @@ object CourseFetch extends LazyLogging {
     Await.result(allWorkFuture, Duration(1, TimeUnit.HOURS))
   }
 
-  private def withDepartmentsAndCourses[T](courseFetchManager: Option[CourseFetchManager], school: SchoolId)
+  private def withDepartmentsAndCourses[T](courseFetchManager: Option[SchoolManager], school: SchoolId)
                                           (work: (Department, Seq[Course]) => Future[T])
                                           (implicit dbManager: DBManager, session: Session): Future[Seq[T]] = {
     courseFetchManager match {
@@ -123,9 +153,10 @@ object CourseFetch extends LazyLogging {
   }
 }
 
-abstract class CourseFetchManager {
+abstract class SchoolManager {
   def fetchDepartments: Future[Seq[Department]]
   def fetchCourses(term: String, department: Department): Future[Seq[Course]]
   def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]]
-}
 
+  def shouldAlert(oldEvent: Event, newEvent: Event): Boolean
+}
