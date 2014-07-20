@@ -1,13 +1,27 @@
-package core
+package course_refresh
 
+import java.net.URLEncoder
+
+import com.ning.http.client.AsyncHttpClientConfig.Builder
+import com.typesafe.scalalogging.slf4j.LazyLogging
 import dispatch.Defaults._
 import dispatch.as.tagsoup.{NodeSeq => DNodeSeq}
 import dispatch.{Http, Req, url}
-import java.net.URLEncoder
+
 import scala.concurrent.Future
 import scala.xml.NodeSeq
 
-object HTTPManager {
+object HTTPManager extends LazyLogging {
+
+  val httpExecutor: Http = Http configure { builder: Builder =>
+    val timeoutInMs = 360000
+    builder
+      .setConnectionTimeoutInMs(timeoutInMs)
+      .setRequestTimeoutInMs(timeoutInMs)
+      .setIdleConnectionInPoolTimeoutInMs(timeoutInMs)
+      .setIdleConnectionTimeoutInMs(timeoutInMs)
+      .setWebSocketIdleTimeoutInMs(timeoutInMs)
+  }
 
   def execute[T](request: HTTPRequest)(onSuccess: NodeSeq => T): Future[T] = {
     this.execute(reqFromHTTPRequest(request))(onSuccess)
@@ -18,14 +32,10 @@ object HTTPManager {
   }
 
   private def execute[T](req: Req)(onSuccess: NodeSeq => T): Future[T] = {
-    // Creating a new HTTP client every time. Here's where we will pick a random proxy to go through
-    val futureResult: Future[NodeSeq] = Http(req.OK(DNodeSeq(_)))
-    futureResult.transform({ nodeSeq: NodeSeq =>
-      val result: T = onSuccess(nodeSeq)
-      result
-    }, { t: Throwable =>
-      t
-    })
+    val futureResult: Future[NodeSeq] = httpExecutor(req.OK(DNodeSeq(_)))
+    futureResult map { nodeSeq: NodeSeq =>
+      onSuccess(nodeSeq)
+    }
   }
 
   def reqFromHTTPRequest(request: HTTPRequest): Req = {
@@ -44,7 +54,11 @@ object HTTPManager {
     url(fullURLString)
   }
 
-  def shutdown() = Http.shutdown()
+  def shutdown() = {
+    logger.info("Shutting down the HTTP executor.")
+    httpExecutor.shutdown()
+    Http.shutdown()
+  }
 }
 
 class HTTPRequestFactory(root: String) {

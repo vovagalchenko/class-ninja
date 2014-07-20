@@ -1,9 +1,10 @@
 package model
 
+import course_refresh.StringUtilities._
 import model.SchoolId._
-import core.StringUtilities._
+
 import scala.slick.driver.MySQLDriver.simple._
-import scala.util.parsing.json.{JSONObject, JSONArray, JSON}
+import scala.util.parsing.json.{JSON, JSONArray, JSONObject}
 
 case class Event(
                   schoolSpecificEventId: Option[String],

@@ -1,4 +1,4 @@
-package core
+package course_refresh
 
 import scala.xml.{Node, NodeSeq}
 

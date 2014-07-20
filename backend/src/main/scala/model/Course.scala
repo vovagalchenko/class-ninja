@@ -1,7 +1,8 @@
 package model
 
+import course_refresh.StringUtilities._
 import model.SchoolId.SchoolId
-import core.StringUtilities._
+
 import scala.slick.driver.MySQLDriver.simple._
 
 case class Course(

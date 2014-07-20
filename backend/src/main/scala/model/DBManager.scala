@@ -1,10 +1,12 @@
 package model
 
+import com.typesafe.scalalogging.slf4j.LazyLogging
+import conf.DBConfig
+
 import scala.slick.driver.MySQLDriver.simple._
 import scala.slick.jdbc.meta.MTable
-import com.typesafe.config.Config
 
-class DBManager(dbConfig: DBConfig) {
+class DBManager(dbConfig: DBConfig) extends LazyLogging {
 
   private val db = Database.forURL(
     s"jdbc:mysql://${dbConfig.mySqlEndpoint}",
@@ -29,6 +31,7 @@ class DBManager(dbConfig: DBConfig) {
 
   def createIfNeeded[T <: Table[_]](table: TableQuery[T]) = db withSession { implicit session: Session =>
     if (MTable.getTables(table.baseTableRow.tableName).list.isEmpty) {
+      logger.info(s"Creating table ${table.baseTableRow.tableName}")
       table.ddl.create
     }
   }
@@ -36,20 +39,4 @@ class DBManager(dbConfig: DBConfig) {
   def withSession[T](work: Session => T) = db withSession work
 }
 
-object DBConfig {
-  def apply(config: Config): DBConfig = {
-    val dsn = config.getString("dsn")
-    val username = getOptionalConfString(config, "username")
-    val password = getOptionalConfString(config, "password")
-    DBConfig(dsn, username, password)
-  }
 
-  private def getOptionalConfString(config: Config, key: String): Option[String] = {
-    if (config.hasPath(key)) {
-      Option(config.getString(key))
-    } else {
-      None
-    }
-  }
-}
-case class DBConfig(mySqlEndpoint: String, user: Option[String], password: Option[String])

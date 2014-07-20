@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: core.CourseFetch
 Class-Path: .
+Main-Class: course_refresh.CourseFetch
 

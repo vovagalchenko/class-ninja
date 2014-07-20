@@ -1,7 +1,8 @@
 package model
 
-import scala.slick.driver.MySQLDriver.simple._
 import model.SchoolId.SchoolId
+
+import scala.slick.driver.MySQLDriver.simple._
 
 object School {
   def create(schoolId: SchoolId, schoolName: String, currentTermCode: String, currentTermName: String) = {

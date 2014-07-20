@@ -1,4 +1,4 @@
-package core
+package course_refresh
 
 object StringUtilities {
   implicit class StringWithSafeId(string: String) {

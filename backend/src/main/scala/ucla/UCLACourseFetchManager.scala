@@ -1,16 +1,14 @@
 package ucla
 
-import core.{HTTPRequestFactory, CourseFetchManager, HTTPManager}
+import com.typesafe.scalalogging.slf4j.LazyLogging
+import course_refresh.NodeSeqUtilities._
+import course_refresh.StringUtilities._
+import course_refresh.{CourseFetchManager, HTTPManager, HTTPRequestFactory}
 import model._
-import core.NodeSeqUtilities._
-import core.StringUtilities._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.xml.{Node, NodeSeq}
-import scala.concurrent.ExecutionContext.Implicits.global
-import model.Course
-import model.Department
-import model.Section
-import com.typesafe.scalalogging.slf4j.LazyLogging
 
 
 object UCLACourseFetchManager extends CourseFetchManager with LazyLogging {
@@ -129,17 +127,23 @@ object UCLACourseFetchManager extends CourseFetchManager with LazyLogging {
         }
       }
     }
-    (Future sequence sectionFutures).map(_.flatten)
+    Future.sequence(sectionFutures).map(_.flatten)
   }
 
   private def getFirstTextInsideFirstNodeOfClass(nodeSeq: NodeSeq, classString: String): String = {
-    val strings = nodeSeq.filterByLiteralAttribute("class", classString)(0) flatMap {node: Node =>
-      val content = node.text
-      if (content != "")
-        Some(content.trim)
-      else
-        None
+    try {
+      val strings = nodeSeq.filterByLiteralAttribute("class", classString)(0) flatMap { node: Node =>
+        val content = node.text
+        if (content != "")
+          Some(content.trim)
+        else
+          None
+      }
+      strings(0)
+    } catch {
+      case t: Throwable =>
+        logger.error(s"Unable to get the text node inside the first node of class <$classString>. Here's the node:\n$nodeSeq", t)
+      ""
     }
-    strings(0)
   }
 }

@@ -3,14 +3,40 @@
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
-            <pattern>%date{MM/dd HH:mm:ss} %-5level[%.15thread] %logger{1} %msg%n</pattern>
+            <pattern>%date{HH:mm:ss} %-5level[%-11.11thread] %logger{1} %msg%n</pattern>
         </encoder>
+    </appender>
+
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>${log_root}/%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- rollover whenever the file size reaches 100MB (should never happen) -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{HH:mm:ss} %-5level[%-11.11thread] %logger{1} &lt;%method&gt; %msg%n</pattern>
+        </encoder>
+        <prudent>true</prudent>
     </appender>
 
     <logger name="scala.slick.jdbc" level="WARN">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROLLING"/>
     </logger>
-    <logger name="core.CourseFetch" level="INFO">
+    <logger name="course_refresh" level="INFO">
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROLLING"/>
+    </logger>
+    <logger name="model" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROLLING"/>
+    </logger>
+    <logger name="ucla" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROLLING"/>
     </logger>
 </configuration>
