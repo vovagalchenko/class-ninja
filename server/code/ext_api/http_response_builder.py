@@ -12,7 +12,7 @@ class HTTP_Response_Builder(object):
     warnings = []
     resource_id = None
     request_headers = {}
-
+    user = None
     def __init__(self, env, resource_id):
         query_string = env.get('QUERY_STRING', '')
         body_stream = env.get('wsgi.input', None)
@@ -52,6 +52,16 @@ class HTTP_Response_Builder(object):
             param_value = param_definition.get_value(passed_in_param_dict.get(param_definition.name, None))
             passed_in_param_dict.pop(param_definition.name, None)
             setattr(self, param_name, param_value)
+
+        accessToken = passed_in_param_dict.get("access_token", None)
+        if accessToken is not None:
+            db_session = DB_Session_Factory.get_db_session() 
+            results = db_session.query(User).filter(User.access_token == accessToken).all()
+            if len(results) > 1:
+                raise API_Exception("500 Internal server error", "Access token is being used more than once")
+            elif len(results) == 1:
+                user = results[0]
+
         if any(passed_in_param_dict):
             self.warnings.append({"unused_arguments" : passed_in_param_dict})
 

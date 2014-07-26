@@ -3,6 +3,7 @@ from ext_api.exceptions import API_Exception
 from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
 from ext_api.parameter import Parameter, String_Parameter_Type
 from model.user_model import User
+from model.user_profile import UserProfile
 
 from datetime import datetime, timedelta
 import re
@@ -31,7 +32,6 @@ class update_user(HTTP_Response_Builder):
             raise API_Exception("404 Not Found", "Entry does not exist in DB")
             return
         
-        print >> error_log, user
         current_ts = datetime.now()
         
         if (current_ts > user.confirmation_deadline):
@@ -42,11 +42,24 @@ class update_user(HTTP_Response_Builder):
         if (user.confirmation_token != self.confirmation_token):
             raise API_Exception("401 Unauthorized", "Wrong confirmation token")
             return
-
+        
         # if all of above checks passed we have a valid phone number, confirmation token and confirmation done within
         # appropriate confirmation deadline. Go ahead, generate authorization token and give it back to user
         user.last_request_ts = current_ts
-        user.access_token = self.generate_access_token()
+
+        # if user registers phone for the first time, generate token
+        # and create credits
+        if user.access_token is None:
+            user.access_token = self.generate_access_token()
+ 
+            userProfile = UserProfile()
+            userProfile.phonenumber =  user.phonenumber
+            # brand new user get 2 free credits
+            userProfile.credits = 2
+            userProfile.email = None
+
+            db_session.add(userProfile)
+        
         db_session.commit()
  
         return HTTP_Response('200 OK', {'access_token' : user.access_token})
@@ -60,3 +73,4 @@ class update_user(HTTP_Response_Builder):
                 return access_token 
             access_token = uuid.uuid4()
      
+ 
