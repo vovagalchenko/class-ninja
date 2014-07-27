@@ -66,49 +66,88 @@ object CourseFetch extends LazyLogging {
     } else {
       None
     }
-    val allWorkFuture = withDepartmentsAndCourses(departmentAndCourseFetchManager, school) { case (department: Department, courses: Seq[Course]) =>
+    val allWorkFuture = if (refreshAllEvents) {
+      withDepartmentsAndCourses(departmentAndCourseFetchManager, school) {
+        case (department: Department, courses: Seq[Course]) =>
+          val sectionIds: Seq[String] = dbManager.sections
+            .filter(_.courseId inSet courses.map(_.primaryKey))
+            .map(_.sectionId)
+            .list
+          val eventIds: Seq[String] = dbManager.events
+            .filter(_.sectionId inSet sectionIds)
+            .map(_.eventId)
+            .list
+          val targetEventQuery = for {
+            t <- dbManager.targets.filter(_.eventId inSet eventIds)
+            e <- dbManager.events if t.eventId === e.eventId
+          } yield (t, e)
+          val targetEvents: Seq[(Target, Event)] = targetEventQuery.list
+          val targetEventTuplesByEventId: Map[String, Seq[(Target, Event)]] = targetEvents.groupBy(_._2.primaryKey)
 
-      val sectionIds: Seq[String] = dbManager.sections
-        .filter(_.courseId inSet courses.map(_.primaryKey))
-        .map(_.sectionId)
-        .list
-      val eventIds: Seq[String] = dbManager.events
-        .filter(_.sectionId inSet sectionIds)
-        .map(_.eventId)
-        .list
-      val targetEventQuery = for {
-        t <- dbManager.targets.filter(_.eventId inSet eventIds)
-        e <- dbManager.events if t.eventId === e.eventId
-      } yield (t, e)
-      val targetEvents: Seq[(Target, Event)] = targetEventQuery.list
-      val targetEventTuplesByEventId: Map[String, Seq[(Target, Event)]] = targetEvents.groupBy(_._2.primaryKey)
-
-      schoolManager.fetchEvents(courses) map { events: Seq[(Section, Seq[Event])] =>
-        // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
-        // really necessary for this update to be transactional. There are rarely going to be multiple writers
-        // touching the same rows, and they're all trying to do the same thing, so it's OK if they
-        // step over each other.
-        if (refreshOfferedCourses) {
-          dbManager.departments.insertOrUpdate(department)
-          courses foreach { course: Course =>
-            dbManager.courses.insertOrUpdate(course)
-          }
-        }
-        events foreach { case (section: Section, sectionsEvents: Seq[Event]) =>
-          dbManager.sections.insertOrUpdate(section)
-          sectionsEvents foreach { event: Event =>
-            dbManager.events.insertOrUpdate(event)
-            targetEventTuplesByEventId.get(event.primaryKey) map { targetEventTuples: Seq[(Target, Event)] =>
-              targetEventTuples foreach { case (target: Target, oldEvent: Event) =>
-                if (schoolManager.shouldAlert(oldEvent, event)) {
-                  logger.info(s"Queuing notifications about $target")
-                  messageExchange.sendNotification(target, event)
+          schoolManager.fetchEvents(courses) map {
+            events: Seq[(Section, Seq[Event])] =>
+              // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
+              // really necessary for this update to be transactional. There are rarely going to be multiple writers
+              // touching the same rows, and they're all trying to do the same thing, so it's OK if they
+              // step over each other.
+              if (refreshOfferedCourses) {
+                dbManager.departments.insertOrUpdate(department)
+                courses foreach {
+                  course: Course =>
+                    dbManager.courses.insertOrUpdate(course)
                 }
               }
-            }
+              events foreach {
+                case (section: Section, sectionsEvents: Seq[Event]) =>
+                  dbManager.sections.insertOrUpdate(section)
+                  sectionsEvents foreach {
+                    event: Event =>
+                      dbManager.events.insertOrUpdate(event)
+                      targetEventTuplesByEventId.get(event.primaryKey) map {
+                        targetEventTuples: Seq[(Target, Event)] =>
+                          targetEventTuples foreach {
+                            case (target: Target, oldEvent: Event) =>
+                              if (schoolManager.shouldAlert(oldEvent, event)) {
+                                logger.info(s"Queuing notifications about $target")
+                                messageExchange.sendNotification(target, event)
+                              }
+                          }
+                      }
+                  }
+              }
+              logger.info(s"Done updating <${courses.length}> courses at ${school.toString}'s ${department.name}")
           }
+      }
+    } else {
+      val allTargetsQuery = for {
+        t <- dbManager.targets
+        e <- dbManager.events if t.eventId === e.eventId
+      } yield (t, e)
+      val targetEvents: Seq[(Target, Event)] = allTargetsQuery.list
+      val targetEventTuplesByEvent: Map[Event, Seq[(Target, Event)]] = targetEvents.groupBy(_._2)
+      val sectionIds = targetEventTuplesByEvent.keys.map(_.sectionId)
+      val courseIds = dbManager.sections.filter(_.sectionId inSet sectionIds).map(_.courseId).list.distinct
+      val coursesToUpdate = dbManager.courses.filter(_.courseId inSet courseIds).list
+      val targetEventTuplesByEventId: Map[String, Seq[(Target, Event)]] = targetEvents.groupBy(_._2.primaryKey)
+
+      schoolManager.fetchEvents(coursesToUpdate) map { events: Seq[(Section, Seq[Event])] =>
+        events foreach {
+          case (section: Section, sectionsEvents: Seq[Event]) => dbManager.sections.insertOrUpdate(section)
+            sectionsEvents foreach { event: Event =>
+              dbManager.events.insertOrUpdate(event)
+              targetEventTuplesByEventId.get(event.primaryKey) map { targetEventTuples: Seq[(Target, Event)] =>
+                targetEventTuples foreach {
+                  case (target: Target, oldEvent: Event) =>
+                    if (schoolManager.shouldAlert(oldEvent, event)) {
+                      logger.info(s"Queuing notifications about $target")
+                      messageExchange.sendNotification(target, event)
+                    }
+                }
+              }
+              logger.info(s"Done updating targeted event <${event.primaryKey}>")
+            }
         }
-        logger.info(s"Done updating <${courses.length}> courses at ${school.toString}'s ${department.name}")
+        logger.info(s"Done updating <${coursesToUpdate.size}> courses with targeted events at ${school}")
       }
     }
     Await.result(allWorkFuture, Duration(1, TimeUnit.HOURS))
