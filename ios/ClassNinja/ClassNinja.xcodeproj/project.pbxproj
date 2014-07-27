@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */; };
+		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
 		707F9841196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
 		707F9843196899BC00D6E552 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9842196899BC00D6E552 /* CoreGraphics.framework */; };
 		707F9845196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
@@ -43,11 +44,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		707F983D196899BC00D6E552 /* classalert.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = classalert.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		70557114197B1ED7008F66F1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CNInAppPurchaseHelper.h; path = ClassNinja/Classes/CNInAppPurchaseHelper.h; sourceTree = "<group>"; };
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CNInAppPurchaseHelper.m; path = ClassNinja/Classes/CNInAppPurchaseHelper.m; sourceTree = "<group>"; };
-		707F983D196899BC00D6E552 /* ClassNinja.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClassNinja.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7055711919858293008F66F1 /* CNWelcomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CNWelcomeViewController.h; path = ClassNinja/Classes/CNWelcomeViewController.h; sourceTree = "<group>"; };
+		7055711A19858293008F66F1 /* CNWelcomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CNWelcomeViewController.m; path = ClassNinja/Classes/CNWelcomeViewController.m; sourceTree = "<group>"; };
+		707F983D196899BC00D6E552 /* ClassNinja.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = ClassNinja.app; path = classalert.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		707F9840196899BC00D6E552 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		707F9842196899BC00D6E552 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		707F9844196899BC00D6E552 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -113,6 +115,8 @@
 		707F9834196899BC00D6E552 = {
 			isa = PBXGroup;
 			children = (
+				7055711919858293008F66F1 /* CNWelcomeViewController.h */,
+				7055711A19858293008F66F1 /* CNWelcomeViewController.m */,
 				70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */,
 				70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */,
 				707F9846196899BC00D6E552 /* ClassNinja */,
@@ -125,7 +129,7 @@
 		707F983E196899BC00D6E552 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				707F983D196899BC00D6E552 /* classalert.app */,
+				707F983D196899BC00D6E552 /* ClassNinja.app */,
 				707F9858196899BC00D6E552 /* ClassNinjaTests.xctest */,
 			);
 			name = Products;
@@ -230,7 +234,7 @@
 			);
 			name = ClassNinja;
 			productName = ClassNinja;
-			productReference = 707F983D196899BC00D6E552 /* classalert.app */;
+			productReference = 707F983D196899BC00D6E552 /* ClassNinja.app */;
 			productType = "com.apple.product-type.application";
 		};
 		707F9857196899BC00D6E552 /* ClassNinjaTests */ = {
@@ -320,6 +324,7 @@
 				707F98B119689D9E00D6E552 /* AFHTTPSessionManager.m in Sources */,
 				707F98B219689D9E00D6E552 /* AFNetworkReachabilityManager.m in Sources */,
 				707F98B619689D9E00D6E552 /* AFURLResponseSerialization.m in Sources */,
+				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
 				707F98B719689D9E00D6E552 /* AFURLSessionManager.m in Sources */,
 				707F9851196899BC00D6E552 /* CNAppDelegate.m in Sources */,
 			);

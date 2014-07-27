@@ -9,6 +9,7 @@
 #import "CNAppDelegate.h"
 #import "CNAPIClient.h"
 #import "CNInAppPurchaseHelper.h"
+#import "CNWelcomeViewController.h"
 
 @interface CNAppDelegate ()
 @property (nonatomic)CNInAppPurchaseHelper *iap;
@@ -21,6 +22,10 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    
+    CNWelcomeViewController *welcomeVC = [[CNWelcomeViewController alloc] init];
+    self.window.rootViewController = welcomeVC;
+    
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
 
