@@ -7,9 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "CNModels.h"
 #import "CNSiongNavigationViewController.h"
 
+@class CNDepartment;
 @interface CNCourseViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, SiongNavigationProtocol>
 @property (nonatomic, weak) CNSiongNavigationViewController *siongNavigationController;
 @property (nonatomic) CNDepartment *department;

@@ -41,11 +41,10 @@
 - (void)loadContent
 {
     CNAPIClient *client = [CNAPIClient sharedInstance];
-    [client listCoursesForDepartment:self.department
-                 withCompletionBlock:^(NSArray *courses) {
-                     self.courses = courses;
-                    [self.tableView reloadData];
-                 }];
+    [client listChildren:self.department completion:^(NSArray *courses) {
+        self.courses = courses;
+        [self.tableView reloadData];
+    }];
 }
 
 #pragma mark UITableViewDataSource

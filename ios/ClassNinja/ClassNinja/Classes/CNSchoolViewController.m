@@ -8,7 +8,6 @@
 
 #import "CNSchoolViewController.h"
 #import "CNDepartmentViewController.h"
-#import "CNModels.h"
 #import "CNAPIClient.h"
 
 @interface CNSchoolViewController ()
@@ -44,10 +43,11 @@
 - (void)loadContent
 {
     CNAPIClient *client = [CNAPIClient sharedInstance];
-    [client listSchoolsWithCompletionBlock:^(NSArray *schools) {
-        self.schools = schools;
-        [self.tableView reloadData];
-    }];
+    [client list:[CNSchool class]
+      completion:^(NSArray *schools) {
+          self.schools = schools;
+          [self.tableView reloadData];
+      }];
 }
 
 #pragma mark Collation related methods

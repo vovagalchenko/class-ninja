@@ -28,72 +28,13 @@
     
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
-
-//    self.iap = [[CNInAppPurchaseHelper alloc] init];
-//    NSArray *productIdentifiers = [NSArray arrayWithObjects:@"class.ninja.targets", nil];
-//    
-//    [self.iap validateProductIdentifiers:productIdentifiers];
     
-    
-    
-    CNAPIClient *client = [CNAPIClient sharedInstance];
-    
-//    [client listSchoolsWithCompletionBlock:^(NSArray *schools) {
-//        for (CNSchool *school in schools) {
-//            [client listDepartmentForSchool:school withCompletionBlock:^(NSArray *departments) {
-//                for (CNDepartment *department in departments) {
-//                    if ([department.departmentId isEqualToString:@"UCLA_COMPTNG"]) {
-//                        [client listCoursesForDepartment:department withCompletionBlock:^(NSArray *courses) {
-//                            for (CNCourse *course in courses) {
-//                                if ([course.courseId isEqualToString:@"UCLA_COMPTNG_COMPTNG_10B"]) {
-//                                    [client listSectionsInfoForCourse:course withCompletionBlock:^(NSArray *sectionInfo) {
-//                                        NSLog(@"%@", sectionInfo);
-//                                    }];
-//                                }
-//                            }
-//                                
-//                        }];
-//                    }
-//                }
-//            }];
-//        }
-//    }];
-
-    NSString *confirmationCode=@"218871";
-    [client exchangeConfirmationCodeInAuthCode:confirmationCode forPhoneNumber:@"4089126890" completionBlock:^(NSString *authToken) {
-        NSLog(@"authToken = %@", authToken);
-    }];
-
-    
-//    NSString *phonenumber = @"4089126890";
-//    [client requestPhoneNumberVerification:phonenumber withVendorId:@"123" completionBlock:^(BOOL success) {
-//        if (success) {
-//            NSLog(@"Succeeded!");
-//        } else {
-//            NSLog(@"Failure");
-//        }
-//    }];
-    
-//    [client listSchoolsWithCompletionBlock:^(NSArray *schools) {
-//        for (CNSchool *school in schools) {
-//            [client listDepartmentForSchool:school withCompletionBlock:^(NSArray *departments) {
-//                for (CNDepartment *department in departments) {
-//                    if ([department.departmentId isEqualToString:@"UCLA_COMPTNG"]) {
-//                        [client listCoursesForDepartment:department withCompletionBlock:^(NSArray *courses) {
-//                            for (CNCourse *course in courses) {
-//                                if ([course.courseId isEqualToString:@"UCLA_COMPTNG_COMPTNG_10B"]) {
-//                                    [client listSectionsInfoForCourse:course withCompletionBlock:^(NSArray *sectionInfo) {
-//                                        NSLog(@"%@", sectionInfo);
-//                                    }];
-//                                }
-//                            }
-//                                
-//                        }];
-//                    }
-//                }
-//            }];
-//        }
-//    }];
+    /*
+    CNUser *user = [[CNUser alloc] init];
+    user.phoneNumber = @"4089126890";
+    user.accessToken = @"acf73667-b4c7-4674-9fd4-e94767e978cb";
+    [[[CoreAPIClient sharedInstance] authContext] setLoggedInUser:user];
+    */
     
     return YES;
 }

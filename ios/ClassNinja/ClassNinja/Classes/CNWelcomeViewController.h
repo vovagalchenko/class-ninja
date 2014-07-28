@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CNWelcomeStatusView.h"
 
-@interface CNWelcomeViewController : UIViewController
+@interface CNWelcomeViewController : UIViewController <CNWelcomeStatusViewDelegate>
 
 @end

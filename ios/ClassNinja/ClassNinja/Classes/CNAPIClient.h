@@ -1,25 +1,32 @@
 //
-//  CNAPIClient.h
-//  Class Ninja
+//  BaseAPIClient.h
+//  ClassNinja
 //
-//  Created by Boris Suvorov on 7/4/14.
+//  Created by Vova Galchenko on 7/27/14.
 //  Copyright (c) 2014 Bova. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import "AFNetworking.h"
+#import "CNAuthContext.h"
 #import "CNModels.h"
 
-@interface CNAPIClient : AFHTTPSessionManager
+typedef enum : NSUInteger {
+    CNFailRequestOnAuthFailure,
+    CNForceAuthenticationOnAuthFailure,
+} CNAuthenticationPolicy;
+
+@interface CNAPIClient : NSObject
+
+@property (nonatomic, readonly) CNAuthContext *authContext;
 
 + (instancetype)sharedInstance;
-
-- (void)listSchoolsWithCompletionBlock:(void (^)(NSArray *schools))block;
-- (void)listDepartmentForSchool:(CNSchool *)school withCompletionBlock:(void (^)(NSArray *departments))block;
-- (void)listCoursesForDepartment:(CNDepartment *)department withCompletionBlock:(void (^)(NSArray *courses))block;
-- (void)listSectionsInfoForCourse:(CNCourse *)course  withCompletionBlock:(void (^)(NSArray *sectionInfo))block;
-
-- (void)requestPhoneNumberVerification:(NSString *)phoneNumber withVendorId:(NSString *)deviceVendorId completionBlock:(void (^)(BOOL success))block;
-- (void)exchangeConfirmationCodeInAuthCode:(NSString *)confirmationToken forPhoneNumber:(NSString *)phoneNumber completionBlock:(void (^)(NSString *accessToken))block;
+- (void)list:(Class<CNModel>)model completion:(void (^)(NSArray *))completionBlock;
+- (void)list:(Class<CNModel>)model
+  authPolicy:(CNAuthenticationPolicy)authPolicy
+  completion:(void (^)(NSArray *))completionBlock;
+- (void)listChildren:(id<CNModel>)parentModel completion:(void (^)(NSArray *))completionBlock;
+- (void)listChildren:(id<CNModel>)parentModel
+          authPolicy:(CNAuthenticationPolicy)authPolicy
+          completion:(void (^)(NSArray *))completionBlock;
 
 @end

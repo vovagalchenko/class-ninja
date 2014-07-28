@@ -31,6 +31,15 @@
 
 @end
 
+@implementation CNTarget
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Target %@, id = %@,  dept spec course id = %@, deptId = %@, ", self.name, self.courseId, self.departmentSpecificCourseId, self.departmentId];
+}
+
+@end
+
 @implementation CNSection
 - (NSString *)description
 {
@@ -46,5 +55,27 @@
 }
 @end
 
+@implementation CNUser
 
+- (id)initWithCoder:(NSCoder *)aDecoder
+{
+    if (self = [super init]) {
+        _phoneNumber = [aDecoder decodeObjectForKey:@"phoneNumber"];
+        _accessToken = [aDecoder decodeObjectForKey:@"accessToken"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:self.phoneNumber forKey:@"phoneNumber"];
+    [aCoder encodeObject:self.accessToken forKey:@"accessToken"];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"User phoneNumber %@, accessToken = %@", self.phoneNumber, self.accessToken];
+}
+
+@end
 

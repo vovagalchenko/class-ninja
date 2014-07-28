@@ -8,7 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface CNSchool : NSObject
+@protocol CNModel <NSObject>
+
+@required
+- (NSString *)description;
+
+@end
+
+@interface CNSchool : NSObject<CNModel>
 
 @property (nonatomic) NSString *schoolId;
 @property (nonatomic) NSString *name;
@@ -17,7 +24,7 @@
 
 @end
 
-@interface CNDepartment : NSObject
+@interface CNDepartment : NSObject<CNModel>
 
 @property (nonatomic) NSString *schoolId;
 
@@ -26,16 +33,23 @@
 
 @end
 
-@interface CNCourse : NSObject
+@interface CNCourse : NSObject<CNModel>
 
 @property (nonatomic) NSString *departmentId;
 @property (nonatomic) NSString *departmentSpecificCourseId;
 @property (nonatomic) NSString *courseId;
 @property (nonatomic) NSString *name;
 
+// Array of sections this course contains
+@property (nonatomic) NSArray *sections;
+
 @end
 
-@interface CNSection : NSObject
+// A target is a course. It doesn't specialize this resource yet.
+@interface CNTarget : CNCourse
+@end
+
+@interface CNSection : NSObject<CNModel>
 
 @property (nonatomic) NSString *courseId;
 @property (nonatomic) NSString *sectionid;
@@ -46,14 +60,13 @@
 
 @end
 
-@interface CNEvent : NSObject
+@interface CNEvent : NSObject<CNModel>
 
 // Q: Why there is no pointer to CNSection?
 // A: Because CNSection contains array of CNEvents. That would cause reference loop.
 
 @property (nonatomic) NSString *sectionId;
 @property (nonatomic) NSString *eventId;
-
 @property (nonatomic) NSString *status;
 @property (nonatomic) NSString *eventType;
 @property (nonatomic) NSString *schoolSpecificEventId;
@@ -62,4 +75,15 @@
 @property (nonatomic) NSNumber *numberWaitlisted;
 @property (nonatomic) NSNumber *numberEnrolled;
 @property (nonatomic) NSNumber *waitlistCapacity;
+
+@end
+
+// Implementing NSCoding, because we'll be persisting the logged in user in the keychain
+@interface CNUser: NSObject <CNModel, NSCoding>
+
+// We might want to create a CNPhoneNumber class and make this be an instance of that.
+// Phone numbers have to go through some sanitization/standardization layer.
+@property (nonatomic) NSString *phoneNumber;
+@property (nonatomic) NSString *accessToken;
+
 @end

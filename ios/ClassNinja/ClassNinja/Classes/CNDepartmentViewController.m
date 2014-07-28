@@ -73,12 +73,11 @@
 - (void)loadContent
 {
     CNAPIClient *client = [CNAPIClient sharedInstance];
-    [client listDepartmentForSchool:self.school
-                withCompletionBlock:^(NSArray *departments) {
-                    [self collateDepartmentsByName:departments];
-                    [self.tableView reloadData];
-                }];
-
+    [client listChildren:self.school
+              completion:^(NSArray *departments) {
+        [self collateDepartmentsByName:departments];
+        [self.tableView reloadData];
+    }];
 }
 
 #pragma mark Collation related methods

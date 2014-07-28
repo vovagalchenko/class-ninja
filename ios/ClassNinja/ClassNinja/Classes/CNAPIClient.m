@@ -1,17 +1,30 @@
 //
-//  CNAPIClient.m
-//  Class Ninja
+//  BaseAPIClient.m
+//  ClassNinja
 //
-//  Created by Boris Suvorov on 7/4/14.
+//  Created by Vova Galchenko on 7/27/14.
 //  Copyright (c) 2014 Bova. All rights reserved.
 //
 
 #import "CNAPIClient.h"
-
-@interface CNAPIClient()
-@end
+#import "CNAPIResource.h"
 
 @implementation CNAPIClient
+
+#pragma mark Misc. Helpers
+
+static inline NSURL *baseURL()
+{
+    // TODO: Get this from info plist
+    return [NSURL URLWithString:@"http://vova.class-ninja.com/api"];
+}
+
+static inline NSTimeInterval urlRequestTimeoutInterval()
+{
+    return 10.0;
+}
+
+#pragma mark Object Lifecycle
 
 + (instancetype)sharedInstance
 {
@@ -20,253 +33,143 @@
     dispatch_once(&onceToken, ^{
         sharedAPIClient = [[CNAPIClient alloc] init];
     });
-    
     return sharedAPIClient;
 }
 
-- (instancetype)init
+- (id)init
 {
-    NSURL *baseURL = [NSURL URLWithString:@"http://boris.class-ninja.com/api"];
-    self = [super initWithBaseURL:baseURL sessionConfiguration:nil];;
-    [self setRequestSerializer:[[AFJSONRequestSerializer alloc] init]];
-    
+    if (self = [super init]) {
+        _authContext = [[CNAuthContext alloc] init];
+    }
     return self;
 }
 
-- (void)requestPhoneNumberVerification:(NSString *)phoneNumber withVendorId:(NSString *)deviceVendorId completionBlock:(void (^)(BOOL success))block
+#pragma mark API Implementation
+
+- (void)list:(Class<CNModel>)model completion:(void (^)(NSArray *))completionBlock
 {
-    // phone number must be set for us to attempt registration
-    if (phoneNumber == nil) {
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(NO);
-            });
-        }
-    }
-
-    NSString *path = @"user";
-    NSMutableDictionary *parameters = [NSMutableDictionary dictionaryWithObjectsAndKeys:phoneNumber,@"phone", nil];
-    // user might or might not set device ID to notify him of push notificaitons.
-    if (deviceVendorId) {
-        [parameters setObject:deviceVendorId forKey:@"device_vendor_id"];
-    }
-
-    [self POST:path
-    parameters:parameters
-       success:^(NSURLSessionDataTask *task, id responseObject) {
-           NSLog(@"Received request and will send SMS");
-           if (block) {
-               dispatch_async(dispatch_get_main_queue(), ^{
-                   block(YES);
-               });
-           }
-       }
-       failure:^(NSURLSessionDataTask *task, NSError *error) {
-           NSLog(@"Failed to process request with error %@", error);
-           if (block) {
-               dispatch_async(dispatch_get_main_queue(), ^{
-                   block(NO);
-               });
-           }
-       }];
+    [self list:model authPolicy:CNFailRequestOnAuthFailure completion:completionBlock];
 }
 
-- (void)exchangeConfirmationCodeInAuthCode:(NSString *)confirmationToken forPhoneNumber:(NSString *)phoneNumber completionBlock:(void (^)(NSString *accessToken))block
+- (void)list:(Class<CNModel>)model authPolicy:(CNAuthenticationPolicy)authPolicy completion:(void (^)(NSArray *))completionBlock
 {
-    // phone number must be set for us to attempt registration
-    if (phoneNumber == nil || confirmationToken == nil) {
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(nil);
-            });
+    [self listChildrenOfAPIResource:[CNRootAPIResource rootAPIResourceForModel:model]
+               authenticationPolicy:authPolicy
+                         completion:completionBlock];
+}
+
+- (void)listChildren:(id<CNModel>)parentModel completion:(void (^)(NSArray *))completionBlock
+{
+    [self listChildren:parentModel authPolicy:CNFailRequestOnAuthFailure completion:completionBlock];
+}
+
+- (void)listChildren:(id<CNModel>)parentModel
+          authPolicy:(CNAuthenticationPolicy)authPolicy
+          completion:(void (^)(NSArray *))completionBlock
+{
+    id<CNAPIResource>apiResource = [CNAPIResourceFactory apiResourceWithModel:parentModel];
+    [self listChildrenOfAPIResource:apiResource
+               authenticationPolicy:authPolicy
+                         completion:completionBlock];
+}
+
+- (void)listChildrenOfAPIResource:(id<CNAPIResource>)parentAPIResource
+             authenticationPolicy:(CNAuthenticationPolicy)authPolicy
+                       completion:(void (^)(NSArray *))completionBlock
+{
+    NSURL *urlWithResourceType = [baseURL() URLByAppendingPathComponent:[parentAPIResource resourceTypeName] isDirectory:YES];
+    NSURL *finishedURL = [urlWithResourceType URLByAppendingPathComponent:[parentAPIResource resourceIdentifier]];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:finishedURL
+                            cachePolicy:NSURLRequestReloadIgnoringCacheData
+                        timeoutInterval:urlRequestTimeoutInterval()];
+    [self makeURLRequest:urlRequest
+  authenticationRequired:[[parentAPIResource childResourceClass] needsAuthentication]
+          withAuthPolicy:authPolicy
+              completion:^(NSDictionary *jsonResult) {
+                  if (jsonResult == nil) {
+                      completionBlock(nil);
+                  } else {
+                      NSString *childrenKey = nil;
+                      if ([parentAPIResource isKindOfClass:[CNRootAPIResource class]]) {
+                          childrenKey = [[parentAPIResource resourceTypeName] stringByAppendingString:@"s"];
+                      } else {
+                          
+                          id<CNAPIResource>childAPIResourceInstance = [[(Class)[parentAPIResource childResourceClass] alloc] init];
+                          childrenKey = [NSString stringWithFormat:@"%@_%@s",
+                                         [parentAPIResource resourceTypeName], [childAPIResourceInstance resourceTypeName]];
+                      }
+                      NSArray *children = [jsonResult objectForKey:childrenKey];
+                      NSAssert(children != nil, @"Unable to find the childrenKey <%@> in JSON result:\n%@", childrenKey, jsonResult);
+                      NSMutableArray *childObjects = [NSMutableArray arrayWithCapacity:children.count];
+                      for (NSDictionary *childDict in children) {
+                          [childObjects addObject:[[parentAPIResource childResourceClass] modelWithDictionary:childDict]];
+                      }
+                      completionBlock(childObjects);
+                  }
+              }];
+}
+
+#pragma API Utilities
+
+- (void)makeURLRequest:(NSMutableURLRequest *)request
+authenticationRequired:(BOOL)authRequired
+        withAuthPolicy:(CNAuthenticationPolicy)authPolicy
+            completion:(void (^)(id))completionBlock
+{
+    NSAssert(completionBlock != nil, @"Must pass in a completion block");
+    
+    void (^authFailureHandler)() = nil;
+    switch (authPolicy) {
+        case CNForceAuthenticationOnAuthFailure:
+        {
+            authFailureHandler = ^{
+                [self.authContext authenticateWithCompletion:^{
+                    [self makeURLRequest:request
+                  authenticationRequired:YES
+                          withAuthPolicy:CNFailRequestOnAuthFailure
+                              completion:completionBlock];
+                }];
+            };
+            break;
+        }
+        case CNFailRequestOnAuthFailure:
+        default:
+        {
+            authFailureHandler = ^{ completionBlock(nil); };
+            break;
         }
     }
     
-    NSString *path = [@"user" stringByAppendingPathComponent:phoneNumber];
-    NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:confirmationToken,@"confirmation_token", nil];
-
-    [self POST:path parameters:parameters success:^(NSURLSessionDataTask *task, id responseObject) {
-        NSString *accessToken = [responseObject valueForKey:@"access_token"];
-        NSLog(@"We're given authorization token %@", accessToken);
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(accessToken);
-            });
+    if (authRequired) {
+        if (!self.authContext.loggedInUser) {
+            authFailureHandler();
+            return;
+        } else {
+            [request setValue:self.authContext.loggedInUser.accessToken
+           forHTTPHeaderField:@"AUTHORIZATION"];
         }
-
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        NSLog(@"Failed with error %@", error);
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(nil);
-            });
-        }
-
-    }];
-}
-
-- (void)listSectionsInfoForCourse:(CNCourse *)course  withCompletionBlock:(void (^)(NSArray *sectionInfo))block
-{
-    NSString *path = [@"course" stringByAppendingPathComponent:course.courseId];
-    [self GET:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        NSMutableArray *sections = [[NSMutableArray alloc] init];
-        
-        for (NSDictionary *sectionDict in [responseObject valueForKey:@"course_sections"]) {
-            CNSection *section = [self createSectionFromAPIDictionary:sectionDict];
-            [sections addObject:section];
-        }
-        
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block([sections copy]);
-            });
-        }
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(nil);
-            });
-        }
-    }];
-
-    
-}
-
-- (void)listCoursesForDepartment:(CNDepartment *)department withCompletionBlock:(void (^)(NSArray *courses))block
-{
-    NSString *path = [@"department" stringByAppendingPathComponent:department.departmentId];
-    [self GET:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        NSMutableArray *courses = [[NSMutableArray alloc] init];
-        
-        for (NSDictionary *courseDict in [responseObject valueForKey:@"department_courses"]) {
-            CNCourse *course = [self createCourseFromAPIDictionary:courseDict];
-            [courses addObject:course];
-        }
-        
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block([courses copy]);
-            });
-        }
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(nil);
-            });
-        }
-    }];
-}
-
-- (void)listDepartmentForSchool:(CNSchool *)school withCompletionBlock:(void (^)(NSArray *departments))block
-{    
-    NSString *path = [@"school" stringByAppendingPathComponent:school.schoolId];
-    [self GET:path parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        NSMutableArray *departments = [[NSMutableArray alloc] init];
-
-        for (NSDictionary *departmentDict in [responseObject valueForKey:@"school_departments"]) {
-            CNDepartment *department = [self createDepartmentFromAPIDictionary:departmentDict];
-            [departments addObject:department];
-        }
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block([departments copy]);
-            });
-        }
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(nil);
-            });
-        }
-    }];
-}
-
-- (void)listSchoolsWithCompletionBlock:(void (^)(NSArray *schools))block
-{
-    [self GET:@"school" parameters:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-        NSMutableArray *schools = [[NSMutableArray alloc] init];
-        for(NSDictionary *schoolDict in [responseObject valueForKey:@"schools"]) {
-            CNSchool *school = [self createSchoolFromAPIDictionary:schoolDict];
-            [schools addObject:school];
-        }
-
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block([schools copy]);
-            });
-        }
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        if (block) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                block(nil);
-            });
-        }
-    }];
-}
-
-
-- (CNEvent *)createEventFromAPIDictionary:(NSDictionary *)eventDict
-{
-    CNEvent *event = [[CNEvent alloc] init];
-    event.sectionId = [eventDict valueForKey:@"section_id"];
-    event.eventId = [eventDict valueForKey:@"event_id"];
-    event.status = [eventDict valueForKey:@"status"];
-    event.eventType = [eventDict valueForKey:@"event_type"];
-    event.schoolSpecificEventId = [eventDict valueForKey:@"school_specific_event_id"];
-    event.timesAndLocations = [eventDict valueForKey:@"times_and_locations"];
-    event.enrollmentCap = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"enrollment_cap"] unsignedIntegerValue]];
-    event.numberWaitlisted = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"number_waitlisted"] unsignedIntegerValue]];
-    event.numberEnrolled = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"number_enrolled"] unsignedIntegerValue]];
-    event.waitlistCapacity = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"waitlist_capacity"] unsignedIntegerValue]];
-    return event;
-}
-
-
-- (CNSection *)createSectionFromAPIDictionary:(NSDictionary *)sectionDict
-{
-    CNSection *section = [[CNSection alloc] init];
-    section.courseId = [sectionDict valueForKey:@"course_id"];
-    section.sectionid = [sectionDict valueForKey:@"section_id"];
-
-    section.staffName = [sectionDict valueForKey:@"staff_name"];
-    section.name = [sectionDict valueForKey:@"section_name"];
-    NSMutableArray *events = [[NSMutableArray alloc] init];
-    for (NSDictionary *eventDict in [sectionDict valueForKey:@"events"]) {
-        CNEvent *event = [self createEventFromAPIDictionary:eventDict];
-        [events addObject:event];
     }
-
-    section.events = [events copy];
     
-    return section;
+    [NSURLConnection sendAsynchronousRequest:request
+                                       queue:[NSOperationQueue mainQueue] // Callbacks executed on the main thread
+                           completionHandler:^(NSURLResponse* response, NSData* data, NSError* connectionError) {
+        if (connectionError || [(NSHTTPURLResponse *)response statusCode] >= 400) {
+            NSLog(@"Error attempting to execute: %@\n%@", response, connectionError);
+            completionBlock(nil);
+        } else {
+            NSError *serializationError = nil;
+            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&serializationError];
+            if (serializationError) {
+                NSLog(@"Error attempting to deserialize response to: %@\nResponse: %@\nError: %@",
+                      jsonDict, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], serializationError);
+                completionBlock(nil);
+            } else {
+                completionBlock(jsonDict);
+            }
+        }
+    }];
 }
 
-- (CNCourse *)createCourseFromAPIDictionary:(NSDictionary *)coursesDict
-{
-    CNCourse *course = [[CNCourse alloc] init];
-    
-    course.courseId = [coursesDict valueForKey:@"course_id"];
-    course.name = [coursesDict valueForKey:@"name"];
-    course.departmentSpecificCourseId = [coursesDict valueForKey:@"department_specific_course_id"];
+#pragma mark Auth
 
-    return course;
-}
-
- - (CNDepartment *)createDepartmentFromAPIDictionary:(NSDictionary *)departmentDict
- {
-     CNDepartment *department = [[CNDepartment alloc] init];
-     department.departmentId = [departmentDict valueForKey:@"department_id"];
-     department.name = [departmentDict valueForKey:@"name"];
-     return department;
- }
-     
-- (CNSchool *)createSchoolFromAPIDictionary:(NSDictionary *)schoolDict
-{
-    CNSchool *school = [[CNSchool alloc] init];
-    school.currentTermCode = [schoolDict valueForKey:@"current_term_code"];
-    school.currentTermName = [schoolDict valueForKey:@"current_term_name"];
-    school.schoolId = [NSString stringWithFormat:@"%lu", (unsigned long)[[schoolDict valueForKey:@"school_id"] unsignedIntegerValue]];
-    school.name = [schoolDict valueForKey:@"school_name"];
-    return school;
-}
 @end
