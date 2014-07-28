@@ -10,6 +10,9 @@
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */; };
 		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
+		7055711E1985D634008F66F1 /* CNDepartmentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711D1985D634008F66F1 /* CNDepartmentViewController.m */; };
+		705571211985E7B0008F66F1 /* CNCourseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705571201985E7B0008F66F1 /* CNCourseViewController.m */; };
+		7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */; };
 		707F9841196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
 		707F9843196899BC00D6E552 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9842196899BC00D6E552 /* CoreGraphics.framework */; };
 		707F9845196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
@@ -49,6 +52,12 @@
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CNInAppPurchaseHelper.m; path = ClassNinja/Classes/CNInAppPurchaseHelper.m; sourceTree = "<group>"; };
 		7055711919858293008F66F1 /* CNWelcomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CNWelcomeViewController.h; path = ClassNinja/Classes/CNWelcomeViewController.h; sourceTree = "<group>"; };
 		7055711A19858293008F66F1 /* CNWelcomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CNWelcomeViewController.m; path = ClassNinja/Classes/CNWelcomeViewController.m; sourceTree = "<group>"; };
+		7055711C1985D634008F66F1 /* CNDepartmentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CNDepartmentViewController.h; path = ClassNinja/Classes/CNDepartmentViewController.h; sourceTree = "<group>"; };
+		7055711D1985D634008F66F1 /* CNDepartmentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CNDepartmentViewController.m; path = ClassNinja/Classes/CNDepartmentViewController.m; sourceTree = "<group>"; };
+		7055711F1985E7B0008F66F1 /* CNCourseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CNCourseViewController.h; path = ClassNinja/Classes/CNCourseViewController.h; sourceTree = "<group>"; };
+		705571201985E7B0008F66F1 /* CNCourseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CNCourseViewController.m; path = ClassNinja/Classes/CNCourseViewController.m; sourceTree = "<group>"; };
+		7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CNSiongNavigationViewController.h; path = ClassNinja/Classes/CNSiongNavigationViewController.h; sourceTree = "<group>"; };
+		7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CNSiongNavigationViewController.m; path = ClassNinja/Classes/CNSiongNavigationViewController.m; sourceTree = "<group>"; };
 		707F983D196899BC00D6E552 /* ClassNinja.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = ClassNinja.app; path = classalert.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		707F9840196899BC00D6E552 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		707F9842196899BC00D6E552 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -115,7 +124,13 @@
 		707F9834196899BC00D6E552 = {
 			isa = PBXGroup;
 			children = (
+				7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */,
+				7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */,
+				7055711F1985E7B0008F66F1 /* CNCourseViewController.h */,
+				705571201985E7B0008F66F1 /* CNCourseViewController.m */,
 				7055711919858293008F66F1 /* CNWelcomeViewController.h */,
+				7055711C1985D634008F66F1 /* CNDepartmentViewController.h */,
+				7055711D1985D634008F66F1 /* CNDepartmentViewController.m */,
 				7055711A19858293008F66F1 /* CNWelcomeViewController.m */,
 				70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */,
 				70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */,
@@ -315,14 +330,17 @@
 				707F984D196899BC00D6E552 /* main.m in Sources */,
 				707F98B319689D9E00D6E552 /* AFSecurityPolicy.m in Sources */,
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */,
+				705571211985E7B0008F66F1 /* CNCourseViewController.m in Sources */,
 				707F989819689D8700D6E552 /* CNAPIClient.m in Sources */,
 				707F98B019689D9E00D6E552 /* AFHTTPRequestOperationManager.m in Sources */,
 				707F98B419689D9E00D6E552 /* AFURLConnectionOperation.m in Sources */,
 				707F98AF19689D9E00D6E552 /* AFHTTPRequestOperation.m in Sources */,
 				707F989919689D8700D6E552 /* CNModels.m in Sources */,
 				707F98B519689D9E00D6E552 /* AFURLRequestSerialization.m in Sources */,
+				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
 				707F98B119689D9E00D6E552 /* AFHTTPSessionManager.m in Sources */,
 				707F98B219689D9E00D6E552 /* AFNetworkReachabilityManager.m in Sources */,
+				7055711E1985D634008F66F1 /* CNDepartmentViewController.m in Sources */,
 				707F98B619689D9E00D6E552 /* AFURLResponseSerialization.m in Sources */,
 				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
 				707F98B719689D9E00D6E552 /* AFURLSessionManager.m in Sources */,

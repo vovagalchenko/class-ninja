@@ -7,6 +7,7 @@
 //
 
 #import "CNInAppPurchaseHelper.h"
+#import "CNAPIClient.h"
 
 @interface CNInAppPurchaseHelper ()
 @property (nonatomic, strong) SKProductsRequest *productsRequest;

@@ -7,6 +7,8 @@
 //
 
 #import "CNWelcomeViewController.h"
+#import "CNDepartmentViewController.h"
+#import "CNSiongNavigationViewController.h"
 
 @interface CNWelcomeViewController ()
 @property (nonatomic) UILabel *statusLabel;
@@ -40,7 +42,7 @@
         [_addClassesButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         [_addClassesButton setTitleColor:[UIColor yellowColor] forState:UIControlStateHighlighted];
         _addClassesButton.titleLabel.font = [UIFont boldSystemFontOfSize:12.0];
-        
+        [_addClassesButton addTarget:self action:@selector(addClassesButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _addClassesButton;
 }
@@ -79,6 +81,19 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+}
+
+- (void)addClassesButtonPressed:(id)sender
+{
+    CNDepartmentViewController *deptVC = [[CNDepartmentViewController alloc] init];
+
+//    UINavigationController *tmpController = [[UINavigationController alloc] initWithRootViewController:deptVC];
+    
+    CNSiongNavigationViewController *navController = [[CNSiongNavigationViewController alloc] initWithRootViewController:deptVC];
+    navController.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:navController animated:YES completion:^{
+//        [navController pushViewController:deptVC animated:YES];
+    }];
 }
 
 - (void)didReceiveMemoryWarning
