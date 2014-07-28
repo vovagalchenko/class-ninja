@@ -38,7 +38,9 @@
     // phone number must be set for us to attempt registration
     if (phoneNumber == nil) {
         if (block) {
-            block(NO);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(NO);
+            });
         }
     }
 
@@ -54,13 +56,17 @@
        success:^(NSURLSessionDataTask *task, id responseObject) {
            NSLog(@"Received request and will send SMS");
            if (block) {
-               block(YES);
+               dispatch_async(dispatch_get_main_queue(), ^{
+                   block(YES);
+               });
            }
        }
        failure:^(NSURLSessionDataTask *task, NSError *error) {
            NSLog(@"Failed to process request with error %@", error);
            if (block) {
-               block(NO);
+               dispatch_async(dispatch_get_main_queue(), ^{
+                   block(NO);
+               });
            }
        }];
 }
@@ -70,7 +76,9 @@
     // phone number must be set for us to attempt registration
     if (phoneNumber == nil || confirmationToken == nil) {
         if (block) {
-            block(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(nil);
+            });
         }
     }
     
@@ -81,13 +89,17 @@
         NSString *accessToken = [responseObject valueForKey:@"access_token"];
         NSLog(@"We're given authorization token %@", accessToken);
         if (block) {
-            block(accessToken);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(accessToken);
+            });
         }
 
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         NSLog(@"Failed with error %@", error);
         if (block) {
-            block(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(nil);
+            });
         }
 
     }];
@@ -105,11 +117,15 @@
         }
         
         if (block) {
-            block([sections copy]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block([sections copy]);
+            });
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (block) {
-            block(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(nil);
+            });
         }
     }];
 
@@ -128,11 +144,15 @@
         }
         
         if (block) {
-            block([courses copy]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block([courses copy]);
+            });
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (block) {
-            block(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(nil);
+            });
         }
     }];
 }
@@ -148,11 +168,15 @@
             [departments addObject:department];
         }
         if (block) {
-            block([departments copy]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block([departments copy]);
+            });
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (block) {
-            block(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(nil);
+            });
         }
     }];
 }
@@ -167,11 +191,15 @@
         }
 
         if (block) {
-            block([schools copy]);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block([schools copy]);
+            });
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         if (block) {
-            block(nil);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                block(nil);
+            });
         }
     }];
 }
