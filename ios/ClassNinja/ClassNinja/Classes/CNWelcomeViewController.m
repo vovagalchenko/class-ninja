@@ -7,7 +7,7 @@
 //
 
 #import "CNWelcomeViewController.h"
-#import "CNDepartmentViewController.h"
+#import "CNSchoolViewController.h"
 #import "CNSiongNavigationViewController.h"
 
 @interface CNWelcomeViewController ()
@@ -85,15 +85,10 @@
 
 - (void)addClassesButtonPressed:(id)sender
 {
-    CNDepartmentViewController *deptVC = [[CNDepartmentViewController alloc] init];
-
-//    UINavigationController *tmpController = [[UINavigationController alloc] initWithRootViewController:deptVC];
-    
+    CNSchoolViewController *deptVC = [[CNSchoolViewController alloc] init];
     CNSiongNavigationViewController *navController = [[CNSiongNavigationViewController alloc] initWithRootViewController:deptVC];
     navController.modalPresentationStyle = UIModalPresentationFullScreen;
-    [self presentViewController:navController animated:YES completion:^{
-//        [navController pushViewController:deptVC animated:YES];
-    }];
+    [self presentViewController:navController animated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -101,16 +96,5 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

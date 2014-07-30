@@ -8,7 +8,6 @@
 
 #import "CNDepartmentViewController.h"
 #import "CNCourseViewController.h"
-
 #import "CNAPIClient.h"
 
 @interface CNDepartmentViewController ()
@@ -74,14 +73,12 @@
 - (void)loadContent
 {
     CNAPIClient *client = [CNAPIClient sharedInstance];
-    [client listSchoolsWithCompletionBlock:^(NSArray *schools) {
-        CNSchool *school = [schools objectAtIndex:0];
-        [client listDepartmentForSchool:school
-                    withCompletionBlock:^(NSArray *departments) {
-                        [self collateDepartmentsByName:departments];
-                        [self.tableView reloadData];
-                    }];
-    }];
+    [client listDepartmentForSchool:self.school
+                withCompletionBlock:^(NSArray *departments) {
+                    [self collateDepartmentsByName:departments];
+                    [self.tableView reloadData];
+                }];
+
 }
 
 #pragma mark Collation related methods
@@ -129,8 +126,6 @@
     NSArray *collatedDepartments = [self.departmentsByCollationIndex objectAtIndex:indexPath.section];
     courseVC.department = [collatedDepartments objectAtIndex:indexPath.row];
     
-    // this should live within navigation controller code itself
-    courseVC.siongNavigationController = self.siongNavigationController;
     [self.siongNavigationController pushViewController:courseVC];
 }
 
