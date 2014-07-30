@@ -1,5 +1,6 @@
 from base import Base, Ninja_Model_Mixin
 from sqlalchemy import Column, String, Enum, ForeignKey, Integer, TEXT
+from sqlalchemy.orm import backref, relationship
 
 class Event(Base, Ninja_Model_Mixin):
     __tablename__ = 'events'

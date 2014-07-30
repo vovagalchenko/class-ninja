@@ -1,5 +1,7 @@
 from base import Base, Ninja_Model_Mixin
 from sqlalchemy import Column, String, Enum, ForeignKey, Integer, DateTime
+from sqlalchemy.orm import relationship, backref
+from model.target import Target
 
 class User(Base, Ninja_Model_Mixin):
     __tablename__ = 'authentication'
@@ -11,3 +13,4 @@ class User(Base, Ninja_Model_Mixin):
     confirmation_deadline = Column('confirmation_deadline', DateTime, nullable = False)
     last_request_ts = Column('last_request_ts', DateTime, nullable = False)
 
+    targets = relationship("Target", backref = "user")

@@ -3,7 +3,9 @@ from ext_api.exceptions import *
 from ext_api.parameter import Parameter, Invalid_Parameter_Exception
 from urlparse import parse_qsl
 from re import subn
-#from model.db_session import DB_Session_Factory
+from model.db_session import DB_Session_Factory
+from model.user_model import User
+from model.base import Ninja_Model_Mixin
 from datetime import datetime, date
 from lib.time_utils import dt_to_timestamp
 import requests
@@ -52,18 +54,17 @@ class HTTP_Response_Builder(object):
             param_value = param_definition.get_value(passed_in_param_dict.get(param_definition.name, None))
             passed_in_param_dict.pop(param_definition.name, None)
             setattr(self, param_name, param_value)
+        self.authenticate()
 
-        accessToken = passed_in_param_dict.get("access_token", None)
-        if accessToken is not None:
+    def authenticate(self):
+        auth_header = self.request_headers.get('AUTHORIZATION', None)
+        if auth_header is not None:
             db_session = DB_Session_Factory.get_db_session() 
-            results = db_session.query(User).filter(User.access_token == accessToken).all()
+            results = db_session.query(User).filter(User.access_token == auth_header).all()
             if len(results) > 1:
-                raise API_Exception("500 Internal server error", "Access token is being used more than once")
+                raise API_Exception("500 Server Error", "This access token is being used by multiple users.")
             elif len(results) == 1:
-                user = results[0]
-
-        if any(passed_in_param_dict):
-            self.warnings.append({"unused_arguments" : passed_in_param_dict})
+                self.user = results[0]
 
     def finalize_http_response(self, http_response):
         if self.warnings:
@@ -76,6 +77,15 @@ class HTTP_Response_Builder(object):
     def run(self):
         http_response = self.do_controller_specific_work()
         return self.finalize_http_response(http_response)
+
+
+def serialize(obj):
+    serialized_obj = "<UNSERIALIZABLE_OBJECT>"
+    if isinstance(obj, datetime) or isinstance(obj, date):
+        serialized_obj = dt_to_timestamp(obj)
+    elif isinstance(obj, Ninja_Model_Mixin):
+        serialized_obj = obj.for_api()
+    return serialized_obj
 
 class HTTP_Response(object):
     
@@ -96,11 +106,7 @@ class HTTP_Response(object):
     
     def get_body_string(self):
         if self.serialized_body_cache is None:
-            dthandler = lambda obj: (
-                dt_to_timestamp(obj)
-                if isinstance(obj, datetime)
-                or isinstance(obj, date)
-                else "<UNSERIALIZABLE_OBJECT>")
+            dthandler = lambda obj: serialize(obj)
             self.serialized_body_cache = dumps(self.body, default = dthandler)
         return self.serialized_body_cache
     
