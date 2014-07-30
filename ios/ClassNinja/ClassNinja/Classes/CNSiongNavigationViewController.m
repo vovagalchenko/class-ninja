@@ -31,7 +31,7 @@
 - (void)viewWillLayoutSubviews
 {
     self.scrollView.frame = self.view.bounds;
-    self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width * 3, self.scrollView.frame.size.height);
+    self.scrollView.contentSize = self.scrollView.frame.size;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -63,29 +63,67 @@
     viewController.siongNavigationController = self;
     // dismiss all view controllers to the right of current VC
     for (NSUInteger vcIndex = self.viewControllers.count-1; vcIndex > currentVCIndex; vcIndex--) {
-        [self popViewController];
+        [self popViewControllerAnimated:NO];
     }
     
     if ([self.viewControllers indexOfObject:viewController] == NSNotFound) {
         [self.viewControllers addObject:viewController];
     }
     
+    NSUInteger vcIndex = self.viewControllers.count - 1;
+    viewController.view.frame = [self frameForChildVCAtIndex:vcIndex];
+    self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
+
     [self.scrollView addSubview:viewController.view];
-    
-    CGFloat vcIndex = self.viewControllers.count - 1;
-    CGSize size = self.view.bounds.size;
-    CGFloat vcWidth = size.width - 2*kLeftBoundsOffset;
-    CGFloat x = kLeftBoundsOffset + (vcWidth + kSpaceBetweenViews) * vcIndex;
-    viewController.view.frame = CGRectMake(x, 0, vcWidth, size.height);
-    
-    [self scrollToIndex:self.viewControllers.count - 1];
+    [self scrollToIndex:vcIndex];
 }
 
-- (UIViewController *)popViewController
+- (CGSize)scrollViewcontentSizeForVCIndex:(NSUInteger)vcIndex
+{
+    CGSize contentSize = self.view.bounds.size;
+    CGFloat vcWidth = [self childVCWidth];
+    contentSize.width = kLeftBoundsOffset + (vcWidth) * (vcIndex+1) + vcIndex * kSpaceBetweenViews + kLeftBoundsOffset;
+    return contentSize;
+}
+
+- (CGRect)frameForChildVCAtIndex:(NSUInteger)vcIndex
+{
+    CGFloat vcWidth = [self childVCWidth];
+    CGFloat x = kLeftBoundsOffset + (vcWidth + kSpaceBetweenViews) * vcIndex;
+    return CGRectMake(x, 0, vcWidth, self.view.bounds.size.height);
+}
+
+- (CGFloat)childVCWidth
+{
+    return self.view.bounds.size.width - 2*kLeftBoundsOffset;
+}
+
+
+
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated
 {
     UIViewController *resultVC = self.topViewController;
-    [resultVC.view removeFromSuperview];
-    [self.viewControllers removeLastObject];
+    
+    NSUInteger vcIndex = self.viewControllers.count - 2;
+    dispatch_block_t completionBlock = ^{
+        [resultVC.view removeFromSuperview];
+        [self.viewControllers removeLastObject];
+    };
+    
+    
+    if (animated) {
+        [UIView animateWithDuration:0.3 animations:^{
+            self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
+        }completion:^(BOOL finished) {
+            if (finished) {
+                completionBlock();
+            }
+        }];
+    } else {
+        self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
+        completionBlock();
+    }
+    
     return resultVC;
 }
 

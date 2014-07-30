@@ -20,7 +20,7 @@
 
  // Uses a horizontal scroll transition. Has no effect if the view controller is already in the stack.
 - (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController;
-- (UIViewController *)popViewController;
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated;
 
 @property(nonatomic,readonly) UIViewController *topViewController; // The top view controller on the stack.
 

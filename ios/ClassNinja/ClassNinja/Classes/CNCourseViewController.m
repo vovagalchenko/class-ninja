@@ -44,7 +44,7 @@
     [client listCoursesForDepartment:self.department
                  withCompletionBlock:^(NSArray *courses) {
                      self.courses = courses;
-                     [self.tableView reloadData];
+                    [self.tableView reloadData];
                  }];
 }
 
@@ -70,7 +70,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"Push information about sessions here");
+    [self.siongNavigationController popViewControllerAnimated:YES];
 }
 
 @end
