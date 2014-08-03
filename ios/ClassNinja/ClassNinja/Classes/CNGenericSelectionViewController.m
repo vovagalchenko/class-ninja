@@ -42,6 +42,7 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
+    self.tableView.backgroundColor = [UIColor clearColor];
     
     self.view.autoresizingMask = UIViewAutoresizingNone;
     [self.view addSubview:self.tableView];

@@ -15,7 +15,7 @@
 @property (nonatomic) UIScrollView *scrollView;
 @property (nonatomic) UIButton *backButton;
 @property (nonatomic) UILabel *headerLabel;
-@property (nonatomic,readwrite,strong) NSMutableArray *viewControllers;
+@property (nonatomic) NSMutableArray *viewControllers;
 @end
 
 @implementation CNSiongNavigationViewController
@@ -25,19 +25,38 @@
     self = [super init];
     if (self) {
         _viewControllers = [NSMutableArray array];
-        _scrollView = [[UIScrollView alloc] init];
-
-        _scrollView.backgroundColor = [UIColor clearColor];
-        
         [_viewControllers addObject:rootViewController];
         
-        [self.view addSubview:self.backButton];
-        self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
-        
         rootViewController.siongNavigationController = self;
-        [self.view addSubview:_scrollView];
     }
     return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
+    
+    _scrollView = [[UIScrollView alloc] init];
+    _scrollView.backgroundColor = [UIColor clearColor];
+
+    [self.view addSubview:self.backButton];
+    [self.view addSubview:self.headerLabel];
+    [self.view addSubview:self.scrollView];
+}
+
+- (UILabel *)headerLabel
+{
+    if (_headerLabel ==nil) {
+        _headerLabel = [[UILabel alloc] init];
+        _headerLabel.textColor = [UIColor colorWithRed:32/255.0 green:48/255.0 blue:66/255.0 alpha:1.0];
+        _headerLabel.text = @"Add Class";
+        _headerLabel.font = [UIFont systemFontOfSize:14];
+        _headerLabel.userInteractionEnabled = NO;
+        _headerLabel.textAlignment = NSTextAlignmentCenter;
+    }
+    return _headerLabel;
 }
 
 - (UIButton *)backButton
@@ -49,7 +68,7 @@
         _backButton.titleLabel.numberOfLines = 1;
         [_backButton setTitle:@"<" forState:UIControlStateNormal];
         [_backButton setTitle:@"<" forState:UIControlStateHighlighted];
-        [_backButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_backButton setTitleColor:[UIColor colorWithRed:32/255.0 green:48/255.0 blue:66/255.0 alpha:1.0] forState:UIControlStateNormal];
         [_backButton setTitleColor:[UIColor yellowColor] forState:UIControlStateHighlighted];
         [_backButton addTarget:self
                         action:@selector(backButtonPressed:)
@@ -74,8 +93,8 @@
     scrollFrame.size.height -= kScrollYOffset;
     self.scrollView.frame = scrollFrame;
 
-    self.backButton.frame = CGRectMake(0, 0, 75, 75);
-    
+    self.backButton.frame = CGRectMake(0, 0, kScrollYOffset, kScrollYOffset);
+    self.headerLabel.frame = CGRectMake(0, 0, scrollFrame.size.width, kScrollYOffset);
     self.scrollView.contentSize = self.scrollView.frame.size;
 }
 
@@ -125,7 +144,7 @@
 
 - (CGSize)scrollViewcontentSizeForVCIndex:(NSUInteger)vcIndex
 {
-    CGSize contentSize = self.view.bounds.size;
+    CGSize contentSize = self.scrollView.bounds.size;
     CGFloat vcWidth = [self childVCWidth];
     contentSize.width = kLeftBoundsOffset + (vcWidth) * (vcIndex+1) + vcIndex * kSpaceBetweenViews + kLeftBoundsOffset;
     return contentSize;
