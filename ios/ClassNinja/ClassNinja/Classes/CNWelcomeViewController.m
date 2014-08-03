@@ -40,8 +40,8 @@
     [super viewDidAppear:animated];
     [self setNeedsStatusBarAppearanceUpdate];
     [[CNAPIClient sharedInstance] list:[CNTarget class]
-                              authPolicy:CNFailRequestOnAuthFailure
-                              completion:^(NSArray *targets) {
+                            authPolicy:CNForceAuthenticationOnAuthFailure
+                            completion:^(NSArray *targets) {
         NSLog(@"Targets: %@", targets);
     }];
 }
@@ -90,7 +90,7 @@
     [super viewDidLoad];
     
     self.view.translatesAutoresizingMaskIntoConstraints = NO;
-    self.view.backgroundColor = [UIColor colorWithRed:27/255.0 green:127/255.0 blue:247/255.0 alpha:1.0];
+    self.view.backgroundColor = WELCOME_BLUE_COLOR;
     
     self.tableViewController = [[UITableViewController alloc] init];
     [self addChildViewController:self.tableViewController];

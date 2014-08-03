@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define APP_DELEGATE        ((CNAppDelegate *)[[UIApplication sharedApplication] delegate])
+
 @interface CNAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;

@@ -7,6 +7,8 @@
 //
 
 #import "CNAuthContext.h"
+#import "CNAppDelegate.h"
+#import "CNAuthViewController.h"
 
 @interface CNAuthContext()
 
@@ -20,7 +22,9 @@
 
 - (void)authenticateWithCompletion:(void (^)())completionBlock
 {
-    NSAssert(NO, @"This isn't implemented yet.");
+    [APP_DELEGATE.window.rootViewController presentViewController:[[CNAuthViewController alloc] init]
+                                                         animated:YES
+                                                       completion:nil];
 }
 
 #pragma mark loggedInUser Management

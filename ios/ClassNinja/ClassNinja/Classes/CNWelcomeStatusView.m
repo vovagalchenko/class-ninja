@@ -9,8 +9,6 @@
 #import "CNWelcomeStatusView.h"
 #import "AppearanceConstants.h"
 
-#define INTER_ELEMENT_VERTICAL_PADDING      10.0
-
 @interface CNWelcomeStatusView()
 
 @property (nonatomic, readonly) UILabel *welcomeLabel;
@@ -33,7 +31,7 @@
         [self addSubview:self.addClassesButton];
         
         NSArray *verticalConstraints = [NSLayoutConstraint
-                                        constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_welcomeLabel]-%f-[_statusLabel]-%f-[_addClassesButton]-%f-|", 50.0, INTER_ELEMENT_VERTICAL_PADDING, INTER_ELEMENT_VERTICAL_PADDING, 10.0]
+                                        constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_welcomeLabel]-%f-[_statusLabel]-%f-[_addClassesButton]-%f-|", VERTICAL_MARGIN, INTER_ELEMENT_VERTICAL_PADDING, INTER_ELEMENT_VERTICAL_PADDING, 10.0]
                                         options:0
                                         metrics:nil
                                         views:NSDictionaryOfVariableBindings(_welcomeLabel, _statusLabel, _addClassesButton)];
@@ -106,7 +104,7 @@
 {
     if (_statusLabel == nil) {
         _statusLabel = [[UILabel alloc] init];
-        _statusLabel.font = [UIFont systemFontOfSize:18.0];
+        _statusLabel.font = INSTRUCTION_LABEL_FONT;
         _statusLabel.text = @"Fetching your targets...";
         _statusLabel.textColor = [UIColor whiteColor];
         _statusLabel.numberOfLines = 0;
@@ -123,7 +121,7 @@
 {
     if (_welcomeLabel == nil) {
         _welcomeLabel = [[UILabel alloc] init];
-        _welcomeLabel.font = [UIFont systemFontOfSize:25.0];
+        _welcomeLabel.font = [UIFont systemFontOfSize:FOCAL_LABEL_TEXT_SIZE];
         _welcomeLabel.text = @"Hello";
         _welcomeLabel.textColor = [UIColor whiteColor];
         _welcomeLabel.numberOfLines = 1;

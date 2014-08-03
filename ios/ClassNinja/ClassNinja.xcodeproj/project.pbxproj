@@ -30,6 +30,8 @@
 		DC08B6A4198D8DD00092EE90 /* CNModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 707F989719689D8700D6E552 /* CNModels.m */; };
 		DCCAA3921985ECB200BC4E7D /* CNAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = DCCAA3911985ECB200BC4E7D /* CNAPIClient.m */; };
 		DCCAA3951985FA5D00BC4E7D /* CNAPIResource.m in Sources */ = {isa = PBXBuildFile; fileRef = DCCAA3941985FA5D00BC4E7D /* CNAPIResource.m */; };
+		DCE7E7EF198D97DD00E14E3E /* CNAuthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E7EE198D97DD00E14E3E /* CNAuthViewController.m */; };
+		DCE7E7F2198DA60600E14E3E /* CNNumberEntryTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E7F1198DA60600E14E3E /* CNNumberEntryTextField.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +84,10 @@
 		DCCAA3911985ECB200BC4E7D /* CNAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNAPIClient.m; sourceTree = "<group>"; };
 		DCCAA3931985FA5D00BC4E7D /* CNAPIResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNAPIResource.h; sourceTree = "<group>"; };
 		DCCAA3941985FA5D00BC4E7D /* CNAPIResource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNAPIResource.m; sourceTree = "<group>"; };
+		DCE7E7ED198D97DD00E14E3E /* CNAuthViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNAuthViewController.h; sourceTree = "<group>"; };
+		DCE7E7EE198D97DD00E14E3E /* CNAuthViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNAuthViewController.m; sourceTree = "<group>"; };
+		DCE7E7F0198DA60600E14E3E /* CNNumberEntryTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNNumberEntryTextField.h; sourceTree = "<group>"; };
+		DCE7E7F1198DA60600E14E3E /* CNNumberEntryTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNNumberEntryTextField.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +215,10 @@
 		DC08B6A3198D7D990092EE90 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
+				DCE7E7ED198D97DD00E14E3E /* CNAuthViewController.h */,
+				DCE7E7EE198D97DD00E14E3E /* CNAuthViewController.m */,
+				DCE7E7F0198DA60600E14E3E /* CNNumberEntryTextField.h */,
+				DCE7E7F1198DA60600E14E3E /* CNNumberEntryTextField.m */,
 			);
 			name = Auth;
 			sourceTree = "<group>";
@@ -354,6 +364,8 @@
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
 				7055711E1985D634008F66F1 /* CNDepartmentViewController.m in Sources */,
 				DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */,
+				DCE7E7F2198DA60600E14E3E /* CNNumberEntryTextField.m in Sources */,
+				DCE7E7EF198D97DD00E14E3E /* CNAuthViewController.m in Sources */,
 				DC08B6A4198D8DD00092EE90 /* CNModels.m in Sources */,
 				DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */,
 				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
