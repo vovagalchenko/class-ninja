@@ -53,6 +53,12 @@
 {
     return [NSString stringWithFormat:@"Event id %@, type = %@, times / location = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.eventType, self.timesAndLocations, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
 }
+
+- (NSString *)name
+{
+    return [NSString stringWithFormat:@"%@ %@ %@", self.eventType, self.timesAndLocations, self.status];
+}
+
 @end
 
 @implementation CNUser
@@ -75,6 +81,11 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"User phoneNumber %@, accessToken = %@", self.phoneNumber, self.accessToken];
+}
+
+- (NSString *)name
+{
+    return [NSString stringWithFormat:@"%@", self.phoneNumber];
 }
 
 @end

@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "CNSiongNavigationViewController.h"
+#import "CNModels.h"
 
-@interface CNSchoolViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, SiongNavigationProtocol>
+@interface CNGenericSelectionViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, SiongNavigationProtocol>
 @property (nonatomic, weak) CNSiongNavigationViewController *siongNavigationController;
+@end
+
+@interface CNSchoolViewController : CNGenericSelectionViewController
 @end

@@ -78,10 +78,13 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
                        completion:(void (^)(NSArray *))completionBlock
 {
     NSURL *urlWithResourceType = [baseURL() URLByAppendingPathComponent:[parentAPIResource resourceTypeName] isDirectory:YES];
+    
     NSURL *finishedURL = [urlWithResourceType URLByAppendingPathComponent:[parentAPIResource resourceIdentifier]];
+    
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:finishedURL
                             cachePolicy:NSURLRequestReloadIgnoringCacheData
                         timeoutInterval:urlRequestTimeoutInterval()];
+    
     [self makeURLRequest:urlRequest
   authenticationRequired:[[parentAPIResource childResourceClass] needsAuthentication]
           withAuthPolicy:authPolicy
@@ -93,7 +96,6 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
                       if ([parentAPIResource isKindOfClass:[CNRootAPIResource class]]) {
                           childrenKey = [[parentAPIResource resourceTypeName] stringByAppendingString:@"s"];
                       } else {
-                          
                           id<CNAPIResource>childAPIResourceInstance = [[(Class)[parentAPIResource childResourceClass] alloc] init];
                           childrenKey = [NSString stringWithFormat:@"%@_%@s",
                                          [parentAPIResource resourceTypeName], [childAPIResourceInstance resourceTypeName]];

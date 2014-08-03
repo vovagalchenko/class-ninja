@@ -7,9 +7,14 @@
 //
 
 #import "CNSiongNavigationViewController.h"
+#import "AppearanceConstants.h"
+
+#define kScrollYOffset 75.0
 
 @interface CNSiongNavigationViewController ()
 @property (nonatomic) UIScrollView *scrollView;
+@property (nonatomic) UIButton *backButton;
+@property (nonatomic) UILabel *headerLabel;
 @property (nonatomic,readwrite,strong) NSMutableArray *viewControllers;
 @end
 
@@ -21,16 +26,56 @@
     if (self) {
         _viewControllers = [NSMutableArray array];
         _scrollView = [[UIScrollView alloc] init];
+
+        _scrollView.backgroundColor = [UIColor clearColor];
+        
         [_viewControllers addObject:rootViewController];
+        
+        [self.view addSubview:self.backButton];
+        self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
+        
         rootViewController.siongNavigationController = self;
         [self.view addSubview:_scrollView];
     }
     return self;
 }
 
+- (UIButton *)backButton
+{
+    if (_backButton == nil) {
+        _backButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+        _backButton.titleLabel.font = [UIFont boldSystemFontOfSize:12.0];
+        _backButton.titleLabel.numberOfLines = 1;
+        [_backButton setTitle:@"<" forState:UIControlStateNormal];
+        [_backButton setTitle:@"<" forState:UIControlStateHighlighted];
+        [_backButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_backButton setTitleColor:[UIColor yellowColor] forState:UIControlStateHighlighted];
+        [_backButton addTarget:self
+                        action:@selector(backButtonPressed:)
+              forControlEvents:UIControlEventTouchUpInside];
+        
+        _backButton.translatesAutoresizingMaskIntoConstraints = NO;
+        [_backButton setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [_backButton setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    }
+    return _backButton;
+}
+
+- (void)backButtonPressed:(id)sender
+{
+    [self popViewControllerAnimated:YES];
+}
+
 - (void)viewWillLayoutSubviews
 {
-    self.scrollView.frame = self.view.bounds;
+    CGRect scrollFrame = self.view.bounds;
+    scrollFrame.origin.y += kScrollYOffset;
+    scrollFrame.size.height -= kScrollYOffset;
+    self.scrollView.frame = scrollFrame;
+
+    self.backButton.frame = CGRectMake(0, 0, 75, 75);
+    
     self.scrollView.contentSize = self.scrollView.frame.size;
 }
 
@@ -103,25 +148,29 @@
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated
 {
     UIViewController *resultVC = self.topViewController;
-    
-    NSUInteger vcIndex = self.viewControllers.count - 2;
-    dispatch_block_t completionBlock = ^{
-        [resultVC.view removeFromSuperview];
-        [self.viewControllers removeLastObject];
-    };
-    
-    
-    if (animated) {
-        [UIView animateWithDuration:0.3 animations:^{
+ 
+    NSUInteger vcCount = self.viewControllers.count;
+    if (vcCount >= 2) {
+        NSUInteger vcIndex = vcCount - 2;
+        dispatch_block_t completionBlock = ^{
+            [resultVC.view removeFromSuperview];
+            [self.viewControllers removeLastObject];
+        };
+        
+        if (animated) {
+            [UIView animateWithDuration:0.3 animations:^{
+                self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
+            }completion:^(BOOL finished) {
+                if (finished) {
+                    completionBlock();
+                }
+            }];
+        } else {
             self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
-        }completion:^(BOOL finished) {
-            if (finished) {
-                completionBlock();
-            }
-        }];
+            completionBlock();
+        }
     } else {
-        self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
-        completionBlock();
+        [self dismissViewControllerAnimated:animated completion:nil];
     }
     
     return resultVC;

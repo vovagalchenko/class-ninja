@@ -11,7 +11,7 @@
 @protocol CNModel <NSObject>
 
 @required
-- (NSString *)description;
+- (NSString *)name;
 
 @end
 

@@ -10,10 +10,8 @@
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */; };
 		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
-		7055711E1985D634008F66F1 /* CNDepartmentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711D1985D634008F66F1 /* CNDepartmentViewController.m */; };
-		705571211985E7B0008F66F1 /* CNCourseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705571201985E7B0008F66F1 /* CNCourseViewController.m */; };
 		7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */; };
-		705571271988BC7B008F66F1 /* CNSchoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705571261988BC7B008F66F1 /* CNSchoolViewController.m */; };
+		705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705571261988BC7B008F66F1 /* CNGenericSelectionViewController.m */; };
 		707F9841196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
 		707F9843196899BC00D6E552 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9842196899BC00D6E552 /* CoreGraphics.framework */; };
 		707F9845196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
@@ -24,6 +22,7 @@
 		707F985A196899BC00D6E552 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9859196899BC00D6E552 /* XCTest.framework */; };
 		707F985B196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
 		707F985C196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
+		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
 		DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B67819883E020092EE90 /* CNAuthContext.m */; };
 		DC08B698198AB0470092EE90 /* CNWelcomeStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B697198AB0470092EE90 /* CNWelcomeStatusView.m */; };
 		DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B69E198AF3D50092EE90 /* UITableView+LayoutSubviews.m */; };
@@ -50,14 +49,10 @@
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseHelper.m; sourceTree = "<group>"; };
 		7055711919858293008F66F1 /* CNWelcomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNWelcomeViewController.h; sourceTree = "<group>"; };
 		7055711A19858293008F66F1 /* CNWelcomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNWelcomeViewController.m; sourceTree = "<group>"; };
-		7055711C1985D634008F66F1 /* CNDepartmentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNDepartmentViewController.h; sourceTree = "<group>"; };
-		7055711D1985D634008F66F1 /* CNDepartmentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNDepartmentViewController.m; sourceTree = "<group>"; };
-		7055711F1985E7B0008F66F1 /* CNCourseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCourseViewController.h; sourceTree = "<group>"; };
-		705571201985E7B0008F66F1 /* CNCourseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCourseViewController.m; sourceTree = "<group>"; };
 		7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSiongNavigationViewController.h; sourceTree = "<group>"; };
 		7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSiongNavigationViewController.m; sourceTree = "<group>"; };
-		705571251988BC7B008F66F1 /* CNSchoolViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSchoolViewController.h; sourceTree = "<group>"; };
-		705571261988BC7B008F66F1 /* CNSchoolViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSchoolViewController.m; sourceTree = "<group>"; };
+		705571251988BC7B008F66F1 /* CNGenericSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGenericSelectionViewController.h; sourceTree = "<group>"; };
+		705571261988BC7B008F66F1 /* CNGenericSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionViewController.m; sourceTree = "<group>"; };
 		707F983D196899BC00D6E552 /* classalert.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = classalert.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		707F9840196899BC00D6E552 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		707F9842196899BC00D6E552 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -73,6 +68,8 @@
 		707F9859196899BC00D6E552 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		707F989619689D8700D6E552 /* CNModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNModels.h; sourceTree = "<group>"; };
 		707F989719689D8700D6E552 /* CNModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNModels.m; sourceTree = "<group>"; };
+		70DB470C198D967000F81F43 /* CNGenericSelectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGenericSelectionTableViewCell.h; sourceTree = "<group>"; };
+		70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionTableViewCell.m; sourceTree = "<group>"; };
 		DC08B67719883E020092EE90 /* CNAuthContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNAuthContext.h; sourceTree = "<group>"; };
 		DC08B67819883E020092EE90 /* CNAuthContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNAuthContext.m; sourceTree = "<group>"; };
 		DC08B696198AB0470092EE90 /* CNWelcomeStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNWelcomeStatusView.h; sourceTree = "<group>"; };
@@ -115,6 +112,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		70495D22198DDD910059B267 /* Navigation */ = {
+			isa = PBXGroup;
+			children = (
+				7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */,
+				7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */,
+			);
+			name = Navigation;
+			sourceTree = "<group>";
+		};
 		707F9834196899BC00D6E552 = {
 			isa = PBXGroup;
 			children = (
@@ -249,14 +255,11 @@
 		DCE7E7EC198D90FC00E14E3E /* CourseBrowsing */ = {
 			isa = PBXGroup;
 			children = (
-				705571251988BC7B008F66F1 /* CNSchoolViewController.h */,
-				705571261988BC7B008F66F1 /* CNSchoolViewController.m */,
-				7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */,
-				7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */,
-				7055711F1985E7B0008F66F1 /* CNCourseViewController.h */,
-				705571201985E7B0008F66F1 /* CNCourseViewController.m */,
-				7055711C1985D634008F66F1 /* CNDepartmentViewController.h */,
-				7055711D1985D634008F66F1 /* CNDepartmentViewController.m */,
+				70495D22198DDD910059B267 /* Navigation */,
+				70DB470C198D967000F81F43 /* CNGenericSelectionTableViewCell.h */,
+				70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */,
+				705571251988BC7B008F66F1 /* CNGenericSelectionViewController.h */,
+				705571261988BC7B008F66F1 /* CNGenericSelectionViewController.m */,
 			);
 			name = CourseBrowsing;
 			sourceTree = "<group>";
@@ -309,6 +312,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Bova;
 				TargetAttributes = {
+					707F983C196899BC00D6E552 = {
+						DevelopmentTeam = FPJM4NGXTD;
+					};
 					707F9857196899BC00D6E552 = {
 						TestTargetID = 707F983C196899BC00D6E552;
 					};
@@ -358,11 +364,9 @@
 			files = (
 				DCCAA3951985FA5D00BC4E7D /* CNAPIResource.m in Sources */,
 				707F984D196899BC00D6E552 /* main.m in Sources */,
-				705571271988BC7B008F66F1 /* CNSchoolViewController.m in Sources */,
+				705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */,
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */,
-				705571211985E7B0008F66F1 /* CNCourseViewController.m in Sources */,
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
-				7055711E1985D634008F66F1 /* CNDepartmentViewController.m in Sources */,
 				DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */,
 				DCE7E7F2198DA60600E14E3E /* CNNumberEntryTextField.m in Sources */,
 				DCE7E7EF198D97DD00E14E3E /* CNAuthViewController.m in Sources */,
@@ -371,6 +375,7 @@
 				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
 				DCCAA3921985ECB200BC4E7D /* CNAPIClient.m in Sources */,
 				707F9851196899BC00D6E552 /* CNAppDelegate.m in Sources */,
+				70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */,
 				DC08B698198AB0470092EE90 /* CNWelcomeStatusView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -420,7 +425,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Boris Suvorov (476T9Z2Y89)";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -439,6 +444,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = classalert;
+				PROVISIONING_PROFILE = "B5B5172E-A905-4380-B5E7-D79EBADDC12A";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -460,7 +466,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Boris Suvorov (476T9Z2Y89)";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -472,6 +478,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = classalert;
+				PROVISIONING_PROFILE = "B5B5172E-A905-4380-B5E7-D79EBADDC12A";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -483,10 +490,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
 				PRODUCT_NAME = classalert;
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -496,10 +506,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
 				PRODUCT_NAME = classalert;
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

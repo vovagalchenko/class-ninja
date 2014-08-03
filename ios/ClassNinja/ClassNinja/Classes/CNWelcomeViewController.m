@@ -7,7 +7,7 @@
 //
 
 #import "CNWelcomeViewController.h"
-#import "CNSchoolViewController.h"
+#import "CNGenericSelectionViewController.h"
 #import "CNSiongNavigationViewController.h"
 #import "CNAPIClient.h"
 #import "AppearanceConstants.h"
@@ -37,6 +37,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    self.view.backgroundColor = [UIColor colorWithRed:27/255.0 green:127/255.0 blue:247/255.0 alpha:1.0];
     [super viewDidAppear:animated];
     [self setNeedsStatusBarAppearanceUpdate];
     [[CNAPIClient sharedInstance] list:[CNTarget class]
@@ -175,8 +176,8 @@
 
 - (void)addClassesButtonPressed:(id)sender
 {
-    CNSchoolViewController *deptVC = [[CNSchoolViewController alloc] init];
-    CNSiongNavigationViewController *navController = [[CNSiongNavigationViewController alloc] initWithRootViewController:deptVC];
+    CNSchoolViewController *schoolVC = [[CNSchoolViewController alloc] init];
+    CNSiongNavigationViewController *navController = [[CNSiongNavigationViewController alloc] initWithRootViewController:schoolVC];
     navController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:navController animated:YES completion:nil];
 }
