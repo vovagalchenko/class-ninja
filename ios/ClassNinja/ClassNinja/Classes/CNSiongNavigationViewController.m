@@ -10,12 +10,15 @@
 #import "AppearanceConstants.h"
 
 #define kScrollYOffset 75.0
+#define kPushDuration 0.3
 
-@interface CNSiongNavigationViewController ()
+@interface CNSiongNavigationViewController () <UIScrollViewDelegate>
 @property (nonatomic) UIScrollView *scrollView;
 @property (nonatomic) UIButton *backButton;
 @property (nonatomic) UILabel *headerLabel;
 @property (nonatomic) NSMutableArray *viewControllers;
+@property (nonatomic) NSUInteger lastPageIndex;
+@property (nonatomic) NSUInteger currentPageIndex;
 @end
 
 @implementation CNSiongNavigationViewController
@@ -38,17 +41,29 @@
 
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
     
-    _scrollView = [[UIScrollView alloc] init];
-    _scrollView.backgroundColor = [UIColor clearColor];
-
+    
     [self.view addSubview:self.backButton];
     [self.view addSubview:self.headerLabel];
     [self.view addSubview:self.scrollView];
 }
 
+- (UIScrollView *)scrollView
+{
+    if (_scrollView == nil) {
+        _scrollView = [[UIScrollView alloc] init];
+        _scrollView.backgroundColor = [UIColor clearColor];
+        _scrollView.showsHorizontalScrollIndicator = NO;
+        
+        _scrollView.showsVerticalScrollIndicator = YES;
+        _scrollView.pagingEnabled = NO;
+        _scrollView.delegate = self;
+    }
+    return _scrollView;
+}
+
 - (UILabel *)headerLabel
 {
-    if (_headerLabel ==nil) {
+    if (_headerLabel == nil) {
         _headerLabel = [[UILabel alloc] init];
         _headerLabel.textColor = [UIColor colorWithRed:32/255.0 green:48/255.0 blue:66/255.0 alpha:1.0];
         _headerLabel.text = @"Add Class";
@@ -81,6 +96,7 @@
     return _backButton;
 }
 
+
 - (void)backButtonPressed:(id)sender
 {
     [self popViewControllerAnimated:YES];
@@ -95,36 +111,101 @@
 
     self.backButton.frame = CGRectMake(0, 0, kScrollYOffset, kScrollYOffset);
     self.headerLabel.frame = CGRectMake(0, 0, scrollFrame.size.width, kScrollYOffset);
+
     self.scrollView.contentSize = self.scrollView.frame.size;
 }
 
-- (void)viewWillAppear:(BOOL)animated
+- (void)viewDidAppear:(BOOL)animated
 {
     [self pushViewController:[self.viewControllers firstObject]];
 }
 
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    self.currentPageIndex = [self indexOfVisibleViewController];
+}
+
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
+{
+    NSInteger newPage = self.currentPageIndex;
+    if (velocity.x == 0) {
+        newPage = [self indexOfPageForContentOffset:targetContentOffset->x];
+    } else {
+        if (velocity.x > 0) {
+            newPage++;
+        } else {
+            newPage--;
+        }
+        
+        if (newPage < 0) {
+            newPage = 0;
+        }
+        
+        if (newPage >= self.viewControllers.count) {
+            newPage = self.viewControllers.count - 1;
+        }
+    }
+    
+    *targetContentOffset = [self targetPointForPageIndex:newPage];
+    [self scrollToIndex:newPage];
+}
+
+
 #define kLeftBoundsOffset 24.0
 #define kSpaceBetweenViews (kLeftBoundsOffset/2.0)
 
+- (NSUInteger)indexOfPageForContentOffset:(CGFloat)contentXOffset
+{
+    CGFloat midOfPageXOffset = contentXOffset + self.view.bounds.size.width / 2;
+    CGFloat interVCWidth =  self.view.bounds.size.width - kLeftBoundsOffset - kSpaceBetweenViews;
+    NSUInteger index = (NSUInteger)((midOfPageXOffset / interVCWidth));
+    return index;
+}
+
 - (NSUInteger)indexOfVisibleViewController
 {
-    CGFloat xOffset = self.scrollView.contentOffset.x;
+    return [self indexOfPageForContentOffset:self.scrollView.contentOffset.x];
+}
+
+
+
+- (CGPoint)targetPointForPageIndex:(NSUInteger)index
+{
     CGFloat interVCWidth =  self.view.bounds.size.width - kLeftBoundsOffset - kSpaceBetweenViews;
-    NSUInteger index = (NSUInteger)((xOffset / interVCWidth));
-    return index;
+    CGPoint newContentOffset = CGPointMake(index * interVCWidth, 0);
+    return newContentOffset;
 }
 
 - (void)scrollToIndex:(NSUInteger)index
 {
-    CGFloat interVCWidth =  self.view.bounds.size.width - kLeftBoundsOffset - kSpaceBetweenViews;
-    CGPoint newContentOffset = CGPointMake(index * interVCWidth, 0);
-    [self.scrollView setContentOffset:newContentOffset animated:YES];
+    self.lastPageIndex = index;
+
+    // I wanted to keep contant velocity for all the kinds of scrolling to index page.
+    // user might select next view controller, or drag to the next one.
+    // thus in this two scenarios distance is going to be different.
+    // V = pushDistance / kPushDuration.
+    // We want V to be const for all kinds of scrolling to the next page (next VC)
+    // Thus for drag induced scrolls we have following formula for duration:
+    // duration = currentScrollDistance * (kPushDuration / viewControllerPushDistance)
+    CGFloat viewControllerPushDistance = [self childVCWidth];
+    CGPoint targetPoint = [self targetPointForPageIndex:index];
+    CGFloat currentScrollDistance = fabs(self.scrollView.contentOffset.x  - targetPoint.x);
+    CGFloat duration = currentScrollDistance * kPushDuration / viewControllerPushDistance;
+
+    // UIViewAnimationOptionCurveLinear option also felt good IMO
+    UIViewAnimationOptions animationOptions = UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState;
+    [UIView animateWithDuration:duration
+                          delay:0
+                        options:animationOptions
+                     animations:^{ self.scrollView.contentOffset = targetPoint; }
+                     completion:nil];
 }
 
 - (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController
 {
     NSUInteger currentVCIndex = [self indexOfVisibleViewController];
     viewController.siongNavigationController = self;
+
     // dismiss all view controllers to the right of current VC
     for (NSUInteger vcIndex = self.viewControllers.count-1; vcIndex > currentVCIndex; vcIndex--) {
         [self popViewControllerAnimated:NO];
@@ -154,7 +235,7 @@
 {
     CGFloat vcWidth = [self childVCWidth];
     CGFloat x = kLeftBoundsOffset + (vcWidth + kSpaceBetweenViews) * vcIndex;
-    return CGRectMake(x, 0, vcWidth, self.view.bounds.size.height);
+    return CGRectMake(x, 0, vcWidth, self.scrollView.bounds.size.height);
 }
 
 - (CGFloat)childVCWidth
@@ -174,6 +255,7 @@
         dispatch_block_t completionBlock = ^{
             [resultVC.view removeFromSuperview];
             [self.viewControllers removeLastObject];
+            self.lastPageIndex = self.viewControllers.count - 1;
         };
         
         if (animated) {
