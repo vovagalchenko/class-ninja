@@ -271,7 +271,7 @@
             completionBlock();
         }
     } else {
-        [self dismissViewControllerAnimated:animated completion:nil];
+        [self.presentingViewController dismissViewControllerAnimated:animated completion:nil];
     }
     
     return resultVC;
