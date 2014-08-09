@@ -11,11 +11,16 @@
 #import "CNGenericSelectionTableViewCell.h"
 #import "AppearanceConstants.h"
 
+#define kTitleViewHeight 90
+#define kTitleLabelXOffset 20
+
 @interface CNGenericSelectionViewController ()
 @property (nonatomic, readonly) NSString *headerText;
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) NSArray *childrenOfRootModel;
 @property (nonatomic) id <CNModel> rootModel;
+
+@property (nonatomic) UIView *titleView;
 
 - (void)reloadResults:(NSArray *)children;
 - (id <CNModel>)modelForIndexPath:(NSIndexPath *)indexPath;
@@ -45,14 +50,28 @@
     self.tableView.backgroundColor = [UIColor clearColor];
     
     self.view.autoresizingMask = UIViewAutoresizingNone;
+
+}
+
+- (void)viewWillLayoutSubviews
+{
     [self.view addSubview:self.tableView];
+    [self.view addSubview:self.titleView];
 }
 
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-    self.tableView.frame = self.view.bounds;
-    self.tableView.tableHeaderView = [self tableHeaderView];
+
+    // set header first
+    self.titleView.frame = CGRectMake(0, 0, self.view.frame.size.width, kTitleViewHeight);
+
+    // set table view
+    CGRect tableRect = self.view.bounds;
+    tableRect.origin.y += kTitleViewHeight;
+    tableRect.size.height -= kTitleViewHeight;
+    
+    self.tableView.frame = tableRect;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -108,21 +127,26 @@
     [self.siongNavigationController pushViewController:nextVC];
 }
 
-- (UIView *)tableHeaderView
+- (UIView *)titleView
 {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 90)];
+    if (_titleView == nil) {
+        UIView *view = [[UIView alloc] init];
+        
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(kTitleLabelXOffset, 0,
+                                                                   self.view.frame.size.width - 2*kTitleLabelXOffset, kTitleViewHeight)];
+        
+        label.text = [self headerText];
+        label.numberOfLines = 3;
+        label.textColor = [UIColor whiteColor];
+        label.font = [UIFont systemFontOfSize:18];
+        
+        [view addSubview:label];
+        [view setBackgroundColor:[UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]];
 
-    CGFloat xOffset = 20;
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(xOffset, 0, self.tableView.frame.size.width - 2*xOffset, 90)];
-
-    label.text = [self headerText];
-    label.numberOfLines = 3;
-    label.textColor = [UIColor whiteColor];
-    label.font = [UIFont systemFontOfSize:18];
-
-    [view addSubview:label];
-    [view setBackgroundColor:[UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]];
-    return view;
+        _titleView = view;
+    }
+    
+    return _titleView;
 }
 
 @end
