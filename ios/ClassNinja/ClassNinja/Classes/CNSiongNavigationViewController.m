@@ -17,7 +17,6 @@
 @property (nonatomic) UIButton *backButton;
 @property (nonatomic) UILabel *headerLabel;
 @property (nonatomic) NSMutableArray *viewControllers;
-@property (nonatomic) NSUInteger lastPageIndex;
 @property (nonatomic) NSUInteger currentPageIndex;
 @end
 
@@ -178,8 +177,6 @@
 
 - (void)scrollToIndex:(NSUInteger)index
 {
-    self.lastPageIndex = index;
-
     // I wanted to keep contant velocity for all the kinds of scrolling to index page.
     // user might select next view controller, or drag to the next one.
     // thus in this two scenarios distance is going to be different.
@@ -245,29 +242,42 @@
 
 
 
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated
+-(UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex animated:(BOOL)animated
 {
     UIViewController *resultVC = self.topViewController;
- 
+
     NSUInteger vcCount = self.viewControllers.count;
-    if (vcCount >= 2) {
-        NSUInteger vcIndex = vcCount - 2;
+
+    if (vcIndex >= vcCount){
+        return nil;
+    }
+    
+    if (vcIndex >= 1) {
         dispatch_block_t completionBlock = ^{
             [resultVC.view removeFromSuperview];
-            [self.viewControllers removeLastObject];
-            self.lastPageIndex = self.viewControllers.count - 1;
+            NSRange range = NSMakeRange(vcIndex, self.viewControllers.count - vcIndex);
+            
+            for (NSUInteger i = vcCount-1; i >= vcIndex; i--) {
+                UIViewController *vc = [self.viewControllers objectAtIndex:i];
+                [vc.view removeFromSuperview];
+            }
+
+            [self.viewControllers removeObjectsInRange:range];
+            self.currentPageIndex = self.viewControllers.count - 1;
         };
+        
+        NSUInteger targetVCIndex = vcIndex -1;
         
         if (animated) {
             [UIView animateWithDuration:0.3 animations:^{
-                self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
+                self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:targetVCIndex];
             }completion:^(BOOL finished) {
                 if (finished) {
                     completionBlock();
                 }
             }];
         } else {
-            self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:vcIndex];
+            self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:targetVCIndex];
             completionBlock();
         }
     } else {
@@ -275,6 +285,12 @@
     }
     
     return resultVC;
+}
+
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated
+{
+    NSUInteger currentPageIndex = [self indexOfVisibleViewController];
+    return [self popViewControllerAtIndex:currentPageIndex animated:animated];
 }
 
 - (UIViewController *)topViewController
