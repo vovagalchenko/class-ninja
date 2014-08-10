@@ -29,6 +29,8 @@
 @property (nonatomic) NSUInteger currentPageIndex;
 @property (nonatomic) UIView *leftBlendedView;
 @property (nonatomic) UIView *rightBlendedView;
+
+@property (nonatomic) BOOL firstLoad;
 @end
 
 @implementation CNSiongNavigationViewController
@@ -49,6 +51,17 @@
 {
     [super viewDidLoad];
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
+    
+    [self.view addSubview:self.backButton];
+    [self.view addSubview:self.headerLabel];
+    [self.view addSubview:self.scrollView];
+    
+    // always last
+    [self.view addSubview:self.leftBlendedView];
+    [self.view addSubview:self.rightBlendedView];
+    
+    UIViewController *vc = [self.viewControllers firstObject];
+    [self.scrollView addSubview:vc.view];
 }
 
 - (UIView *)createGenericBlendedView
@@ -64,10 +77,6 @@
 {
     if (_leftBlendedView == nil) {
         _leftBlendedView = [self createGenericBlendedView];
-        _leftBlendedView.frame = CGRectMake(0,
-                                            0,
-                                            kSpaceBetweenViews,
-                                            self.view.bounds.size.height);
     }
     return _leftBlendedView;
 }
@@ -76,10 +85,6 @@
 {
     if (_rightBlendedView == nil) {
         _rightBlendedView = [self createGenericBlendedView];
-        _rightBlendedView.frame = CGRectMake(self.view.bounds.size.width - kSpaceBetweenViews,
-                                             0,
-                                             kSpaceBetweenViews,
-                                             self.view.bounds.size.height);
     }
     return _rightBlendedView;
 }
@@ -123,7 +128,8 @@
         
         _backButton.translatesAutoresizingMaskIntoConstraints = NO;
         [_backButton setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        [_backButton setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+        [_backButton setContentCompressionResistancePriority:UILayoutPriorityRequired
+                                                     forAxis:UILayoutConstraintAxisVertical];
     }
     return _backButton;
 }
@@ -136,14 +142,6 @@
 
 - (void)viewWillLayoutSubviews
 {
-    [self.view addSubview:self.backButton];
-    [self.view addSubview:self.headerLabel];
-    [self.view addSubview:self.scrollView];
-    
-    // always last
-    [self.view addSubview:self.leftBlendedView];
-    [self.view addSubview:self.rightBlendedView];
-    
     CGRect scrollFrame = self.view.bounds;
     scrollFrame.origin.y += kScrollYOffset;
     scrollFrame.size.height -= kScrollYOffset;
@@ -154,11 +152,31 @@
     self.headerLabel.frame = CGRectMake(0, kButtonOriginY, scrollFrame.size.width, 20);
 
     self.scrollView.contentSize = self.scrollView.frame.size;
+    
+    self.rightBlendedView.frame = CGRectMake(self.view.bounds.size.width - kSpaceBetweenViews,
+                                             0,
+                                             kSpaceBetweenViews,
+                                             self.view.bounds.size.height);
+
+    self.leftBlendedView.frame = CGRectMake(0,
+                                            0,
+                                            kSpaceBetweenViews,
+                                            self.view.bounds.size.height);
+    
+    [self layoutViewControllersInScrollView];
 }
 
-- (void)viewDidAppear:(BOOL)animated
+- (void)layoutViewControllersInScrollView
 {
-    [self pushViewController:[self.viewControllers firstObject]];
+    NSUInteger vcCount = self.viewControllers.count;
+    for (NSUInteger vcIndex = 0; vcIndex < vcCount; vcIndex++) {
+        UIViewController *vc = [self.viewControllers objectAtIndex:vcIndex];
+        vc.view.frame = [self frameForChildVCAtIndex:vcIndex];
+    }
+
+    self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:self.viewControllers.count - 1];
+
+    [self scrollToIndex:self.currentPageIndex];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -215,6 +233,7 @@
 
 - (void)scrollToIndex:(NSUInteger)index
 {
+    self.currentPageIndex = index;
     // I wanted to keep contant velocity for all the kinds of scrolling to index page.
     // user might select next view controller, or drag to the next one.
     // thus in this two scenarios distance is going to be different.
@@ -276,7 +295,9 @@
     return self.view.bounds.size.width - 2*kLeftBoundsOffset;
 }
 
--(UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex animated:(BOOL)animated deselectRows:(BOOL)deselectRows
+-(UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex
+                         animated:(BOOL)animated
+                         deselectRows:(BOOL)deselectRows
 {
     UIViewController *resultVC = nil;
     NSInteger vcCount = self.viewControllers.count;
