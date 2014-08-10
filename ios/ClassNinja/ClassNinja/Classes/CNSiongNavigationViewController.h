@@ -12,6 +12,7 @@
 
 @protocol SiongNavigationProtocol <NSObject>
 @property (nonatomic, weak) CNSiongNavigationViewController *siongNavigationController;
+- (void)nextViewControllerWillPop;
 @end
 
 @interface CNSiongNavigationViewController : UIViewController
@@ -20,7 +21,6 @@
 
  // Uses a horizontal scroll transition. Has no effect if the view controller is already in the stack.
 - (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController;
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated;
 
 @property(nonatomic,readonly) UIViewController *topViewController; // The top view controller on the stack.
 

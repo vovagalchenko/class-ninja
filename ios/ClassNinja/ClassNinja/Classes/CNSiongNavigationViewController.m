@@ -98,7 +98,7 @@
 
 - (void)backButtonPressed:(id)sender
 {
-    [self popViewControllerAnimated:YES];
+    [self popViewControllerAnimated:YES deselectRows:YES];
 }
 
 - (void)viewWillLayoutSubviews
@@ -204,9 +204,7 @@
     viewController.siongNavigationController = self;
 
     // dismiss all view controllers to the right of current VC
-    for (NSUInteger vcIndex = self.viewControllers.count-1; vcIndex > currentVCIndex; vcIndex--) {
-        [self popViewControllerAnimated:NO];
-    }
+    [self popViewControllerAtIndex:currentVCIndex + 1 animated:NO deselectRows:NO];
     
     if ([self.viewControllers indexOfObject:viewController] == NSNotFound) {
         [self.viewControllers addObject:viewController];
@@ -240,33 +238,37 @@
     return self.view.bounds.size.width - 2*kLeftBoundsOffset;
 }
 
-
-
--(UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex animated:(BOOL)animated
+-(UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex animated:(BOOL)animated deselectRows:(BOOL)deselectRows
 {
-    UIViewController *resultVC = self.topViewController;
-
+    UIViewController *resultVC = nil;
     NSUInteger vcCount = self.viewControllers.count;
 
     if (vcIndex >= vcCount){
         return nil;
     }
     
+    resultVC = [self.viewControllers objectAtIndex:vcIndex];
+    
     if (vcIndex >= 1) {
         dispatch_block_t completionBlock = ^{
-            [resultVC.view removeFromSuperview];
-            NSRange range = NSMakeRange(vcIndex, self.viewControllers.count - vcIndex);
-            
             for (NSUInteger i = vcCount-1; i >= vcIndex; i--) {
-                UIViewController *vc = [self.viewControllers objectAtIndex:i];
-                [vc.view removeFromSuperview];
+                UIViewController <SiongNavigationProtocol> *currentVC = [self.viewControllers objectAtIndex:i];
+                [currentVC.view removeFromSuperview];
+                [self.viewControllers removeObjectAtIndex:i];
             }
-
-            [self.viewControllers removeObjectsInRange:range];
+            
             self.currentPageIndex = self.viewControllers.count - 1;
         };
         
-        NSUInteger targetVCIndex = vcIndex -1;
+        NSUInteger targetVCIndex = vcIndex - 1;
+        if (deselectRows) {
+            for (NSUInteger i = vcCount-2; i >= targetVCIndex; i--) {
+                UIViewController <SiongNavigationProtocol> *vc = [self.viewControllers objectAtIndex:i];
+                if ([vc respondsToSelector:@selector(nextViewControllerWillPop)]) {
+                    [vc nextViewControllerWillPop];
+                }
+            }
+        }
         
         if (animated) {
             [UIView animateWithDuration:0.3 animations:^{
@@ -287,10 +289,10 @@
     return resultVC;
 }
 
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated deselectRows:(BOOL)deselectRows
 {
     NSUInteger currentPageIndex = [self indexOfVisibleViewController];
-    return [self popViewControllerAtIndex:currentPageIndex animated:animated];
+    return [self popViewControllerAtIndex:currentPageIndex animated:animated deselectRows:deselectRows];
 }
 
 - (UIViewController *)topViewController

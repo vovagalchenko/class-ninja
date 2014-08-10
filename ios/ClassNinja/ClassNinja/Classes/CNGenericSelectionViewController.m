@@ -19,8 +19,8 @@
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) NSArray *childrenOfRootModel;
 @property (nonatomic) id <CNModel> rootModel;
-
 @property (nonatomic) UIView *titleView;
+@property (nonatomic) NSIndexPath *lastSelectedRow;
 
 - (void)reloadResults:(NSArray *)children;
 - (id <CNModel>)modelForIndexPath:(NSIndexPath *)indexPath;
@@ -124,7 +124,13 @@
     id <CNModel> model = [self modelForIndexPath:indexPath];
     CNGenericSelectionViewController *nextVC = [[[self nextVCClass] alloc] init];
     nextVC.rootModel = model;
+    self.lastSelectedRow =  indexPath;
     [self.siongNavigationController pushViewController:nextVC];
+}
+
+- (void)setLastSelectedRow:(NSIndexPath *)indexPath
+{
+    _lastSelectedRow = indexPath;
 }
 
 - (UIView *)titleView
@@ -147,6 +153,12 @@
     }
     
     return _titleView;
+}
+
+#pragma mark SiongNavigationProtocol
+- (void)nextViewControllerWillPop
+{
+    [self.tableView deselectRowAtIndexPath:self.lastSelectedRow animated:YES];
 }
 
 @end
