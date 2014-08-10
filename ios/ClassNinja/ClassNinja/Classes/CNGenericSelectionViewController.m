@@ -64,8 +64,6 @@
 {
     [super viewDidLayoutSubviews];
 
-    // set header first
-    self.titleView.frame = CGRectMake(0, 0, self.view.frame.size.width, kTitleViewHeight);
 
     // set table view
     CGRect tableRect = self.view.bounds;
@@ -73,6 +71,7 @@
     tableRect.size.height -= kTitleViewHeight;
     
     self.tableView.frame = tableRect;
+    [self layoutTitleView];
 }
 
 - (void)loadContent
@@ -133,8 +132,7 @@
     if (_titleView == nil) {
         UIView *view = [[UIView alloc] init];
         
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(kTitleLabelXOffset, 0,
-                                                                   self.view.frame.size.width - 2*kTitleLabelXOffset, kTitleViewHeight)];
+        UILabel *label = [[UILabel alloc] init];
         
         label.text = [self headerText];
         label.numberOfLines = 3;
@@ -148,6 +146,13 @@
     }
     
     return _titleView;
+}
+
+- (void)layoutTitleView
+{
+    self.titleView.frame = CGRectMake(0, 0, self.view.frame.size.width, kTitleViewHeight);
+    [[self.titleView.subviews objectAtIndex:0] setFrame:CGRectMake(kTitleLabelXOffset, 0,
+                                                                  self.view.frame.size.width - 2*kTitleLabelXOffset, kTitleViewHeight)];
 }
 
 #pragma mark SiongNavigationProtocol
