@@ -13,8 +13,19 @@ typedef enum : NSUInteger {
     CNNumberEntryTextFieldTypeVerificationCode,
 } CNNumberEntryTextFieldType;
 
+@protocol CNNumberEntryTextFieldDelegate;
 @interface CNNumberEntryTextField : UITextField<UITextFieldDelegate>
 
+- (instancetype)initWithDelegate:(id<CNNumberEntryTextFieldDelegate>)d;
 @property (nonatomic, readwrite) NSArray *groupArray;
+@property (nonatomic, readonly) unsigned short numberOfDigitsEntered;
+@property (nonatomic, readonly) unsigned short digitsNeeded;
+
+@end
+
+@protocol CNNumberEntryTextFieldDelegate <NSObject>
+
+@required
+- (void)numberEntryTextFieldDidChangeText:(CNNumberEntryTextField *)tf;
 
 @end

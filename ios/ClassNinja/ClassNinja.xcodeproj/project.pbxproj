@@ -36,6 +36,7 @@
 		DC08B698198AB0470092EE90 /* CNWelcomeStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B697198AB0470092EE90 /* CNWelcomeStatusView.m */; };
 		DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B69E198AF3D50092EE90 /* UITableView+LayoutSubviews.m */; };
 		DC08B6A4198D8DD00092EE90 /* CNModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 707F989719689D8700D6E552 /* CNModels.m */; };
+		DC42205A1996D96100739068 /* CNActivityIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = DC4220591996D96100739068 /* CNActivityIndicator.m */; };
 		DCCAA3921985ECB200BC4E7D /* CNAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = DCCAA3911985ECB200BC4E7D /* CNAPIClient.m */; };
 		DCCAA3951985FA5D00BC4E7D /* CNAPIResource.m in Sources */ = {isa = PBXBuildFile; fileRef = DCCAA3941985FA5D00BC4E7D /* CNAPIResource.m */; };
 		DCE7E7EF198D97DD00E14E3E /* CNAuthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DCE7E7EE198D97DD00E14E3E /* CNAuthViewController.m */; };
@@ -98,6 +99,8 @@
 		DC08B699198AB1780092EE90 /* AppearanceConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppearanceConstants.h; sourceTree = "<group>"; };
 		DC08B69D198AF3D50092EE90 /* UITableView+LayoutSubviews.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITableView+LayoutSubviews.h"; sourceTree = "<group>"; };
 		DC08B69E198AF3D50092EE90 /* UITableView+LayoutSubviews.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITableView+LayoutSubviews.m"; sourceTree = "<group>"; };
+		DC4220581996D96100739068 /* CNActivityIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNActivityIndicator.h; sourceTree = "<group>"; };
+		DC4220591996D96100739068 /* CNActivityIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNActivityIndicator.m; sourceTree = "<group>"; };
 		DCCAA3901985ECB200BC4E7D /* CNAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNAPIClient.h; sourceTree = "<group>"; };
 		DCCAA3911985ECB200BC4E7D /* CNAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNAPIClient.m; sourceTree = "<group>"; };
 		DCCAA3931985FA5D00BC4E7D /* CNAPIResource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNAPIResource.h; sourceTree = "<group>"; };
@@ -250,6 +253,8 @@
 			isa = PBXGroup;
 			children = (
 				DC08B699198AB1780092EE90 /* AppearanceConstants.h */,
+				DC4220581996D96100739068 /* CNActivityIndicator.h */,
+				DC4220591996D96100739068 /* CNActivityIndicator.m */,
 				DCE7E7EC198D90FC00E14E3E /* CourseBrowsing */,
 				DC08B6A3198D7D990092EE90 /* Auth */,
 				DC08B695198AB0290092EE90 /* Welcome */,
@@ -423,6 +428,7 @@
 				DC08B6A4198D8DD00092EE90 /* CNModels.m in Sources */,
 				DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */,
 				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
+				DC42205A1996D96100739068 /* CNActivityIndicator.m in Sources */,
 				DCCAA3921985ECB200BC4E7D /* CNAPIClient.m in Sources */,
 				707F9851196899BC00D6E552 /* CNAppDelegate.m in Sources */,
 				70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */,

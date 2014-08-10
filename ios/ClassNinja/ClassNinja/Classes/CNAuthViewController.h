@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CNNumberEntryTextField.h"
 
-@interface CNAuthViewController : UIViewController
+@interface CNAuthViewController : UIViewController <CNNumberEntryTextFieldDelegate>
 
 @end

@@ -11,35 +11,50 @@
 
 @interface CNNumberEntryTextField()
 
-@property (nonatomic, assign) NSUInteger maxNumDigits;
+@property (nonatomic, assign) unsigned short digitsNeeded;
+@property (nonatomic, weak) id<CNNumberEntryTextFieldDelegate>numberEntryTextFieldDelegate;
 
 @end
 
 @implementation CNNumberEntryTextField
 
-- (instancetype)init
+- (instancetype)initWithDelegate:(id<CNNumberEntryTextFieldDelegate>)d
 {
     if (self = [super init]) {
         self.keyboardType = UIKeyboardTypeNumberPad;
         self.keyboardAppearance = UIKeyboardAppearanceDefault;
         self.translatesAutoresizingMaskIntoConstraints = NO;
         self.delegate = self;
-        self.maxNumDigits = 0;
+        self.numberEntryTextFieldDelegate = d;
+        self.digitsNeeded = 0;
         self.groupArray = nil;
         
         [self addTarget:self
-                 action:@selector(setNeedsDisplay)
+                 action:@selector(contentTextChanged)
        forControlEvents:UIControlEventEditingChanged];
     }
     return self;
 }
 
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    [self setNeedsDisplay];
+}
+
+#pragma mark - Externally Facing Properties
+
 - (void)setGroupArray:(NSArray *)groupArray
 {
     ASSERT_MAIN_THREAD();
     _groupArray = groupArray;
-    self.maxNumDigits = totalNumberOfDigits(groupArray);
+    self.digitsNeeded = totalNumberOfDigits(groupArray);
     [self setNeedsDisplay];
+}
+
+- (unsigned short)numberOfDigitsEntered
+{
+    return self.text.length;
 }
 
 #pragma mark - Overriding UITextField shit
@@ -59,7 +74,7 @@
 {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
     if ([string rangeOfCharacterFromSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]].location == NSNotFound &&
-        newString.length <= self.maxNumDigits) {
+        newString.length <= self.digitsNeeded) {
         return YES;
     } else {
         return NO;
@@ -81,6 +96,12 @@
 {
     // We'll draw our own text, thankyouverymuch
     return CGRectZero;
+}
+
+- (void)contentTextChanged
+{
+    [self setNeedsDisplay];
+    [self.numberEntryTextFieldDelegate numberEntryTextFieldDidChangeText:self];
 }
 
 - (void)drawRect:(CGRect)rect

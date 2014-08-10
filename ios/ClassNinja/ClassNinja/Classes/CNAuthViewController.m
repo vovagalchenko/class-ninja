@@ -9,9 +9,11 @@
 #import "CNAuthViewController.h"
 #import "AppearanceConstants.h"
 #import "CNNumberEntryTextField.h"
+#import "CNActivityIndicator.h"
 
 typedef enum : NSUInteger {
     CNAuthViewControllerStatePhoneNumberEntry,
+    CNAuthViewControllerStateWait,
     CNAuthViewControllerStateVerificationCodeEntry,
 } CNAuthViewControllerState;
 
@@ -19,6 +21,8 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, readonly) UILabel *detailLabel;
 @property (nonatomic, readonly) CNNumberEntryTextField *textField;
+@property (nonatomic, readonly) UIButton *confirmationButton;
+@property (nonatomic, readonly) CNActivityIndicator *activityIndicator;
 @property (nonatomic, readwrite) CNAuthViewControllerState currentState;
 
 @end
@@ -44,8 +48,7 @@ typedef enum : NSUInteger {
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    self.detailLabel.text = [self detailLabelString];
-    self.textField.groupArray = [self textFieldGroupArray];
+    [self changeState:self.currentState animated:NO];
     [self.textField becomeFirstResponder];
     [super viewWillAppear:animated];
 }
@@ -56,22 +59,51 @@ typedef enum : NSUInteger {
     self.view.backgroundColor = AUTH_BLUE_COLOR;
     [self.view addSubview:self.detailLabel];
     [self.view addSubview:self.textField];
+    [self.view addSubview:self.confirmationButton];
+    [self.view addSubview:self.activityIndicator];
     NSArray *horizontal = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_detailLabel]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
                                                                   options:0
                                                                   metrics:nil
                                                                     views:NSDictionaryOfVariableBindings(_detailLabel)];
-    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_detailLabel]-%f-[_textField]", VERTICAL_MARGIN, VERTICAL_MARGIN]
+    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_detailLabel]-%f-[_textField]-[_confirmationButton]", VERTICAL_MARGIN, VERTICAL_MARGIN]
                                                                 options:0
                                                                 metrics:nil
-                                                                  views:NSDictionaryOfVariableBindings(_detailLabel, _textField)];
+                                                                  views:NSDictionaryOfVariableBindings(_detailLabel, _textField, _confirmationButton)];
     NSArray *horizontalTF = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_textField]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
                                                                     options:0
                                                                     metrics:nil
                                                                       views:NSDictionaryOfVariableBindings(_textField)];
+    NSArray *horizontalButton = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-(>=%f)-[_confirmationButton(>=%f)]-%f-|", HORIZONTAL_MARGIN, TAPPABLE_AREA_DIMENSION, HORIZONTAL_MARGIN]
+                                                                        options:0
+                                                                        metrics:nil
+                                                                          views:NSDictionaryOfVariableBindings(_confirmationButton)];
+    NSLayoutConstraint *activityIndicatorHorizontal = [NSLayoutConstraint constraintWithItem:self.activityIndicator
+                                                                                   attribute:NSLayoutAttributeCenterX
+                                                                                   relatedBy:NSLayoutRelationEqual
+                                                                                      toItem:self.view
+                                                                                   attribute:NSLayoutAttributeCenterX multiplier:1.0
+                                                                                    constant:0.0];
+    NSLayoutConstraint *activityIndicatorVertical = [NSLayoutConstraint constraintWithItem:self.activityIndicator
+                                                                                 attribute:NSLayoutAttributeCenterY
+                                                                                 relatedBy:NSLayoutRelationEqual
+                                                                                    toItem:self.view
+                                                                                 attribute:NSLayoutAttributeCenterY multiplier:1.0
+                                                                                  constant:0.0];
+    NSLayoutConstraint *activityIndicatorWidth = [NSLayoutConstraint constraintWithItem:self.activityIndicator
+                                                                                 attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual
+                                                                                    toItem:nil
+                                                                                 attribute:NSLayoutAttributeNotAnAttribute multiplier:0.0
+                                                                                    constant:TAPPABLE_AREA_DIMENSION];
+    NSLayoutConstraint *activityIndicatorHeight = [NSLayoutConstraint constraintWithItem:self.activityIndicator
+                                                                              attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual
+                                                                                 toItem:nil
+                                                                              attribute:NSLayoutAttributeNotAnAttribute multiplier:0.0
+                                                                               constant:TAPPABLE_AREA_DIMENSION];
     [self.view addConstraints:horizontal];
     [self.view addConstraints:vertical];
     [self.view addConstraints:horizontalTF];
-    self.detailLabel.text = [self detailLabelString];
+    [self.view addConstraints:horizontalButton];
+    [self.view addConstraints:@[activityIndicatorHorizontal, activityIndicatorVertical, activityIndicatorWidth, activityIndicatorHeight]];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle
@@ -89,6 +121,36 @@ typedef enum : NSUInteger {
 
 @synthesize detailLabel = _detailLabel;
 @synthesize textField = _textField;
+@synthesize confirmationButton = _confirmationButton;
+@synthesize activityIndicator = _activityIndicator;
+
+- (CNActivityIndicator *)activityIndicator
+{
+    if (!_activityIndicator) {
+        _activityIndicator = [[CNActivityIndicator alloc] initWithFrame:CGRectZero];
+    }
+    return _activityIndicator;
+}
+
+- (UIButton *)confirmationButton
+{
+    if (!_confirmationButton) {
+        _confirmationButton = [[UIButton alloc] init];
+        [_confirmationButton setTitle:@"OK" forState:UIControlStateNormal];
+        _confirmationButton.titleLabel.numberOfLines = 1;
+        _confirmationButton.titleLabel.backgroundColor = [UIColor clearColor];
+        _confirmationButton.backgroundColor = [UIColor clearColor];
+        _confirmationButton.titleLabel.textColor = [UIColor whiteColor];
+        _confirmationButton.alpha = 0.0;
+        [_confirmationButton setTitleColor:DISABLED_GRAY_COLOR forState:UIControlStateHighlighted];
+        [_confirmationButton addTarget:self
+                                action:@selector(confirmationButtonWasPressed:)
+                      forControlEvents:UIControlEventTouchUpInside];
+        
+        _confirmationButton.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    return _confirmationButton;
+}
 
 - (UILabel *)detailLabel
 {
@@ -109,44 +171,129 @@ typedef enum : NSUInteger {
 - (CNNumberEntryTextField *)textField
 {
     if (!_textField) {
-        _textField = [[CNNumberEntryTextField alloc] init];
+        _textField = [[CNNumberEntryTextField alloc] initWithDelegate:self];
         _textField.bounds = CGRectMake(0, 0, 0, FOCAL_LABEL_TEXT_SIZE);
     }
     return _textField;
 }
 
-- (NSArray *)textFieldGroupArray
+static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
 {
-    NSArray *result = @[@(3), @(3), @(4)];
-    switch (self.currentState) {
+    NSArray *result = nil;
+    switch (state) {
         case CNAuthViewControllerStateVerificationCodeEntry:
             result = @[@(4)];
             break;
         case CNAuthViewControllerStatePhoneNumberEntry:
             result = @[@(3), @(3), @(4)];
             break;
+        case CNAuthViewControllerStateWait:
+            result = nil;
+            break;
         default:
-            NSAssert(NO, @"CNAuthViewController is in an unknown state.");
+            NSCAssert(NO, @"CNAuthViewController is in an unknown state.");
             break;
     }
     return result;
 }
 
-- (NSString *)detailLabelString
+static inline NSString *detailLabelStringForState(CNAuthViewControllerState state)
 {
     NSString *result = @"UNKNOWN_STATE";
-    switch (self.currentState) {
+    switch (state) {
         case CNAuthViewControllerStatePhoneNumberEntry:
             result = @"We’ll send you a text message when a class you’re tracking becomes available so you can register immediately.";
             break;
         case CNAuthViewControllerStateVerificationCodeEntry:
             result = @"We’ve just sent you a text message with code to verify that this is your phone number. Please enter it.";
             break;
+        case CNAuthViewControllerStateWait:
+            result = @"";
+            break;
         default:
-            NSAssert(NO, @"CNAuthViewController is in an unknown state.");
+            NSCAssert(NO, @"CNAuthViewController is in an unknown state.");
             break;
     }
     return result;
+}
+
+#pragma mark - Number Entry Text Field Handling
+
+- (void)numberEntryTextFieldDidChangeText:(CNNumberEntryTextField *)tf
+{
+    CGFloat targetButtonAlpha = 0.0;
+    if (tf.numberOfDigitsEntered == tf.digitsNeeded) {
+        targetButtonAlpha = 1.0;
+    }
+    
+    if (targetButtonAlpha != self.confirmationButton.alpha) {
+        [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+            self.confirmationButton.alpha = targetButtonAlpha;
+        }];
+    }
+}
+
+#pragma mark - State Machine
+
+- (void)confirmationButtonWasPressed:(id)sender
+{
+    switch (self.currentState) {
+        case CNAuthViewControllerStatePhoneNumberEntry:
+            [self changeState:CNAuthViewControllerStateWait animated:YES];
+            break;
+        case CNAuthViewControllerStateVerificationCodeEntry:
+            [self changeState:CNAuthViewControllerStateWait animated:YES];
+            break;
+        default:
+            NSAssert(NO, @"Confirmation button pressed in unexpected state: %d", self.currentState);
+            break;
+    }
+}
+
+- (void)changeState:(CNAuthViewControllerState)newState animated:(BOOL)animated
+{
+    void (^switchUIToNewState)(CNAuthViewControllerState) = ^(CNAuthViewControllerState state){
+        self.detailLabel.text = detailLabelStringForState(state);
+        NSArray *groups = textFieldGroupArray(state);
+        if (groups) {
+            self.textField.groupArray = groups;
+        }
+        self.textField.text = @"";
+        
+        switch (state) {
+            case CNAuthViewControllerStatePhoneNumberEntry:
+            case CNAuthViewControllerStateVerificationCodeEntry:
+                self.detailLabel.alpha = 1.0;
+                self.textField.alpha = 1.0;
+                self.activityIndicator.alpha = 0.0;
+                [self.textField becomeFirstResponder];
+                break;
+            case CNAuthViewControllerStateWait:
+                self.detailLabel.alpha = 0.0;
+                self.textField.alpha = 0.0;
+                self.activityIndicator.alpha = 1.0;
+                [self.textField resignFirstResponder];
+                break;
+            default:
+                NSAssert(NO, @"Unknown state: %d", state);
+                break;
+        }
+    };
+    
+    if (animated) {
+        [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+            self.detailLabel.alpha = 0.0;
+            self.textField.alpha = 0.0;
+            self.confirmationButton.alpha = 0.0;
+            self.activityIndicator.alpha = 0.0;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                switchUIToNewState(newState);
+            }];
+        }];
+    } else {
+        switchUIToNewState(newState);
+    }
 }
 
 @end
