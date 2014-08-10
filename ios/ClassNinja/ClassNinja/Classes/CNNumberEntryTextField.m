@@ -110,7 +110,7 @@
                 [[NSString stringWithFormat:@"%c", digitToDraw]
                  drawInRect:CGRectMake(currentPoint.x - redlining.lengthOfPlaceholder, 0, redlining.lengthOfPlaceholder, self.bounds.size.height - placeholderLineThickness*5)
                  withAttributes:@{
-                                  NSFontAttributeName            : [UIFont systemFontOfSize:FOCAL_LABEL_TEXT_SIZE - placeholderLineThickness*5],
+                                  NSFontAttributeName            : [UIFont cnSystemFontOfSize:FOCAL_LABEL_TEXT_SIZE - placeholderLineThickness*5],
                                   NSForegroundColorAttributeName : [UIColor whiteColor],
                                   NSParagraphStyleAttributeName  : centeredParagraphStyle()
                                   }];

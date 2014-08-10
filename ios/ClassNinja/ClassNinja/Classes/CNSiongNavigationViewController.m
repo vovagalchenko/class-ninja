@@ -71,7 +71,7 @@
         _headerLabel = [[UILabel alloc] init];
         _headerLabel.textColor = [UIColor colorWithRed:32/255.0 green:48/255.0 blue:66/255.0 alpha:1.0];
         _headerLabel.text = @"Add Class";
-        _headerLabel.font = [UIFont systemFontOfSize:14];
+        _headerLabel.font = [UIFont cnSystemFontOfSize:14];
         _headerLabel.userInteractionEnabled = NO;
         _headerLabel.textAlignment = NSTextAlignmentCenter;
     }

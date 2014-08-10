@@ -13,6 +13,7 @@
 		701C362219970046004ACFB6 /* close@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361C19970046004ACFB6 /* close@2x.png */; };
 		701C362319970046004ACFB6 /* search.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361D19970046004ACFB6 /* search.png */; };
 		701C362419970046004ACFB6 /* search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361E19970046004ACFB6 /* search@2x.png */; };
+		70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320133199719950032F16B /* UIFont+CNAdditions.m */; };
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */; };
 		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
@@ -56,6 +57,8 @@
 		701C361C19970046004ACFB6 /* close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "close@2x.png"; sourceTree = "<group>"; };
 		701C361D19970046004ACFB6 /* search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.png; sourceTree = "<group>"; };
 		701C361E19970046004ACFB6 /* search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "search@2x.png"; sourceTree = "<group>"; };
+		70320132199719950032F16B /* UIFont+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+CNAdditions.h"; sourceTree = "<group>"; };
+		70320133199719950032F16B /* UIFont+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+CNAdditions.m"; sourceTree = "<group>"; };
 		70557114197B1ED7008F66F1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNInAppPurchaseHelper.h; sourceTree = "<group>"; };
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseHelper.m; sourceTree = "<group>"; };
@@ -208,6 +211,8 @@
 				70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */,
 				707F984F196899BC00D6E552 /* CNAppDelegate.h */,
 				707F9850196899BC00D6E552 /* CNAppDelegate.m */,
+				70320132199719950032F16B /* UIFont+CNAdditions.h */,
+				70320133199719950032F16B /* UIFont+CNAdditions.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -396,6 +401,7 @@
 			files = (
 				DCCAA3951985FA5D00BC4E7D /* CNAPIResource.m in Sources */,
 				707F984D196899BC00D6E552 /* main.m in Sources */,
+				70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */,
 				705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */,
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */,
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,

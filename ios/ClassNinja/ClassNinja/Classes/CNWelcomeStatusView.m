@@ -83,7 +83,7 @@
     if (_addClassesButton == nil) {
         _addClassesButton = [UIButton buttonWithType:UIButtonTypeCustom];
         _addClassesButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-        _addClassesButton.titleLabel.font = [UIFont boldSystemFontOfSize:12.0];
+        _addClassesButton.titleLabel.font = [UIFont cnBoldSystemFontOfSize:12.0];
         _addClassesButton.titleLabel.numberOfLines = 1;
         [_addClassesButton setTitle:@"+ Add classes" forState:UIControlStateNormal];
         [_addClassesButton setTitle:@"+ Add classes" forState:UIControlStateHighlighted];
@@ -121,7 +121,7 @@
 {
     if (_welcomeLabel == nil) {
         _welcomeLabel = [[UILabel alloc] init];
-        _welcomeLabel.font = [UIFont systemFontOfSize:FOCAL_LABEL_TEXT_SIZE];
+        _welcomeLabel.font = [UIFont cnSystemFontOfSize:FOCAL_LABEL_TEXT_SIZE];
         _welcomeLabel.text = @"Hello";
         _welcomeLabel.textColor = [UIColor whiteColor];
         _welcomeLabel.numberOfLines = 1;

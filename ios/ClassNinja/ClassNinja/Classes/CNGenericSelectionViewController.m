@@ -144,7 +144,7 @@
         label.text = [self headerText];
         label.numberOfLines = 3;
         label.textColor = [UIColor whiteColor];
-        label.font = [UIFont systemFontOfSize:18];
+        label.font = [UIFont cnSystemFontOfSize:18];
         
         [view addSubview:label];
         [view setBackgroundColor:[UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]];
