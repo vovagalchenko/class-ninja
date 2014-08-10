@@ -10,6 +10,11 @@
 #import "AppearanceConstants.h"
 
 #define kScrollYOffset 75.0
+
+#define kBackButtonWidth 22
+#define kButtonOriginX 20
+#define kButtonOriginY 35
+
 #define kPushDuration 0.3
 
 @interface CNSiongNavigationViewController () <UIScrollViewDelegate>
@@ -77,13 +82,8 @@
 {
     if (_backButton == nil) {
         _backButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
-        _backButton.titleLabel.font = [UIFont boldSystemFontOfSize:12.0];
-        _backButton.titleLabel.numberOfLines = 1;
-        [_backButton setTitle:@"<" forState:UIControlStateNormal];
-        [_backButton setTitle:@"<" forState:UIControlStateHighlighted];
-        [_backButton setTitleColor:[UIColor colorWithRed:32/255.0 green:48/255.0 blue:66/255.0 alpha:1.0] forState:UIControlStateNormal];
-        [_backButton setTitleColor:[UIColor yellowColor] forState:UIControlStateHighlighted];
+        _backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
+        [_backButton setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
         [_backButton addTarget:self
                         action:@selector(backButtonPressed:)
               forControlEvents:UIControlEventTouchUpInside];
@@ -108,8 +108,9 @@
     scrollFrame.size.height -= kScrollYOffset;
     self.scrollView.frame = scrollFrame;
 
-    self.backButton.frame = CGRectMake(0, 0, kScrollYOffset, kScrollYOffset);
-    self.headerLabel.frame = CGRectMake(0, 0, scrollFrame.size.width, kScrollYOffset);
+    CGRect rect = CGRectMake(kButtonOriginX, kButtonOriginY, kBackButtonWidth, kBackButtonWidth);
+    self.backButton.frame = rect;
+    self.headerLabel.frame = CGRectMake(0, kButtonOriginY, scrollFrame.size.width, 20);
 
     self.scrollView.contentSize = self.scrollView.frame.size;
 }
@@ -241,7 +242,7 @@
 -(UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex animated:(BOOL)animated deselectRows:(BOOL)deselectRows
 {
     UIViewController *resultVC = nil;
-    NSUInteger vcCount = self.viewControllers.count;
+    NSInteger vcCount = self.viewControllers.count;
 
     if (vcIndex >= vcCount){
         return nil;
@@ -251,7 +252,7 @@
     
     if (vcIndex >= 1) {
         dispatch_block_t completionBlock = ^{
-            for (NSUInteger i = vcCount-1; i >= vcIndex; i--) {
+            for (NSInteger i = vcCount-1; i >= vcIndex; i--) {
                 UIViewController <SiongNavigationProtocol> *currentVC = [self.viewControllers objectAtIndex:i];
                 [currentVC.view removeFromSuperview];
                 [self.viewControllers removeObjectAtIndex:i];
@@ -260,9 +261,9 @@
             self.currentPageIndex = self.viewControllers.count - 1;
         };
         
-        NSUInteger targetVCIndex = vcIndex - 1;
+        NSInteger targetVCIndex = vcIndex - 1;
         if (deselectRows) {
-            for (NSUInteger i = vcCount-2; i >= targetVCIndex; i--) {
+            for (NSInteger i = vcCount-2; i >= targetVCIndex; i--) {
                 UIViewController <SiongNavigationProtocol> *vc = [self.viewControllers objectAtIndex:i];
                 if ([vc respondsToSelector:@selector(nextViewControllerWillPop)]) {
                     [vc nextViewControllerWillPop];

@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		701C361F19970046004ACFB6 /* back.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361919970046004ACFB6 /* back.png */; };
+		701C362019970046004ACFB6 /* back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361A19970046004ACFB6 /* back@2x.png */; };
+		701C362119970046004ACFB6 /* close.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361B19970046004ACFB6 /* close.png */; };
+		701C362219970046004ACFB6 /* close@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361C19970046004ACFB6 /* close@2x.png */; };
+		701C362319970046004ACFB6 /* search.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361D19970046004ACFB6 /* search.png */; };
+		701C362419970046004ACFB6 /* search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361E19970046004ACFB6 /* search@2x.png */; };
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */; };
 		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
@@ -44,6 +50,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		701C361919970046004ACFB6 /* back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = back.png; sourceTree = "<group>"; };
+		701C361A19970046004ACFB6 /* back@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "back@2x.png"; sourceTree = "<group>"; };
+		701C361B19970046004ACFB6 /* close.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = close.png; sourceTree = "<group>"; };
+		701C361C19970046004ACFB6 /* close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "close@2x.png"; sourceTree = "<group>"; };
+		701C361D19970046004ACFB6 /* search.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = search.png; sourceTree = "<group>"; };
+		701C361E19970046004ACFB6 /* search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "search@2x.png"; sourceTree = "<group>"; };
 		70557114197B1ED7008F66F1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNInAppPurchaseHelper.h; sourceTree = "<group>"; };
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseHelper.m; sourceTree = "<group>"; };
@@ -112,6 +124,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		701C361819970046004ACFB6 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				701C361919970046004ACFB6 /* back.png */,
+				701C361A19970046004ACFB6 /* back@2x.png */,
+				701C361B19970046004ACFB6 /* close.png */,
+				701C361C19970046004ACFB6 /* close@2x.png */,
+				701C361D19970046004ACFB6 /* search.png */,
+				701C361E19970046004ACFB6 /* search@2x.png */,
+			);
+			path = Assets;
+			sourceTree = "<group>";
+		};
 		70495D22198DDD910059B267 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -155,6 +180,7 @@
 		707F9846196899BC00D6E552 /* ClassNinja */ = {
 			isa = PBXGroup;
 			children = (
+				701C361819970046004ACFB6 /* Assets */,
 				707F989319689D8700D6E552 /* Classes */,
 				707F9852196899BC00D6E552 /* Images.xcassets */,
 				707F9847196899BC00D6E552 /* Supporting Files */,
@@ -343,8 +369,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				701C362419970046004ACFB6 /* search@2x.png in Resources */,
 				707F984B196899BC00D6E552 /* InfoPlist.strings in Resources */,
+				701C362019970046004ACFB6 /* back@2x.png in Resources */,
 				707F9853196899BC00D6E552 /* Images.xcassets in Resources */,
+				701C362319970046004ACFB6 /* search.png in Resources */,
+				701C362219970046004ACFB6 /* close@2x.png in Resources */,
+				701C362119970046004ACFB6 /* close.png in Resources */,
+				701C361F19970046004ACFB6 /* back.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
