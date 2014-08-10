@@ -13,7 +13,6 @@
 
 @interface CNSiongNavigationViewController () <CNGenericNavigationProtocol>
 @property (nonatomic) NSMutableArray *viewControllers;
-@property (nonatomic) BOOL firstLoad;
 @property (nonatomic) CNSiongNavigationView *siongView;
 @end
 
