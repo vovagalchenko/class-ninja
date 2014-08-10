@@ -10,6 +10,7 @@
 #import "CNAPIClient.h"
 #import "CNGenericSelectionTableViewCell.h"
 #import "AppearanceConstants.h"
+#import "CNCourseDetailsViewController.h"
 
 #define kTitleViewHeight 90
 #define kTitleLabelXOffset 20
@@ -50,16 +51,14 @@
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
     self.tableView.backgroundColor = [UIColor clearColor];
     
-
-    
     self.view.autoresizingMask = UIViewAutoresizingNone;
-}
-
-- (void)viewWillLayoutSubviews
-{
+    
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.titleView];
+
+    [self loadContent];
 }
+
 
 - (void)viewDidLayoutSubviews
 {
@@ -74,12 +73,6 @@
     tableRect.size.height -= kTitleViewHeight;
     
     self.tableView.frame = tableRect;
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    [self loadContent];
 }
 
 - (void)loadContent
@@ -289,4 +282,19 @@
 {
     return nil;
 }
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    id <CNModel> model = [self modelForIndexPath:indexPath];
+    CNCourseDetailsViewController *nextVC = [[CNCourseDetailsViewController alloc] init];
+    nextVC.course = (CNCourse *)model;
+    self.lastSelectedRow =  indexPath;
+    nextVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    nextVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    nextVC.modalPresentationCapturesStatusBarAppearance = YES;
+    [self.siongNavigationController presentViewController:nextVC animated:YES completion:nil];
+}
+
+
 @end
