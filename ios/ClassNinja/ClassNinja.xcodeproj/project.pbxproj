@@ -15,6 +15,7 @@
 		701C362419970046004ACFB6 /* search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 701C361E19970046004ACFB6 /* search@2x.png */; };
 		70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320133199719950032F16B /* UIFont+CNAdditions.m */; };
 		70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320136199722320032F16B /* CNCourseDetailsViewController.m */; };
+		7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320139199736EF0032F16B /* CNSiongNavigationView.m */; };
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */; };
 		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
@@ -62,6 +63,8 @@
 		70320133199719950032F16B /* UIFont+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+CNAdditions.m"; sourceTree = "<group>"; };
 		70320135199722320032F16B /* CNCourseDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCourseDetailsViewController.h; sourceTree = "<group>"; };
 		70320136199722320032F16B /* CNCourseDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCourseDetailsViewController.m; sourceTree = "<group>"; };
+		70320138199736EF0032F16B /* CNSiongNavigationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSiongNavigationView.h; sourceTree = "<group>"; };
+		70320139199736EF0032F16B /* CNSiongNavigationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSiongNavigationView.m; sourceTree = "<group>"; };
 		70557114197B1ED7008F66F1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNInAppPurchaseHelper.h; sourceTree = "<group>"; };
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseHelper.m; sourceTree = "<group>"; };
@@ -148,6 +151,8 @@
 			children = (
 				7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */,
 				7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */,
+				70320138199736EF0032F16B /* CNSiongNavigationView.h */,
+				70320139199736EF0032F16B /* CNSiongNavigationView.m */,
 			);
 			name = Navigation;
 			sourceTree = "<group>";
@@ -408,6 +413,7 @@
 				707F984D196899BC00D6E552 /* main.m in Sources */,
 				70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */,
 				70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */,
+				7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */,
 				705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */,
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */,
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
