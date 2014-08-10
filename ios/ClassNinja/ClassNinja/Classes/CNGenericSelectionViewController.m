@@ -45,12 +45,14 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.showsVerticalScrollIndicator = NO;
     
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
     self.tableView.backgroundColor = [UIColor clearColor];
     
-    self.view.autoresizingMask = UIViewAutoresizingNone;
 
+    
+    self.view.autoresizingMask = UIViewAutoresizingNone;
 }
 
 - (void)viewWillLayoutSubviews
