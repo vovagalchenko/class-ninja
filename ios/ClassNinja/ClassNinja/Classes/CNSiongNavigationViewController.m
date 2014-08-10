@@ -15,6 +15,10 @@
 #define kButtonOriginX 20
 #define kButtonOriginY 35
 
+#define kLeftBoundsOffset 24.0
+#define kSpaceBetweenViews (kLeftBoundsOffset/2.0)
+
+
 #define kPushDuration 0.3
 
 @interface CNSiongNavigationViewController () <UIScrollViewDelegate>
@@ -23,6 +27,8 @@
 @property (nonatomic) UILabel *headerLabel;
 @property (nonatomic) NSMutableArray *viewControllers;
 @property (nonatomic) NSUInteger currentPageIndex;
+@property (nonatomic) UIView *leftBlendedView;
+@property (nonatomic) UIView *rightBlendedView;
 @end
 
 @implementation CNSiongNavigationViewController
@@ -42,13 +48,40 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
-    
-    
-    [self.view addSubview:self.backButton];
-    [self.view addSubview:self.headerLabel];
-    [self.view addSubview:self.scrollView];
+}
+
+- (UIView *)createGenericBlendedView
+{
+    UIView *view = [[UIView alloc] init];
+    view.alpha = 0.5;
+    view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
+
+    return view;
+}
+
+- (UIView *)leftBlendedView
+{
+    if (_leftBlendedView == nil) {
+        _leftBlendedView = [self createGenericBlendedView];
+        _leftBlendedView.frame = CGRectMake(0,
+                                            0,
+                                            kSpaceBetweenViews,
+                                            self.view.bounds.size.height);
+    }
+    return _leftBlendedView;
+}
+
+- (UIView *)rightBlendedView
+{
+    if (_rightBlendedView == nil) {
+        _rightBlendedView = [self createGenericBlendedView];
+        _rightBlendedView.frame = CGRectMake(self.view.bounds.size.width - kSpaceBetweenViews,
+                                             0,
+                                             kSpaceBetweenViews,
+                                             self.view.bounds.size.height);
+    }
+    return _rightBlendedView;
 }
 
 - (UIScrollView *)scrollView
@@ -103,6 +136,14 @@
 
 - (void)viewWillLayoutSubviews
 {
+    [self.view addSubview:self.backButton];
+    [self.view addSubview:self.headerLabel];
+    [self.view addSubview:self.scrollView];
+    
+    // always last
+    [self.view addSubview:self.leftBlendedView];
+    [self.view addSubview:self.rightBlendedView];
+    
     CGRect scrollFrame = self.view.bounds;
     scrollFrame.origin.y += kScrollYOffset;
     scrollFrame.size.height -= kScrollYOffset;
@@ -149,10 +190,6 @@
     *targetContentOffset = [self targetPointForPageIndex:newPage];
     [self scrollToIndex:newPage];
 }
-
-
-#define kLeftBoundsOffset 24.0
-#define kSpaceBetweenViews (kLeftBoundsOffset/2.0)
 
 - (NSUInteger)indexOfPageForContentOffset:(CGFloat)contentXOffset
 {
