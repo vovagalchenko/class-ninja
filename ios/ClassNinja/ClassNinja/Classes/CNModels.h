@@ -79,6 +79,7 @@
 - (NSString *)daysOfWeek;
 - (NSString *)hours;
 - (NSString *)location;
+- (BOOL)isClosed;
 @end
 
 // Implementing NSCoding, because we'll be persisting the logged in user in the keychain

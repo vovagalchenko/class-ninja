@@ -74,6 +74,11 @@
     return [self.timesAndLocations objectForKey:@"location"];
 }
 
+- (BOOL)isClosed
+{
+    return [self.status isEqual:@"Closed"];
+}
+
 @end
 
 @implementation CNUser
