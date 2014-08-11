@@ -52,7 +52,7 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.showsVerticalScrollIndicator = NO;
+    self.tableView.showsVerticalScrollIndicator = YES;
     
     // FIXME: change color to gradient
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
@@ -141,6 +141,7 @@
                                     completion:^(NSArray*children) {
                                         self.listOfSections = children;
                                         [self.tableView reloadData];
+                                        [self.tableView flashScrollIndicators];
                                     }];
 }
 
@@ -201,14 +202,26 @@
 - (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changeTo:(BOOL)isExpanded
 {
     NSIndexPath *cellIndexPath = [self.tableView indexPathForCell:cell];
-    
+
     if (isExpanded) {
         [self.expandedIndexPaths addObject:cellIndexPath];
     } else {
         [self.expandedIndexPaths removeObject:cellIndexPath];
     }
-    
+
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
+
+    if (isExpanded) {
+        CGRect cellRect = [self.tableView convertRect:cell.frame
+                                               toView:self.tableView.superview];
+        
+        CGFloat tableViewHeight = self.tableView.bounds.size.height;
+        CGFloat originY = cellRect.origin.y;
+
+        if (self.tableView.frame.origin.y + tableViewHeight < originY + cellRect.size.height) {
+            [self.tableView scrollToRowAtIndexPath:cellIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+        }
+    }
 }
 @end
