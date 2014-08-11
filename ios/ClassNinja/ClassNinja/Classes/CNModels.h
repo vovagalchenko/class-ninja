@@ -76,6 +76,9 @@
 @property (nonatomic) NSNumber *numberEnrolled;
 @property (nonatomic) NSNumber *waitlistCapacity;
 
+- (NSString *)daysOfWeek;
+- (NSString *)hours;
+- (NSString *)location;
 @end
 
 // Implementing NSCoding, because we'll be persisting the logged in user in the keychain

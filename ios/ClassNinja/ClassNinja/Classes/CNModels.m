@@ -59,6 +59,21 @@
     return [NSString stringWithFormat:@"%@ %@ %@", self.eventType, self.timesAndLocations, self.status];
 }
 
+- (NSString *)daysOfWeek
+{
+    return [self.timesAndLocations objectForKey:@"weekdays"];
+}
+
+- (NSString *)hours
+{
+    return [self.timesAndLocations objectForKey:@"timeInterval"];
+}
+
+- (NSString *)location
+{
+    return [self.timesAndLocations objectForKey:@"location"];
+}
+
 @end
 
 @implementation CNUser

@@ -14,12 +14,16 @@
 #define kCloseButtonXOffset 20
 #define kCloseButtonYOffset 15
 
-#define kClassNameLabelYOffset 10
-#define kClassNameLabelHeight 75
-#define kTitleViewHeight 90
-#define kTitleLabelXOffset 20
+#define kTitleViewHeight 130
+#define kTitleLabelXOffset kCloseButtonXOffset
 
-@interface CNCourseDetailsViewController () <UITableViewDataSource, UITableViewDelegate>
+#define kClassNameLabelYOffset 10
+#define kClassNameLabelXOffset kCloseButtonXOffset
+#define kClassNameLabelHeight 85
+
+#import "CNCourseDetailsTableViewCell.h"
+
+@interface CNCourseDetailsViewController () <UITableViewDataSource, UITableViewDelegate, CourseDetailsTableViewCellProtocol>
 
 @property (nonatomic) UILabel *classLabel;
 @property (nonatomic) UIView *titleView;
@@ -32,6 +36,8 @@
 
 @property (nonatomic) NSArray *listOfSections;
 
+@property (nonatomic) NSMutableArray *expandedIndexPaths;
+
 @end
 
 @implementation CNCourseDetailsViewController
@@ -39,6 +45,9 @@
 - (void)viewDidLoad
 {    
     [super viewDidLoad];
+    
+    self.expandedIndexPaths = [NSMutableArray array];
+    
     self.tableView = [[UITableView alloc] init];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -75,6 +84,7 @@
         //UPDATEME: just a placeholder frame/title/colors
         _classLabel = [[UILabel alloc] init];
         _classLabel.text = self.course.name;
+        _classLabel.numberOfLines = 2;
         _classLabel.textColor = [UIColor purpleColor];
     }
     return _classLabel;
@@ -109,7 +119,7 @@
     [super viewDidLayoutSubviews];
     
     // set header first
-    self.classLabel.frame = CGRectMake(0, kClassNameLabelYOffset, self.view.frame.size.width, kClassNameLabelHeight);
+    self.classLabel.frame = CGRectMake(kClassNameLabelXOffset, kClassNameLabelYOffset, self.view.frame.size.width - 2 * kClassNameLabelXOffset, kClassNameLabelHeight);
     
     // set table view
     CGRect rect = self.view.bounds;
@@ -149,10 +159,11 @@
 #pragma Cell management
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"classcell"];
+    CNCourseDetailsTableViewCell *cell = [[CNCourseDetailsTableViewCell alloc] initWithReuseIdentifier:@"classcell" canBeTargeted:YES];
     CNSection *cnSection = [self.listOfSections objectAtIndex:indexPath.section];
     
-    cell.textLabel.text = [[cnSection.events objectAtIndex:indexPath.row] name];
+    cell.event = [cnSection.events objectAtIndex:indexPath.row];
+    cell.delegate = self;
     return cell;
 }
 
@@ -176,5 +187,28 @@
     }
     
     return _titleView;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([self.expandedIndexPaths containsObject:indexPath]) {
+        return [CNCourseDetailsTableViewCell expandedHeight];
+    } else {
+        return [CNCourseDetailsTableViewCell collapsedHeight];
+    }
+}
+
+- (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changeTo:(BOOL)isExpanded
+{
+    NSIndexPath *cellIndexPath = [self.tableView indexPathForCell:cell];
+    
+    if (isExpanded) {
+        [self.expandedIndexPaths addObject:cellIndexPath];
+    } else {
+        [self.expandedIndexPaths removeObject:cellIndexPath];
+    }
+    
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
 }
 @end
