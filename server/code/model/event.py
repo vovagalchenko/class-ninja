@@ -15,3 +15,9 @@ class Event(Base, Ninja_Model_Mixin):
     status = Column('status', String(254), nullable = False)
     section_id = Column('section_id', String(254), ForeignKey("sections.section_id"), nullable = False)
     school_id = Column('school_id', Integer, ForeignKey("schools.school_id"),  nullable = False)   
+
+    def for_api(self):
+        base_dict = super(Event, self).for_api()
+        times_and_locations_dict = eval(self.times_and_locations)[0]
+        base_dict["times_and_locations"] = times_and_locations_dict
+        return base_dict
