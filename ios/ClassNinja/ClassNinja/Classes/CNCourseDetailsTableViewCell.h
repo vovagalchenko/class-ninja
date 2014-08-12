@@ -12,7 +12,8 @@
 @class CNCourseDetailsTableViewCell;
 
 @protocol CourseDetailsTableViewCellProtocol
-- (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changeTo:(BOOL)isExpanded;
+- (void)targetingStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isTargeted;
+- (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isExpanded;
 @end
 
 @interface CNCourseDetailsTableViewCell : UITableViewCell

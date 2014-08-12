@@ -14,19 +14,22 @@
 #define kCloseButtonXOffset 20
 #define kCloseButtonYOffset 15
 
-#define kTitleViewHeight 130
-#define kTitleLabelXOffset kCloseButtonXOffset
+#define kHeaderQuestionHeight  60
+#define kHeaderQuestionOffsetX 5
 
-#define kClassNameLabelYOffset 10
-#define kClassNameLabelXOffset kCloseButtonXOffset
-#define kClassNameLabelHeight 85
+
+#define kClassNameLabelXOffset 0
+#define kClassNameLabelHeight 60
+
+#define kTableOffsetX 20
+#define kTableOffsetY (20 + kCloseButtonYOffset)
+#define kTableHeaderHeight (kHeaderQuestionHeight + kClassNameLabelHeight)
+
+#define kTrackButtonHeight 40
 
 #import "CNCourseDetailsTableViewCell.h"
 
 @interface CNCourseDetailsViewController () <UITableViewDataSource, UITableViewDelegate, CourseDetailsTableViewCellProtocol>
-
-@property (nonatomic) UILabel *classLabel;
-@property (nonatomic) UIView *titleView;
 
 @property (nonatomic) UIButton *closeButton;
 @property (nonatomic) UITableView *tableView;
@@ -37,7 +40,7 @@
 @property (nonatomic) NSArray *listOfSections;
 
 @property (nonatomic) NSMutableArray *expandedIndexPaths;
-
+@property (nonatomic) NSMutableArray *targetEvents;
 @end
 
 @implementation CNCourseDetailsViewController
@@ -47,48 +50,99 @@
     [super viewDidLoad];
     
     self.expandedIndexPaths = [NSMutableArray array];
+    self.targetEvents = [NSMutableArray array];
     
     self.tableView = [[UITableView alloc] init];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.showsVerticalScrollIndicator = YES;
+
+    CGSize size = self.view.bounds.size;
+    self.tableView.tableHeaderView = [self headerViewWithWidth:size.width height:kTableHeaderHeight];
     
     // FIXME: change color to gradient
-    self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
+    self.view.backgroundColor = [UIColor magentaColor];
     self.tableView.backgroundColor = [UIColor clearColor];
+    self.tableView.allowsSelection = NO;
     
     self.view.autoresizingMask = UIViewAutoresizingNone;
     
     [self.view addSubview:self.tableView];
-    [self.view addSubview:self.titleView];
-
-    [self.view addSubview:self.classLabel];
     [self.view addSubview:self.closeButton];
-
+    [self.view addSubview:self.trackButton];
     
-    [self loadContent];
-
-    
+    [self loadContent];    
 }
 
-- (void)viewWillLayoutSubviews
+- (UIButton *)trackButton
 {
-    self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset,
-                                        kCloseButtonWidth, kCloseButtonHeight);
-}
-
-- (UILabel *)classLabel
-{
-    if (_classLabel == nil) {
-        //UPDATEME: just a placeholder frame/title/colors
-        _classLabel = [[UILabel alloc] init];
-        _classLabel.text = self.course.name;
-        _classLabel.numberOfLines = 2;
-        _classLabel.textColor = [UIColor purpleColor];
+    if  (_trackButton == nil) {
+        _trackButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_trackButton addTarget:self action:@selector(trackButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        _trackButton.backgroundColor = [UIColor redColor];
+        [_trackButton setTitle:@"Track" forState:UIControlStateNormal];
+        [_trackButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        [_trackButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
     }
-    return _classLabel;
+    return _trackButton;
 }
+
+- (UILabel *)classLabelWithWidth:(CGFloat)width
+{
+    UILabel *classLabel = [[UILabel alloc] initWithFrame:CGRectMake(kClassNameLabelXOffset,
+                                                                    0,
+                                                                    width - 2*kClassNameLabelXOffset,
+                                                                    kClassNameLabelHeight)];
+    classLabel.text = self.course.name;
+    classLabel.numberOfLines = 2;
+    classLabel.textColor = [UIColor purpleColor];
+    classLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    
+    return classLabel;
+}
+
+- (UIView *)questionViewWithWidth:(CGFloat)width
+{
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, kHeaderQuestionHeight)];
+    [view setBackgroundColor:[UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]];
+    view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(kHeaderQuestionOffsetX,
+                                                               0,
+                                                               width - 2*kHeaderQuestionOffsetX,
+                                                               kHeaderQuestionHeight)];
+    
+    label.text = @"Which classes do you want to track?";
+    label.numberOfLines = 2;
+    label.textColor = [UIColor whiteColor];
+    label.font = [UIFont cnSystemFontOfSize:18];
+    label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+
+    [view addSubview:label];
+    
+    return view;
+}
+
+- (UIView *)headerViewWithWidth:(CGFloat)width height:(CGFloat)height
+{
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, height)];
+    view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    
+    UILabel *classLabel = [self classLabelWithWidth:width];
+    UIView *questionView = [self questionViewWithWidth:width];
+    CGRect titleFrame = questionView.frame;
+    titleFrame.origin.y += classLabel.frame.size.height;
+    questionView.frame = titleFrame;
+
+    [view addSubview:classLabel];
+    [view addSubview:questionView];
+    
+    view.backgroundColor = [UIColor clearColor];
+    
+    return view;
+}
+
 
 - (UIButton *)closeButton
 {
@@ -111,28 +165,27 @@
     return YES;
 }
 
-
-
-
-- (void)viewDidLayoutSubviews
+- (void)updateTrackButtonState
 {
-    [super viewDidLayoutSubviews];
-    
-    // set header first
-    self.classLabel.frame = CGRectMake(kClassNameLabelXOffset, kClassNameLabelYOffset, self.view.frame.size.width - 2 * kClassNameLabelXOffset, kClassNameLabelHeight);
-    
-    // set table view
-    CGRect rect = self.view.bounds;
-    rect.origin.y += kClassNameLabelHeight;
-    rect.size.height = kTitleViewHeight;
-    
-    self.titleView = [self titleView];
-    self.titleView.frame = rect;
-    
-    rect.origin.y += kTitleViewHeight;
-    rect.size.height = self.view.bounds.size.height - kTitleViewHeight - kClassNameLabelHeight;
-    
-    self.tableView.frame = rect;
+    self.trackButton.enabled = self.targetEvents.count > 0;
+    if (self.trackButton.enabled) {
+        self.trackButton.backgroundColor = [UIColor blueColor];
+    } else {
+        self.trackButton.backgroundColor = [UIColor greenColor];
+    }
+}
+
+- (void)viewWillLayoutSubviews
+{
+    [super viewWillLayoutSubviews];
+
+    self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset,
+                                        kCloseButtonWidth, kCloseButtonHeight);
+    CGSize size = self.view.bounds.size;
+    self.tableView.frame = CGRectMake(kTableOffsetX, kTableOffsetY, size.width - 2 * kTableOffsetX, size.height - kTableOffsetY - kTrackButtonHeight);
+    self.tableView.tableHeaderView.frame = CGRectMake(0, 0, size.width - 2 * kTableOffsetX,  kTableHeaderHeight);
+    self.trackButton.frame = CGRectMake(0, size.height - kTrackButtonHeight, size.width, kTrackButtonHeight);
+    [self updateTrackButtonState];
 }
 
 - (void)loadContent
@@ -168,28 +221,6 @@
     return cell;
 }
 
-- (UIView *)titleView
-{
-    if (_titleView == nil) {
-        UIView *view = [[UIView alloc] init];
-        
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(kTitleLabelXOffset, 0,
-                                                                   self.view.frame.size.width - 2*kTitleLabelXOffset, kTitleViewHeight)];
-        
-        label.text = @"Which class(es) do you want to track?";
-        label.numberOfLines = 3;
-        label.textColor = [UIColor whiteColor];
-        label.font = [UIFont cnSystemFontOfSize:18];
-        
-        [view addSubview:label];
-        [view setBackgroundColor:[UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]];
-        
-        _titleView = view;
-    }
-    
-    return _titleView;
-}
-
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([self.expandedIndexPaths containsObject:indexPath]) {
@@ -199,7 +230,17 @@
     }
 }
 
-- (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changeTo:(BOOL)isExpanded
+- (void)targetingStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isTargeted
+{
+    if (isTargeted) {
+        [self.targetEvents addObject:cell.event];
+    } else {
+        [self.targetEvents removeObject:cell.event];
+    }
+    [self updateTrackButtonState];
+}
+
+- (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isExpanded
 {
     NSIndexPath *cellIndexPath = [self.tableView indexPathForCell:cell];
 
@@ -224,4 +265,10 @@
         }
     }
 }
+
+- (void)trackButtonPressed:(id)sender
+{
+    NSLog(@"Track button pressed");
+}
+
 @end

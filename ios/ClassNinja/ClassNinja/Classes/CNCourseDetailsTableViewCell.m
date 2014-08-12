@@ -72,7 +72,7 @@
     // FIXME: update these frames after getting proper assets
     self.targetButton.frame = CGRectMake(kStatusLEDWidth, 11, 22, 22);
     self.expandButton.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight + 11, 11, 22, 22);
-    
+
     self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset, kCollapsedHeight, kDetailsFieldWidth, kDetailsFieldHeight);
     self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
                                                             kCollapsedHeight,
@@ -172,12 +172,13 @@
     }
     
     [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
+    [self.delegate targetingStateOnCell:self changedTo:self.isTargetedByUser];
 }
 
 - (void)expandButtonPressed:(id)sender
 {
     self.isExpanded = !self.isExpanded;
-    [self.delegate expandStateOnCell:self changeTo:self.isExpanded];
+    [self.delegate expandStateOnCell:self changedTo:self.isExpanded];
 }
 
 - (UIColor *)colorForEvent:(CNEvent *)event
@@ -203,7 +204,7 @@
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
     [super setSelected:selected animated:animated];
-
+    
     // Configure the view for the selected state
 }
 
