@@ -213,7 +213,7 @@
 #pragma Cell management
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    CNCourseDetailsTableViewCell *cell = [[CNCourseDetailsTableViewCell alloc] initWithReuseIdentifier:@"classcell" canBeTargeted:YES];
+    CNCourseDetailsTableViewCell *cell = [[CNCourseDetailsTableViewCell alloc] initWithReuseIdentifier:@"classcell" usedForTargetting:YES];
     CNSection *cnSection = [self.listOfSections objectAtIndex:indexPath.section];
     
     cell.event = [cnSection.events objectAtIndex:indexPath.row];

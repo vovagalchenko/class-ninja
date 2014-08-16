@@ -21,7 +21,7 @@
 @property (nonatomic) CNEvent *event;
 @property (nonatomic) id <CourseDetailsTableViewCellProtocol>delegate;
 
-- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier canBeTargeted:(BOOL)isSelectable;
+- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting;
 + (CGFloat)collapsedHeight;
 + (CGFloat)expandedHeight;
 @end

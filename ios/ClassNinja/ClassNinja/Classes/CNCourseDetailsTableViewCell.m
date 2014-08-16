@@ -80,11 +80,11 @@
                                                             kDetailsFieldHeight);
 }
 
-- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier canBeTargeted:(BOOL)useForTargetting
+- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting
 {
     self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
     if (self) {
-        _usedForTargetting = useForTargetting;
+        _usedForTargetting = usedForTargetting;
 
         _separationLineView = [[UIView alloc] init];
         _separationLineView.backgroundColor = kBorderHairlineColor;
