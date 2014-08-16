@@ -10,6 +10,9 @@
 
 #define kDisclousureWidthAndHeight 43
 
+#define kCellBackgroundColor            ([UIColor colorWithWhite:250/255.0 alpha:1])
+#define kBorderHairlineColor            ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:229/255.0 alpha:1])
+
 #define kStatusLEDWidth 5
 
 #define kDateTimeLabelXOffset 66
@@ -52,7 +55,8 @@
 
 - (void)layoutSubviews
 {
-    self.backgroundColor = [UIColor whiteColor];
+    self.backgroundColor = kCellBackgroundColor;
+    
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
     
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, self.bounds.size.height);
