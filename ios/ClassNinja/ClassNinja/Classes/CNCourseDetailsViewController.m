@@ -27,9 +27,16 @@
 
 #define kTrackButtonHeight 40
 
+#define kTrackButtonBackgroundColorEnabled  ([UIColor colorWithRed:73/255.0 green:141/255.0 blue:203/255.0 alpha:1.0])
+#define kTrackButtonBackgroundColorDisabled ([UIColor colorWithRed:135/255.0 green:144/255.0 blue:150/255.0 alpha:1.0])
+#define kTrackButtonTextColorEnabled    ([UIColor whiteColor])
+#define kTrackButtonTextColorDisabled   ([UIColor colorWithRed:210/255.0 green:211/255.0 blue:211/255.0 alpha:1.0])
+
 #import "CNCourseDetailsTableViewCell.h"
 
 @interface CNCourseDetailsViewController () <UITableViewDataSource, UITableViewDelegate, CourseDetailsTableViewCellProtocol>
+
+@property (nonatomic) CAGradientLayer *backgroundGradientLayer;
 
 @property (nonatomic) UIButton *closeButton;
 @property (nonatomic) UITableView *tableView;
@@ -48,7 +55,7 @@
 - (void)viewDidLoad
 {    
     [super viewDidLoad];
-    
+
     self.expandedIndexPaths = [NSMutableArray array];
     self.targetEvents = [NSMutableArray array];
     
@@ -62,7 +69,7 @@
     self.tableView.tableHeaderView = [self headerViewWithWidth:size.width height:kTableHeaderHeight];
     
     // FIXME: change color to gradient
-    self.view.backgroundColor = [UIColor magentaColor];
+    self.view.backgroundColor = [UIColor clearColor];
     self.tableView.backgroundColor = [UIColor clearColor];
     self.tableView.allowsSelection = NO;
     
@@ -71,8 +78,44 @@
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.closeButton];
     [self.view addSubview:self.trackButton];
+    [self.view.layer insertSublayer:self.backgroundGradientLayer atIndex:0];
     
     [self loadContent];    
+}
+
+- (CAGradientLayer*)backgroundGradientLayer
+{
+    if (_backgroundGradientLayer == nil) {
+        UIColor *topViewColor = [UIColor colorWithWhite:230/255.0 alpha:1.0];
+        UIColor *topOfTableViewHeaderColor = topViewColor;
+        UIColor *bottomOfTableViewHeaderColor = [UIColor colorWithRed:208/255.0 green:209/255.0 blue:211/255.0 alpha:1.0];
+        UIColor *bottomViewColor = bottomOfTableViewHeaderColor;
+        
+        NSArray *colors =  [NSArray arrayWithObjects:(id)topViewColor.CGColor,
+                            topOfTableViewHeaderColor.CGColor,
+                            bottomOfTableViewHeaderColor.CGColor,
+                            bottomViewColor.CGColor,
+                            nil];
+        
+        _backgroundGradientLayer = [CAGradientLayer layer];
+        _backgroundGradientLayer.colors = colors;
+    }
+    
+    return _backgroundGradientLayer;
+}
+
+- (void)updateBackgroundGradientLayerLocation
+{
+    NSNumber *topViewStop = [NSNumber numberWithFloat:0.0];
+
+    CGFloat viewHeight = self.view.bounds.size.height;
+    NSNumber *topOfTableViewHeaderStop = [NSNumber numberWithFloat:kTableOffsetY / viewHeight];
+    NSNumber *bottomOfTableViewHeaderStop = [NSNumber numberWithFloat:(kTableOffsetY + kTableHeaderHeight)/viewHeight];
+    NSNumber *bottomViewStop = [NSNumber numberWithFloat:1.0];
+
+    NSArray *locations = [NSArray arrayWithObjects:topViewStop, topOfTableViewHeaderStop, bottomOfTableViewHeaderStop, bottomViewStop, nil];
+    self.backgroundGradientLayer.locations = locations;
+    self.backgroundGradientLayer.frame = self.view.bounds;
 }
 
 - (UIButton *)trackButton
@@ -80,10 +123,10 @@
     if  (_trackButton == nil) {
         _trackButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_trackButton addTarget:self action:@selector(trackButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        _trackButton.backgroundColor = [UIColor redColor];
+        _trackButton.backgroundColor = kTrackButtonBackgroundColorDisabled;
         [_trackButton setTitle:@"Track" forState:UIControlStateNormal];
-        [_trackButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        [_trackButton setTitleColor:[UIColor grayColor] forState:UIControlStateDisabled];
+        [_trackButton setTitleColor:kTrackButtonTextColorEnabled forState:UIControlStateNormal];
+        [_trackButton setTitleColor:kTrackButtonTextColorDisabled forState:UIControlStateDisabled];
     }
     return _trackButton;
 }
@@ -155,6 +198,8 @@
     return _closeButton;
 }
 
+
+
 - (void)closeButtonPressed:(id)sender
 {
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -169,9 +214,9 @@
 {
     self.trackButton.enabled = self.targetEvents.count > 0;
     if (self.trackButton.enabled) {
-        self.trackButton.backgroundColor = [UIColor blueColor];
+        self.trackButton.backgroundColor = kTrackButtonBackgroundColorEnabled;
     } else {
-        self.trackButton.backgroundColor = [UIColor greenColor];
+        self.trackButton.backgroundColor = kTrackButtonBackgroundColorDisabled;
     }
 }
 
@@ -186,6 +231,7 @@
     self.tableView.tableHeaderView.frame = CGRectMake(0, 0, size.width - 2 * kTableOffsetX,  kTableHeaderHeight);
     self.trackButton.frame = CGRectMake(0, size.height - kTrackButtonHeight, size.width, kTrackButtonHeight);
     [self updateTrackButtonState];
+    [self updateBackgroundGradientLayerLocation];
 }
 
 - (void)loadContent
