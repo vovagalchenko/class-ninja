@@ -8,13 +8,13 @@
 
 #import "CNCourseDetailsTableViewCell.h"
 
-#define kDisclousureWidthAndHeight 44
+#define kDisclousureWidthAndHeight 43
 
 #define kStatusLEDWidth 5
 
 #define kDateTimeLabelXOffset 66
 #define kDateTimeLabelYOffset 0
-#define kDateTimeLabelXRightMargin (kDisclousureWidthAndHeight + 2)
+#define kDateTimeLabelXRightMargin (kDisclousureWidthAndHeight + 3)
 
 #define kBorderHairlineColor            ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:229/255.0 alpha:1])
 #define kStatusLEDClassAvailableColor   ([UIColor colorWithRed:71/255.0 green:182/255.0 blue:73/255.0 alpha:1])
@@ -42,9 +42,6 @@
 
 @property (nonatomic) BOOL usedForTargetting;
 
-@property (nonatomic) BOOL isTargetedByUser;
-@property (nonatomic) BOOL isExpanded;
-
 @property (nonatomic) UIButton *targetButton;
 @property (nonatomic) UIButton *expandButton;
 
@@ -57,10 +54,11 @@
 
 - (void)layoutSubviews
 {
+    self.backgroundColor = [UIColor whiteColor];
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
-    self.verticalSepartionLineView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight,
+    self.verticalSepartionLineView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight - 1,
                                                       0,
-                                                      kDisclousureWidthAndHeight,
+                                                      1,
                                                       self.bounds.size.height);
     
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, self.bounds.size.height);
@@ -70,8 +68,8 @@
                                           kCollapsedHeight - kDateTimeLabelYOffset);
     
     // FIXME: update these frames after getting proper assets
-    self.targetButton.frame = CGRectMake(kStatusLEDWidth, 11, 22, 22);
-    self.expandButton.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight + 11, 11, 22, 22);
+    self.targetButton.frame = CGRectMake(kStatusLEDWidth, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
+    self.expandButton.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
 
     self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset, kCollapsedHeight, kDetailsFieldWidth, kDetailsFieldHeight);
     self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
@@ -144,41 +142,49 @@
 {
     if (_targetButton == nil) {
         _targetButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_targetButton setImage:[UIImage imageNamed:@"close"] forState:UIControlStateNormal];
+        _targetButton.backgroundColor = [UIColor clearColor];
+        [_targetButton setImage:[UIImage imageNamed:@"checkbox-unchecked"] forState:UIControlStateNormal];
+        [_targetButton setImage:[UIImage imageNamed:@"checkbox-checked"] forState:UIControlStateSelected];
         [_targetButton addTarget:self action:@selector(targetButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _targetButton;
+}
+
+- (void)targetButtonPressed:(id)sender
+{
+    BOOL isTargetedByUser = !self.targetButton.isSelected;
+    self.targetButton.selected = isTargetedByUser;
+    
+    UIImage *buttonImage = nil;
+    if (isTargetedByUser) {
+        buttonImage = [UIImage imageNamed:@"checkbox-checked"];
+    } else {
+        buttonImage = [UIImage imageNamed:@"checkbox-unchecked"];
+    }
+    
+    [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
+    [self.delegate targetingStateOnCell:self changedTo:isTargetedByUser];
 }
 
 - (UIButton *)expandButton
 {
     if (_expandButton == nil) {
         _expandButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_expandButton setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+        _expandButton.backgroundColor = [UIColor clearColor];
+        [_expandButton setImage:[UIImage imageNamed:@"expand-grey"] forState:UIControlStateNormal];
+        [_expandButton setImage:[UIImage imageNamed:@"collapse-grey"] forState:UIControlStateSelected];
         [_expandButton addTarget:self action:@selector(expandButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     }
     
     return _expandButton;
 }
 
-- (void)targetButtonPressed:(id)sender
-{
-    self.isTargetedByUser = !self.isTargetedByUser;
-    UIImage *buttonImage = nil;
-    if (self.isTargetedByUser) {
-        buttonImage = [UIImage imageNamed:@"search"];
-    } else {
-        buttonImage = [UIImage imageNamed:@"close"];
-    }
-    
-    [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
-    [self.delegate targetingStateOnCell:self changedTo:self.isTargetedByUser];
-}
-
 - (void)expandButtonPressed:(id)sender
 {
-    self.isExpanded = !self.isExpanded;
-    [self.delegate expandStateOnCell:self changedTo:self.isExpanded];
+    BOOL isExpanded = !self.expandButton.selected;
+    self.expandButton.selected = isExpanded;
+    self.verticalSepartionLineView.hidden = isExpanded;
+    [self.delegate expandStateOnCell:self changedTo:isExpanded];
 }
 
 - (UIColor *)colorForEvent:(CNEvent *)event
@@ -199,13 +205,6 @@
         [self updateCellDetailsForEvent:event];
         [self updateDateTimeLabelForEvent:event];
     }
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{
-    [super setSelected:selected animated:animated];
-    
-    // Configure the view for the selected state
 }
 
 + (CGFloat)collapsedHeight
@@ -267,6 +266,5 @@
     self.multilineDetailsRightFieldLabel.attributedText = status;
     self.multilineDetailsRightFieldLabel.numberOfLines = 0;
 }
-
 
 @end
