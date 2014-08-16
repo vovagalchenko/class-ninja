@@ -14,5 +14,6 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
     #import "UIFont+CNAdditions.h"
+    #import "UIColor+CNAdditions.h"
     #import "AppearanceConstants.h"
 #endif

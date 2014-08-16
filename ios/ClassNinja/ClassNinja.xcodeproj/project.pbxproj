@@ -47,6 +47,7 @@
 		70E7619919A0013D003F3984 /* collapse-grey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 70E7618B19A0013D003F3984 /* collapse-grey@2x.png */; };
 		70E7619A19A0013D003F3984 /* expand-grey.png in Resources */ = {isa = PBXBuildFile; fileRef = 70E7618C19A0013D003F3984 /* expand-grey.png */; };
 		70E7619B19A0013D003F3984 /* expand-grey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 70E7618D19A0013D003F3984 /* expand-grey@2x.png */; };
+		70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */; };
 		DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B67819883E020092EE90 /* CNAuthContext.m */; };
 		DC08B698198AB0470092EE90 /* CNWelcomeStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B697198AB0470092EE90 /* CNWelcomeStatusView.m */; };
 		DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B69E198AF3D50092EE90 /* UITableView+LayoutSubviews.m */; };
@@ -123,6 +124,8 @@
 		70E7618B19A0013D003F3984 /* collapse-grey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "collapse-grey@2x.png"; sourceTree = "<group>"; };
 		70E7618C19A0013D003F3984 /* expand-grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "expand-grey.png"; sourceTree = "<group>"; };
 		70E7618D19A0013D003F3984 /* expand-grey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "expand-grey@2x.png"; sourceTree = "<group>"; };
+		70E7619C19A02075003F3984 /* UIColor+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CNAdditions.h"; sourceTree = "<group>"; };
+		70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CNAdditions.m"; sourceTree = "<group>"; };
 		DC08B67719883E020092EE90 /* CNAuthContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNAuthContext.h; sourceTree = "<group>"; };
 		DC08B67819883E020092EE90 /* CNAuthContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNAuthContext.m; sourceTree = "<group>"; };
 		DC08B696198AB0470092EE90 /* CNWelcomeStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNWelcomeStatusView.h; sourceTree = "<group>"; };
@@ -303,6 +306,8 @@
 				DCE7E7EC198D90FC00E14E3E /* CourseBrowsing */,
 				DC08B6A3198D7D990092EE90 /* Auth */,
 				DC08B695198AB0290092EE90 /* Welcome */,
+				70E7619C19A02075003F3984 /* UIColor+CNAdditions.h */,
+				70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -486,6 +491,7 @@
 				DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */,
 				DCE7E7F2198DA60600E14E3E /* CNNumberEntryTextField.m in Sources */,
 				DCE7E7EF198D97DD00E14E3E /* CNAuthViewController.m in Sources */,
+				70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */,
 				DC08B6A4198D8DD00092EE90 /* CNModels.m in Sources */,
 				DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */,
 				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
