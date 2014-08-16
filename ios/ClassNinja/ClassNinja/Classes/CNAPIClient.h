@@ -29,4 +29,12 @@ typedef enum : NSUInteger {
           authPolicy:(CNAuthenticationPolicy)authPolicy
           completion:(void (^)(NSArray *))completionBlock;
 
+- (NSMutableURLRequest *)mutableURLRequestForAPIEndpoint:(NSString *)endpoint
+                                              HTTPMethod:(NSString *)httpMethod
+                                      HTTPBodyParameters:(NSDictionary *)httpBodyParams;
+- (void)makeURLRequest:(NSMutableURLRequest *)request
+authenticationRequired:(BOOL)authRequired
+        withAuthPolicy:(CNAuthenticationPolicy)authPolicy
+            completion:(void (^)(id))completionBlock;
+
 @end

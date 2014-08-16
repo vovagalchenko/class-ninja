@@ -92,12 +92,13 @@ static inline UIImage *createGradientImage(CGSize sizeInPts, unsigned short *bit
     bitmapData = malloc(sizeOfBitmapData);
     memset(bitmapData, 0, sizeOfBitmapData);
     CGFloat portionOfCircleForGradientTail = 0.65;
+    unsigned char baseGradientAlpha = 0x66;
     for (int i = 0; i < numPixels; i++) {
         CGFloat y = (int)i/(int)(sizeInPts.width * scale) - sizeInPts.height;
         CGFloat x = i % (int)(sizeInPts.width * scale) - sizeInPts.width;
         CGFloat theta = atan2(y, x)  + M_PI;
         CGFloat alphaMultiple = 1 - MIN(theta/(portionOfCircleForGradientTail*M_PI*2), 1);
-        unsigned char alpha = (unsigned char)(0xFF*alphaMultiple);
+        unsigned char alpha = (unsigned char)(baseGradientAlpha*alphaMultiple);
         bitmapData[i] = (alpha << 8) + 0xFF;
     }
     

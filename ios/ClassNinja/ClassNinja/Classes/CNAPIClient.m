@@ -16,7 +16,7 @@
 static inline NSURL *baseURL()
 {
     // TODO: Get this from info plist
-    return [NSURL URLWithString:@"http://boris.class-ninja.com/api"];
+    return [NSURL URLWithString:@"http://vova.class-ninja.com/api"];
 }
 
 static inline NSTimeInterval urlRequestTimeoutInterval()
@@ -77,15 +77,10 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
              authenticationPolicy:(CNAuthenticationPolicy)authPolicy
                        completion:(void (^)(NSArray *))completionBlock
 {
-    NSURL *urlWithResourceType = [baseURL() URLByAppendingPathComponent:[parentAPIResource resourceTypeName] isDirectory:YES];
-    
-    NSURL *finishedURL = [urlWithResourceType URLByAppendingPathComponent:[parentAPIResource resourceIdentifier]];
-    
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:finishedURL
-                            cachePolicy:NSURLRequestReloadIgnoringCacheData
-                        timeoutInterval:urlRequestTimeoutInterval()];
-    
-    [self makeURLRequest:urlRequest
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:[[parentAPIResource resourceTypeName] stringByAppendingPathComponent:[parentAPIResource resourceIdentifier]]
+                                                              HTTPMethod:@"GET"
+                                                      HTTPBodyParameters:nil];
+    [self makeURLRequest:request
   authenticationRequired:[[parentAPIResource childResourceClass] needsAuthentication]
           withAuthPolicy:authPolicy
               completion:^(NSDictionary *jsonResult) {
@@ -112,6 +107,24 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
 }
 
 #pragma API Utilities
+
+- (NSMutableURLRequest *)mutableURLRequestForAPIEndpoint:(NSString *)endpoint
+                                              HTTPMethod:(NSString *)httpMethod
+                                      HTTPBodyParameters:(NSDictionary *)httpBodyParams
+{
+    NSURL *url = [baseURL() URLByAppendingPathComponent:endpoint];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestReloadIgnoringCacheData
+                                                          timeoutInterval:urlRequestTimeoutInterval()];
+    [urlRequest setHTTPMethod:httpMethod];
+    if (httpBodyParams.count) {
+        NSError *err = nil;
+        NSData *httpBody = [NSJSONSerialization dataWithJSONObject:httpBodyParams options:0 error:&err];
+        NSAssert(err == nil, @"Unable to JSON serialize your http body parameters: %@", httpBodyParams);
+        [urlRequest setHTTPBody:httpBody];
+    }
+    return urlRequest;
+}
 
 - (void)makeURLRequest:(NSMutableURLRequest *)request
 authenticationRequired:(BOOL)authRequired
@@ -156,7 +169,7 @@ authenticationRequired:(BOOL)authRequired
                                        queue:[NSOperationQueue mainQueue] // Callbacks executed on the main thread
                            completionHandler:^(NSURLResponse* response, NSData* data, NSError* connectionError) {
         if (connectionError || [(NSHTTPURLResponse *)response statusCode] >= 400) {
-            NSLog(@"Error attempting to execute: %@\n%@", response, connectionError);
+            NSLog(@"Error attempting to execute: %@\n%@\n%@", response, connectionError, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
             completionBlock(nil);
         } else {
             NSError *serializationError = nil;

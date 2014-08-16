@@ -24,6 +24,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, readonly) UIButton *confirmationButton;
 @property (nonatomic, readonly) CNActivityIndicator *activityIndicator;
 @property (nonatomic, readwrite) CNAuthViewControllerState currentState;
+@property (nonatomic, weak) id<CNAuthViewControllerDelegate>delegate;
+@property (nonatomic, readwrite) NSString *phoneNumber;
 
 @end
 
@@ -31,10 +33,11 @@ typedef enum : NSUInteger {
 
 #pragma mark - UIViewController lifecycle
 
-- (instancetype)init
+- (instancetype)initWithDelegate:(id<CNAuthViewControllerDelegate>)delegate
 {
     if (self = [super init]) {
         self.currentState = CNAuthViewControllerStatePhoneNumberEntry;
+        self.delegate = delegate;
     }
     return self;
 }
@@ -56,7 +59,6 @@ typedef enum : NSUInteger {
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.view.backgroundColor = AUTH_BLUE_COLOR;
     [self.view addSubview:self.detailLabel];
     [self.view addSubview:self.textField];
     [self.view addSubview:self.confirmationButton];
@@ -182,7 +184,7 @@ static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
     NSArray *result = nil;
     switch (state) {
         case CNAuthViewControllerStateVerificationCodeEntry:
-            result = @[@(4)];
+            result = @[@(6)];
             break;
         case CNAuthViewControllerStatePhoneNumberEntry:
             result = @[@(3), @(3), @(4)];
@@ -239,19 +241,60 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
 {
     switch (self.currentState) {
         case CNAuthViewControllerStatePhoneNumberEntry:
+        {
+            self.phoneNumber = self.textField.text;
             [self changeState:CNAuthViewControllerStateWait animated:YES];
+            [self.delegate authViewController:self
+                      receivedUserPhoneNumber:self.phoneNumber
+                       doneProcessingCallback:^(BOOL processingSucceeded){
+                           if (!processingSucceeded) {
+                               [self changeState:CNAuthViewControllerStatePhoneNumberEntry animated:YES];
+                               [[[UIAlertView alloc] initWithTitle:@"Error"
+                                                           message:@"Unable to send the phone number to Class Ninja"
+                                                          delegate:nil
+                                                 cancelButtonTitle:@"OK"
+                                                 otherButtonTitles:nil] show];
+                           } else {
+                               [self changeState:CNAuthViewControllerStateVerificationCodeEntry animated:YES];
+                           }
+                       }];
             break;
+        }
         case CNAuthViewControllerStateVerificationCodeEntry:
+        {
             [self changeState:CNAuthViewControllerStateWait animated:YES];
+            [self.delegate authViewController:self
+                     receivedConfirmationCode:self.textField.text
+                               forPhoneNumber:self.phoneNumber
+                       doneProcessingCallback:^(BOOL success) {
+                        if (success) {
+                            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+                        } else {
+                            self.phoneNumber = nil;
+                            [self changeState:CNAuthViewControllerStatePhoneNumberEntry animated:YES];
+                            [[[UIAlertView alloc] initWithTitle:@"Error"
+                                                        message:@"Unable to send the confirmation to Class Ninja"
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil] show];
+                        }
+                    }];
             break;
+        }
         default:
+        {
             NSAssert(NO, @"Confirmation button pressed in unexpected state: %d", self.currentState);
             break;
+        }
     }
 }
 
 - (void)changeState:(CNAuthViewControllerState)newState animated:(BOOL)animated
 {
+    [self.view.layer removeAllAnimations];
+    [self.detailLabel.layer removeAllAnimations];
+    [self.textField.layer removeAllAnimations];
+    [self.confirmationButton.layer removeAllAnimations];
     void (^switchUIToNewState)(CNAuthViewControllerState) = ^(CNAuthViewControllerState state){
         self.detailLabel.text = detailLabelStringForState(state);
         NSArray *groups = textFieldGroupArray(state);
@@ -262,10 +305,17 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
         
         switch (state) {
             case CNAuthViewControllerStatePhoneNumberEntry:
+                self.detailLabel.alpha = 1.0;
+                self.textField.alpha = 1.0;
+                self.activityIndicator.alpha = 0.0;
+                self.view.backgroundColor = AUTH_BLUE_COLOR;
+                [self.textField becomeFirstResponder];
+                break;
             case CNAuthViewControllerStateVerificationCodeEntry:
                 self.detailLabel.alpha = 1.0;
                 self.textField.alpha = 1.0;
                 self.activityIndicator.alpha = 0.0;
+                self.view.backgroundColor = CONFIRMATION_COLOR;
                 [self.textField becomeFirstResponder];
                 break;
             case CNAuthViewControllerStateWait:
@@ -278,6 +328,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
                 NSAssert(NO, @"Unknown state: %d", state);
                 break;
         }
+        self.currentState = state;
     };
     
     if (animated) {
@@ -287,9 +338,11 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
             self.confirmationButton.alpha = 0.0;
             self.activityIndicator.alpha = 0.0;
         } completion:^(BOOL finished) {
-            [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-                switchUIToNewState(newState);
-            }];
+            if (finished) {
+                [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                    switchUIToNewState(newState);
+                }];
+            }
         }];
     } else {
         switchUIToNewState(newState);

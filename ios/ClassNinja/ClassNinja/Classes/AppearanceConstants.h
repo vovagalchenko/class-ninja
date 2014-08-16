@@ -18,6 +18,7 @@
 #define AUTH_BLUE_COLOR         [UIColor colorWithRed:17.0/255.0 green:33.0/255.0 blue:83.0/255.0 alpha:1.0]
 #define WELCOME_BLUE_COLOR      [UIColor colorWithRed:27.0/255.0 green:127.0/255.0 blue:247.0/255.0 alpha:1.0]
 #define DISABLED_GRAY_COLOR     [UIColor colorWithRed:116.0/255.0 green:125.0/255.0 blue:132.0/255.0 alpha:1.0]
+#define CONFIRMATION_COLOR      [UIColor colorWithRed:47.0/255.0 green:198.0/255.0 blue:183.0/255.0 alpha:1.0]
 
 #define FOCAL_LABEL_TEXT_SIZE   30
 #define INSTRUCTION_LABEL_FONT  [UIFont cnSystemFontOfSize:18.0]

@@ -8,11 +8,12 @@
 
 #import "CNAuthContext.h"
 #import "CNAppDelegate.h"
-#import "CNAuthViewController.h"
+#import "CNAPIClient.h"
 
 @interface CNAuthContext()
 
 @property (nonatomic, readwrite) CNUser *loggedInUser;
+@property (nonatomic, copy) void (^authenticationCompletionBlock)();
 
 @end
 
@@ -22,9 +23,59 @@
 
 - (void)authenticateWithCompletion:(void (^)())completionBlock
 {
-    [APP_DELEGATE.window.rootViewController presentViewController:[[CNAuthViewController alloc] init]
+    self.authenticationCompletionBlock = completionBlock;
+    [APP_DELEGATE.window.rootViewController presentViewController:[[CNAuthViewController alloc] initWithDelegate:self]
                                                          animated:YES
                                                        completion:nil];
+}
+
+- (void)authViewController:(CNAuthViewController *)authViewController
+   receivedUserPhoneNumber:(NSString *)phoneNumber
+    doneProcessingCallback:(void (^)(BOOL))completionCallback
+{
+    CNAPIClient *apiClient = [CNAPIClient sharedInstance];
+    NSMutableURLRequest *request = [apiClient mutableURLRequestForAPIEndpoint:@"user" HTTPMethod:@"POST" HTTPBodyParameters:@{
+                                                                                                                              @"phone" : phoneNumber,
+                                                                                                                              @"device_vendor_id" : [[[UIDevice currentDevice] identifierForVendor] UUIDString]
+                                                                                                                              }];
+    [apiClient makeURLRequest:request
+       authenticationRequired:NO
+               withAuthPolicy:CNFailRequestOnAuthFailure
+                   completion:^(NSDictionary *response) {
+                    // Ewww
+                    completionCallback([[response objectForKey:@"status"] isEqualToString:@"SMS request sent"]);
+                   }];
+}
+
+- (void)authViewController:(CNAuthViewController *)authViewController
+  receivedConfirmationCode:(NSString *)confirmationCode
+            forPhoneNumber:(NSString *)phoneNumber
+    doneProcessingCallback:(void (^)(BOOL))completionCallback
+{
+    CNAPIClient *apiClient = [CNAPIClient sharedInstance];
+    NSMutableURLRequest *request = [apiClient mutableURLRequestForAPIEndpoint:[@"user" stringByAppendingPathComponent:phoneNumber]
+                                                                   HTTPMethod:@"POST"
+                                                           HTTPBodyParameters:@{
+                                                                                @"confirmation_token" : confirmationCode,
+                                                                                }];
+    [apiClient makeURLRequest:request
+       authenticationRequired:NO
+               withAuthPolicy:CNFailRequestOnAuthFailure
+                   completion:^(NSDictionary *response) {
+                       NSString *accessToken = [response objectForKey:@"access_token"];
+                       if (accessToken.length) {
+                           CNUser *user = [[CNUser alloc] init];
+                           user.phoneNumber = phoneNumber;
+                           user.accessToken = accessToken;
+                           self.loggedInUser = user;
+                           completionCallback(YES);
+                           if (self.authenticationCompletionBlock)
+                               self.authenticationCompletionBlock();
+                           self.authenticationCompletionBlock = nil;
+                       } else {
+                           completionCallback(NO);
+                       }
+                   }];
 }
 
 #pragma mark loggedInUser Management

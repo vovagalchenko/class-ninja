@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CNAuthViewController.h"
 
 @class CNUser;
-@interface CNAuthContext : NSObject
+@interface CNAuthContext : NSObject <CNAuthViewControllerDelegate>
 
 @property (nonatomic, readonly) CNUser *loggedInUser;
 
