@@ -16,7 +16,6 @@
 #define kDateTimeLabelYOffset 0
 #define kDateTimeLabelXRightMargin (kDisclousureWidthAndHeight + 3)
 
-#define kBorderHairlineColor            ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:229/255.0 alpha:1])
 #define kStatusLEDClassAvailableColor   ([UIColor colorWithRed:71/255.0 green:182/255.0 blue:73/255.0 alpha:1])
 #define kStatusLEDClassClosedColor      ([UIColor colorWithRed:220/255.0 green:39/255.0 blue:39/255.0 alpha:1])
 
@@ -37,7 +36,6 @@
 
 @property (nonatomic) UIView *statusLEDView;
 @property (nonatomic) UIView *separationLineView;
-@property (nonatomic) UIView *verticalSepartionLineView;
 @property (nonatomic) UILabel *dateTimeLabel;
 
 @property (nonatomic) BOOL usedForTargetting;
@@ -56,10 +54,6 @@
 {
     self.backgroundColor = [UIColor whiteColor];
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
-    self.verticalSepartionLineView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight - 1,
-                                                      0,
-                                                      1,
-                                                      self.bounds.size.height);
     
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, self.bounds.size.height);
     self.dateTimeLabel.frame = CGRectMake(kDateTimeLabelXOffset,
@@ -86,15 +80,11 @@
 
         _separationLineView = [[UIView alloc] init];
         _separationLineView.backgroundColor = kBorderHairlineColor;
-
-        _verticalSepartionLineView = [[UIView alloc] init];
-        _verticalSepartionLineView.backgroundColor = kBorderHairlineColor;
         
         _statusLEDView = [[UIView alloc] init];
         _dateTimeLabel = [[UILabel alloc] init];
         
         [self addSubview:_separationLineView];
-        [self addSubview:_verticalSepartionLineView];
         [self addSubview:_targetButton];
         [self addSubview:_expandButton];
         [self addSubview:_statusLEDView];
@@ -183,7 +173,6 @@
 {
     BOOL isExpanded = !self.expandButton.selected;
     self.expandButton.selected = isExpanded;
-    self.verticalSepartionLineView.hidden = isExpanded;
     [self.delegate expandStateOnCell:self changedTo:isExpanded];
 }
 
