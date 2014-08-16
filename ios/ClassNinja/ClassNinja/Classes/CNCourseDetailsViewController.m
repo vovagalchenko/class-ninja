@@ -229,6 +229,7 @@
     CGSize size = self.view.bounds.size;
     self.tableView.frame = CGRectMake(kTableOffsetX, kTableOffsetY, size.width - 2 * kTableOffsetX, size.height - kTableOffsetY - kTrackButtonHeight);
     self.tableView.tableHeaderView.frame = CGRectMake(0, 0, size.width - 2 * kTableOffsetX,  kTableHeaderHeight);
+    self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(kTableHeaderHeight, 0, 0, 0);
     self.trackButton.frame = CGRectMake(0, size.height - kTrackButtonHeight, size.width, kTrackButtonHeight);
     [self updateTrackButtonState];
     [self updateBackgroundGradientLayerLocation];
