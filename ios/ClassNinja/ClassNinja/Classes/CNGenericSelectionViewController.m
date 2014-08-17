@@ -32,8 +32,6 @@
 @end
 
 @interface CNDepartmentViewController : CNGenericSelectionViewController
-@property (nonatomic) NSMutableArray *departmentsByCollationIndex;
-@property (nonatomic) NSMutableOrderedSet *enUSCollation;
 @end
 
 
@@ -193,85 +191,6 @@
 - (Class)nextVCClass
 {
     return [CNCourseViewController class];
-}
-
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        _enUSCollation = [[NSMutableOrderedSet alloc] init];
-        _departmentsByCollationIndex = [[NSMutableArray alloc] init];
-    }
-    return self;
-}
-
-- (void)collateDepartmentsByName:(NSArray *)departments
-{
-    self.departmentsByCollationIndex = [[NSMutableArray alloc] init];
-    
-    for (CNDepartment *dept in departments) {
-        NSString *firstChar = [[dept.name substringToIndex:1] uppercaseString];
-        NSUInteger index = [self.enUSCollation indexOfObject:firstChar];
-        if (index == NSNotFound) {
-            NSMutableArray *collatedArray = [[NSMutableArray alloc] initWithObjects:dept, nil];
-            [self.departmentsByCollationIndex addObject:collatedArray];
-            [self.enUSCollation addObject:firstChar];
-        } else {
-            NSMutableArray *collatedArray = [self.departmentsByCollationIndex objectAtIndex:index];
-            [collatedArray addObject:dept];
-        }
-    }
-}
-
-- (void)reloadResults:(NSArray *)children
-{
-    [self collateDepartmentsByName:children];
-    [self.tableView reloadData];
-}
-
-#pragma mark Collation related methods
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    return [self.enUSCollation objectAtIndex:section];
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return self.departmentsByCollationIndex.count;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    NSMutableArray *collatedArray = [self.departmentsByCollationIndex objectAtIndex:section];
-    return collatedArray.count;
-}
-
-
-- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
-{
-    return [self.enUSCollation array];
-}
-
-- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index;
-{
-    return index;
-}
-
-#pragma Cell management
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell = [[CNGenericSelectionTableViewCell alloc] initWithReuseIdentifier:@"deparmentcell"];
-    
-    NSArray *collatedDepartments = [self.departmentsByCollationIndex objectAtIndex:indexPath.section];
-    CNDepartment *dept = [collatedDepartments objectAtIndex:indexPath.row];
-    cell.textLabel.text = dept.name;
-    return cell;
-}
-
-- (id <CNModel>)modelForIndexPath:(NSIndexPath *)indexPath
-{
-    NSArray *collatedDepartments = [self.departmentsByCollationIndex objectAtIndex:indexPath.section];
-    return [collatedDepartments objectAtIndex:indexPath.row];
 }
 
 @end
