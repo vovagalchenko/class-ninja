@@ -10,9 +10,11 @@
 
 #define kScrollYOffset 75.0
 
-#define kBackButtonWidth 22
-#define kButtonOriginX 20
-#define kButtonOriginY 35
+#define kBackButtonWidth 44
+#define kButtonOriginX 9
+#define kButtonOriginY 24
+
+#define kHeaderOriginY 35
 
 #define kLeftBoundsOffset 24.0
 #define kSpaceBetweenViews (kLeftBoundsOffset/2.0)
@@ -158,7 +160,7 @@
     
     CGRect rect = CGRectMake(kButtonOriginX, kButtonOriginY, kBackButtonWidth, kBackButtonWidth);
     self.backButton.frame = rect;
-    self.headerLabel.frame = CGRectMake(0, kButtonOriginY, scrollFrame.size.width, 20);
+    self.headerLabel.frame = CGRectMake(0, kHeaderOriginY, scrollFrame.size.width, 20);
     
     self.scrollView.contentSize = self.scrollView.frame.size;
     
