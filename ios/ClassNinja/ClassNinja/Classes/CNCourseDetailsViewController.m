@@ -298,13 +298,12 @@
         return;
     }
     
+    [self.tableView beginUpdates];
     if (isExpanded) {
         [self.expandedIndexPaths addObject:cellIndexPath];
     } else {
         [self.expandedIndexPaths removeObject:cellIndexPath];
     }
-
-    [self.tableView beginUpdates];
     [self.tableView endUpdates];
 
     if (isExpanded) {

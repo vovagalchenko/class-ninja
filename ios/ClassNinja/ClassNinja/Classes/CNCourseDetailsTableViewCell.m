@@ -44,7 +44,7 @@
 @property (nonatomic) BOOL usedForTargetting;
 
 @property (nonatomic) UIButton *targetButton;
-@property (nonatomic) UIButton *expandButton;
+@property (nonatomic) UIView *expandAccessoryView;
 
 @property (nonatomic) UILabel *multilineDetailsLeftFieldLabel;
 @property (nonatomic) UILabel *multilineDetailsRightFieldLabel;
@@ -65,9 +65,8 @@
                                           self.bounds.size.width - kDateTimeLabelXOffset - kDateTimeLabelXRightMargin,
                                           kCollapsedHeight - kDateTimeLabelYOffset);
     
-    // FIXME: update these frames after getting proper assets
     self.targetButton.frame = CGRectMake(kStatusLEDWidth, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
-    self.expandButton.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
+    self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
 
     self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset, kCollapsedHeight, kDetailsFieldWidth, kDetailsFieldHeight);
     self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
@@ -90,11 +89,9 @@
         _dateTimeLabel.userInteractionEnabled = NO;
         
         [self addSubview:_separationLineView];
-        [self addSubview:_targetButton];
-        [self addSubview:_expandButton];
         [self addSubview:_statusLEDView];
         [self addSubview:_dateTimeLabel];
-        [self addSubview:self.expandButton];
+        [self addSubview:self.expandAccessoryView];
         [self addSubview:self.targetButton];
         [self addSubview:self.multilineDetailsRightFieldLabel];
         [self addSubview:self.multilineDetailsLeftFieldLabel];
@@ -161,27 +158,22 @@
     [self.delegate targetingStateOnCell:self changedTo:isTargetedByUser];
 }
 
-- (UIButton *)expandButton
+- (UIView *)expandAccessoryView
 {
-    if (_expandButton == nil) {
-        _expandButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _expandButton.backgroundColor = [UIColor clearColor];
-        [_expandButton setImage:[UIImage imageNamed:@"expand-grey"] forState:UIControlStateNormal];
-        [_expandButton setImage:[UIImage imageNamed:@"collapse-grey"] forState:UIControlStateSelected];
-        [_expandButton addTarget:self action:@selector(expandButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    if (_expandAccessoryView == nil) {
+        _expandAccessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"expand-grey"]];
+        _expandAccessoryView.contentMode = UIViewContentModeCenter;
     }
-    
-    return _expandButton;
-}
-
-- (void)expandButtonPressed:(id)sender
-{
-    [self setExpandedStateTo:!self.expandButton.selected];
+    return _expandAccessoryView;
 }
 
 - (void)setExpandedStateTo:(BOOL)isExpanded
 {
-    self.expandButton.selected = isExpanded;
+    dispatch_block_t accessoryViewFlip = ^{
+        // The 0.999 is a hack to make sure the accessory view rotates counter clockwise
+        self.expandAccessoryView.transform = CGAffineTransformMakeRotation(isExpanded? 0.999*M_PI : 0);
+    };
+    [UIView animateWithDuration:ANIMATION_DURATION animations:accessoryViewFlip];
     [self.delegate expandStateOnCell:self changedTo:isExpanded];
 }
 

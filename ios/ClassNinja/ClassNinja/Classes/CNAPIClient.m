@@ -248,6 +248,4 @@ authenticationRequired:(BOOL)authRequired
 
 }
 
-#pragma mark Auth
-
 @end
