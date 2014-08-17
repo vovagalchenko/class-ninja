@@ -318,7 +318,8 @@
     if (animated) {
         [UIView animateWithDuration:kPushDuration animations:^{
             self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:self.currentPageIndex];
-        }completion:^(BOOL finished) {
+        } completion:^(BOOL finished) {
+            if (!finished) NSLog(@"FIXME: POPPING ANIMATION ENDED ABRUPTLY!");
             localCompletion();
         }];
     } else {

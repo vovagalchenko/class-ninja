@@ -216,6 +216,13 @@
 
 
 @implementation CNCourseViewController
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
+}
+
 - (NSString *)headerText
 {
     return @"Which course are you looking to take?";
@@ -238,6 +245,8 @@
     nextVC.modalPresentationCapturesStatusBarAppearance = YES;
     [self.siongNavigationController presentViewController:nextVC animated:YES completion:nil];
 }
+
+
 
 
 @end
