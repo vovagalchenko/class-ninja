@@ -10,4 +10,6 @@
 
 @interface CNActivityIndicator : UIView
 
+- (id)initWithFrame:(CGRect)frame presentedOnLightBackground:(BOOL)lightBG;
+
 @end

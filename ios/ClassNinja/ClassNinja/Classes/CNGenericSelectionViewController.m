@@ -11,6 +11,7 @@
 #import "CNGenericSelectionTableViewCell.h"
 #import "AppearanceConstants.h"
 #import "CNCourseDetailsViewController.h"
+#import "CNActivityIndicator.h"
 
 #define kTitleViewHeight 90
 #define kTitleLabelXOffset 20
@@ -22,6 +23,7 @@
 @property (nonatomic) id <CNModel> rootModel;
 @property (nonatomic) UIView *titleView;
 @property (nonatomic) NSIndexPath *lastSelectedRow;
+@property (nonatomic) CNActivityIndicator *activityIndicator;
 
 - (void)reloadResults:(NSArray *)children;
 - (id <CNModel>)modelForIndexPath:(NSIndexPath *)indexPath;
@@ -49,8 +51,12 @@
     self.view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
     self.tableView.backgroundColor = [UIColor clearColor];
     
+    self.activityIndicator = [[CNActivityIndicator alloc] initWithFrame:CGRectZero presentedOnLightBackground:YES];
+    self.activityIndicator.alpha = 0.0;
+    
     self.view.autoresizingMask = UIViewAutoresizingNone;
     
+    [self.view addSubview:self.activityIndicator];
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.titleView];
 
@@ -70,12 +76,21 @@
     
     self.tableView.frame = tableRect;
     [self layoutTitleView];
+    
+    CGFloat activityIndicatorDimension = TAPPABLE_AREA_DIMENSION;
+    self.activityIndicator.frame = CGRectMake((self.view.bounds.size.width - activityIndicatorDimension)/2,
+                                              (self.view.bounds.size.height - activityIndicatorDimension)/2,
+                                              activityIndicatorDimension, activityIndicatorDimension);
 }
 
 - (void)loadContent
 {
+    self.activityIndicator.alpha = 1.0;
     [[CNAPIClient sharedInstance] listChildren:self.rootModel
                                     completion:^(NSArray*children) {
+                                        [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                                            self.activityIndicator.alpha = 0.0;
+                                        }];
                                         [self reloadResults:children];
                                     }];
 }
@@ -169,8 +184,12 @@
 
 - (void)loadContent
 {
+    self.activityIndicator.alpha = 1.0;
     [[CNAPIClient sharedInstance] list:[CNSchool class]
                             completion:^(NSArray *children){
+                                [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                                    self.activityIndicator.alpha = 0.0;
+                                }];
                                 [self reloadResults:children];
                             }];
 }

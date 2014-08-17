@@ -15,35 +15,49 @@
 
 @property (nonatomic, readwrite) CGSize previouslyRenderedGradientImageSize;
 @property (nonatomic, readwrite) UIImageView *gradientImageView;
+@property (nonatomic, assign) BOOL presentedOnLightBackground;
+@property (nonatomic) NSArray *verticalConstraints;
+@property (nonatomic) NSArray *horizontalConstraints;
 
 @end
 
 @implementation CNActivityIndicator
 
-- (id)initWithFrame:(CGRect)frame
+- (id)initWithFrame:(CGRect)frame presentedOnLightBackground:(BOOL)lightBG
 {
     if (self = [super initWithFrame:frame]) {
+        self.presentedOnLightBackground = lightBG;
         self.backgroundColor = [UIColor clearColor];
         self.opaque = NO;
         self.clearsContextBeforeDrawing = YES;
-        self.translatesAutoresizingMaskIntoConstraints = NO;
-        self.gradientImageView = [[UIImageView alloc] init];
+        self.gradientImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         self.gradientImageView.translatesAutoresizingMaskIntoConstraints = NO;
         self.previouslyRenderedGradientImageSize = CGSizeMake(0, 0);
         [self addSubview:self.gradientImageView];
-        NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_gradientImageView]|" options:0 metrics:0 views:NSDictionaryOfVariableBindings(_gradientImageView)];
-        NSArray *horizontal = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_gradientImageView]|" options:0 metrics:0 views:NSDictionaryOfVariableBindings(_gradientImageView)];
-        [self addConstraints:vertical];
-        [self addConstraints:horizontal];
+        self.verticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_gradientImageView]|" options:0 metrics:0 views:NSDictionaryOfVariableBindings(_gradientImageView)];
+        self.horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_gradientImageView]|" options:0 metrics:0 views:NSDictionaryOfVariableBindings(_gradientImageView)];
     }
     return self;
+}
+
++ (BOOL)requiresConstraintBasedLayout
+{
+    return YES;
+}
+
+- (void)updateConstraints
+{
+    [self addConstraints:self.verticalConstraints];
+    [self addConstraints:self.horizontalConstraints];
+    [super updateConstraints];
+    
 }
 
 - (void)layoutSubviews
 {
     [super layoutSubviews];
     if (!CGSizeEqualToSize(self.gradientImageView.bounds.size, self.previouslyRenderedGradientImageSize)) {
-        self.gradientImageView.image = createGradientImage(self.gradientImageView.bounds.size, _bitmapData);
+        self.gradientImageView.image = createGradientImage(self.gradientImageView.bounds.size, _bitmapData, self.presentedOnLightBackground);
         self.previouslyRenderedGradientImageSize = self.gradientImageView.bounds.size;
         
         CAShapeLayer *maskLayer = [CAShapeLayer layer];
@@ -56,21 +70,33 @@
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.gradientImageView.layer removeAllAnimations];
-            [self spin];
+            if (self.alpha > 0)
+                [self spin];
         });
     }
 }
 
+- (void)setAlpha:(CGFloat)alpha
+{
+    if (self.alpha == 0 && alpha != 0) {
+        [self spin];
+    } else if (alpha == 0 && self.alpha != 0) {
+        [self.gradientImageView.layer removeAllAnimations];
+    }
+    [super setAlpha:alpha];
+}
+
 - (void)spin
 {
-    [UIView animateWithDuration:0.5
+    [UIView animateWithDuration:ANIMATION_DURATION
                           delay:0.0f
                         options:UIViewAnimationOptionCurveLinear
                      animations:^{
                          self.gradientImageView.transform = CGAffineTransformRotate(self.gradientImageView.transform, M_PI / 2);
                      }
                      completion:^(BOOL finished) {
-                         [self spin];
+                        if (finished)
+                            [self spin];
                      }];
 }
 
@@ -79,7 +105,7 @@ void releaseCallback(void *info, const void *data, size_t size)
     free((void *)data);
 }
 
-static inline UIImage *createGradientImage(CGSize sizeInPts, unsigned short *bitmapData)
+static inline UIImage *createGradientImage(CGSize sizeInPts, unsigned short *bitmapData, BOOL presentedOnLightBackground)
 {
     CGFloat scale = [[UIScreen mainScreen] scale];
     unsigned short bitsPerComponent = 8;
@@ -93,13 +119,14 @@ static inline UIImage *createGradientImage(CGSize sizeInPts, unsigned short *bit
     memset(bitmapData, 0, sizeOfBitmapData);
     CGFloat portionOfCircleForGradientTail = 0.65;
     unsigned char baseGradientAlpha = 0x66;
+    unsigned char baseColor = presentedOnLightBackground? 0x44 : 0xFF;
     for (int i = 0; i < numPixels; i++) {
         CGFloat y = (int)i/(int)(sizeInPts.width * scale) - sizeInPts.height;
         CGFloat x = i % (int)(sizeInPts.width * scale) - sizeInPts.width;
         CGFloat theta = atan2(y, x)  + M_PI;
         CGFloat alphaMultiple = 1 - MIN(theta/(portionOfCircleForGradientTail*M_PI*2), 1);
         unsigned char alpha = (unsigned char)(baseGradientAlpha*alphaMultiple);
-        bitmapData[i] = (alpha << 8) + 0xFF;
+        bitmapData[i] = (alpha << 8) + baseColor;
     }
     
     CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, bitmapData, numPixels, releaseCallback);
@@ -137,8 +164,9 @@ static inline UIImage *createGradientImage(CGSize sizeInPts, unsigned short *bit
     CGFloat outermostCircleProportion = 1.0;
     CGFloat strokeWidth = 2.0;
     CGContextSetLineWidth(ctx, strokeWidth);
+    UIColor *baseColor = self.presentedOnLightBackground? [UIColor darkGrayColor] : [UIColor whiteColor];
     for (int i = 0; i < numCircles; i++) {
-        [[[UIColor whiteColor] colorWithAlphaComponent:outermostCircleAlpha + i*((innermostCircleAlpha - outermostCircleAlpha)/numCircles)] setStroke];
+        [[baseColor colorWithAlphaComponent:outermostCircleAlpha + i*((innermostCircleAlpha - outermostCircleAlpha)/numCircles)] setStroke];
         CGFloat circleProportion = outermostCircleProportion - i*((outermostCircleProportion - innermostCircleProportion)/numCircles);
         CGContextStrokeEllipseInRect(ctx, CGRectMake(
             (self.bounds.size.width - self.bounds.size.width*circleProportion)/2 + strokeWidth/2,

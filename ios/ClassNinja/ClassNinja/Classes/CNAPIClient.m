@@ -165,9 +165,12 @@ authenticationRequired:(BOOL)authRequired
         }
     }
     
+    UIApplication* app = [UIApplication sharedApplication];
+    app.networkActivityIndicatorVisible = YES;
     [NSURLConnection sendAsynchronousRequest:request
                                        queue:[NSOperationQueue mainQueue] // Callbacks executed on the main thread
                            completionHandler:^(NSURLResponse* response, NSData* data, NSError* connectionError) {
+        app.networkActivityIndicatorVisible = NO;
         if (connectionError || [(NSHTTPURLResponse *)response statusCode] >= 400) {
             NSLog(@"Error attempting to execute: %@\n%@\n%@", response, connectionError, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
             completionBlock(nil);

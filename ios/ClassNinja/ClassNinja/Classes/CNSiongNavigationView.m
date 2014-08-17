@@ -151,8 +151,6 @@
 
 - (void)layoutSubviews
 {
-    [super layoutSubviews];
-    
     CGRect scrollFrame = self.bounds;
     scrollFrame.origin.y += kScrollYOffset;
     scrollFrame.size.height -= kScrollYOffset;
@@ -165,6 +163,8 @@
     self.scrollView.contentSize = self.scrollView.frame.size;
     
     [self layoutViewControllersInScrollView];
+    
+    [super layoutSubviews];
 }
 
 - (void)layoutViewControllersInScrollView

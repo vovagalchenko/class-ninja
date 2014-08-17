@@ -129,7 +129,8 @@ typedef enum : NSUInteger {
 - (CNActivityIndicator *)activityIndicator
 {
     if (!_activityIndicator) {
-        _activityIndicator = [[CNActivityIndicator alloc] initWithFrame:CGRectZero];
+        _activityIndicator = [[CNActivityIndicator alloc] initWithFrame:CGRectZero presentedOnLightBackground:NO];
+        _activityIndicator.translatesAutoresizingMaskIntoConstraints = NO;
     }
     return _activityIndicator;
 }
