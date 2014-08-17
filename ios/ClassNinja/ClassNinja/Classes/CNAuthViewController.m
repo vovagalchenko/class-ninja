@@ -274,7 +274,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
                             self.phoneNumber = nil;
                             [self changeState:CNAuthViewControllerStatePhoneNumberEntry animated:YES];
                             [[[UIAlertView alloc] initWithTitle:@"Error"
-                                                        message:@"Unable to send the confirmation to Class Ninja"
+                                                        message:@"Unable to confirm your phone number with Class Ninja"
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil] show];

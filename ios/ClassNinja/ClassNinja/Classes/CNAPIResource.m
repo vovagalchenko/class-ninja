@@ -143,6 +143,7 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
     event.eventId = [eventDict valueForKey:@"event_id"];
     event.status = [eventDict valueForKey:@"status"];
     event.eventType = [eventDict valueForKey:@"event_type"];
+    event.targetId = [eventDict valueForKey:@"target_id"];
     event.schoolSpecificEventId = [eventDict valueForKey:@"school_specific_event_id"];
     event.timesAndLocations = [eventDict valueForKey:@"times_and_locations"];
     event.enrollmentCap = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"enrollment_cap"] unsignedIntegerValue]];

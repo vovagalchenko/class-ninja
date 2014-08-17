@@ -155,14 +155,12 @@ authenticationRequired:(BOOL)authRequired
         }
     }
     
-    if (authRequired) {
-        if (!self.authContext.loggedInUser) {
-            authFailureHandler();
-            return;
-        } else {
-            [request setValue:self.authContext.loggedInUser.accessToken
-           forHTTPHeaderField:@"AUTHORIZATION"];
-        }
+    if (authRequired && !self.authContext.loggedInUser) {
+        authFailureHandler();
+        return;
+    } else if (self.authContext.loggedInUser) {
+        [request setValue:self.authContext.loggedInUser.accessToken
+       forHTTPHeaderField:@"AUTHORIZATION"];
     }
     
     UIApplication* app = [UIApplication sharedApplication];

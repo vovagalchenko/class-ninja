@@ -67,6 +67,7 @@
 // A: Because CNSection contains array of CNEvents. That would cause reference loop.
 
 @property (nonatomic) NSString *sectionId;
+@property (nonatomic) NSString *targetId; // Only set if the event is targeted by the logged in user
 @property (nonatomic) NSString *eventId;
 @property (nonatomic) NSString *status;
 @property (nonatomic) NSString *eventType;
