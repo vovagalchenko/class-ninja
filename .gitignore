@@ -21,7 +21,7 @@ xcuserdata
 .history/
 .lib/
 dist/*
-target/
+backend/target/
 lib_managed/
 src_managed/
 project/boot/
@@ -48,6 +48,5 @@ server/environment.conf
 */.idea/highlighting.xml
 *.class
 out
-target
 build
 *~
