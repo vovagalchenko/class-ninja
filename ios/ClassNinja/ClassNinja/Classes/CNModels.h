@@ -47,6 +47,7 @@
 
 // A target is a course. It doesn't specialize this resource yet.
 @interface CNTarget : CNCourse
+@property (nonatomic) NSString *targetId;
 @end
 
 @interface CNSection : NSObject<CNModel>

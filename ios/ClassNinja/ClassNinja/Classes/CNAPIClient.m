@@ -186,6 +186,33 @@ authenticationRequired:(BOOL)authRequired
 }
 
 #pragma mark targets
+- (void)removeTarget:(CNTarget *)target successBlock:(void (^)(BOOL success))successBlock
+{
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:[@"target" stringByAppendingPathComponent:target.targetId]
+                                                              HTTPMethod:@"DELETE"
+                                                      HTTPBodyParameters:nil];
+
+    [self makeURLRequest:request
+  authenticationRequired:YES
+          withAuthPolicy:CNFailRequestOnAuthFailure
+              completion:^(NSDictionary *response) {
+                  NSNumber *creditsLeft = [response objectForKey:@"credits"];
+                  if (creditsLeft) {
+                      NSLog(@"Removed target successfully");
+                      if (successBlock) {
+                          successBlock(YES);
+                      }
+                  } else {
+                      NSLog(@"Failed to remove target");
+                      if (successBlock) {
+                          successBlock(YES);
+                      }
+                  }
+              }];
+
+    
+}
+
 - (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock
 {
     NSMutableArray *event_ids = [[NSMutableArray alloc] initWithCapacity:events.count];
