@@ -19,13 +19,13 @@
 
 #define kPushDuration 0.3
 
+#define kAlphaForViewsOnSides 0.5
+
 @interface CNSiongNavigationView () <UIScrollViewDelegate>
 
 @property (nonatomic) UIScrollView *scrollView;
 @property (nonatomic) UIButton *backButton;
 @property (nonatomic) UILabel *headerLabel;
-@property (nonatomic) UIView *leftBlendedView;
-@property (nonatomic) UIView *rightBlendedView;
 
 @property (nonatomic) NSMutableArray *scrollViews;
 
@@ -44,11 +44,40 @@
         [self addSubview:self.headerLabel];
         [self addSubview:self.scrollView];
         
-        // always last
-        [self addSubview:self.leftBlendedView];
-        [self addSubview:self.rightBlendedView];
+        [self.scrollView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew context:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [self.scrollView removeObserver:self forKeyPath:@"contentOffset"];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    UIView *leftView = nil;
+    UIView *rightView = nil;
+
+    NSInteger index = self.currentPageIndex;
+    
+    NSInteger leftViewIndex = index - 1;
+    NSInteger rightViewIndex = index + 1;
+
+    UIView *centerView = [self.scrollViews objectAtIndex:index];
+    centerView.alpha = [self alphaViewAtIndex:self.currentPageIndex withScrollViewContentOffsetX:self.scrollView.contentOffset.x];
+    
+    if (leftViewIndex >= 0) {
+        leftView = [self.scrollViews objectAtIndex:leftViewIndex];
+        leftView.alpha  = [self alphaViewAtIndex:leftViewIndex
+                    withScrollViewContentOffsetX:self.scrollView.contentOffset.x];
+    }
+    
+    if (rightViewIndex < self.scrollViews.count) {
+        rightView = [self.scrollViews objectAtIndex:rightViewIndex];
+        rightView.alpha = [self alphaViewAtIndex:rightViewIndex
+                    withScrollViewContentOffsetX:self.scrollView.contentOffset.x];
+    }
 }
 
 #pragma public methods
@@ -71,31 +100,6 @@
 }
 
 #pragma mark private helpers
-
-- (UIView *)createGenericBlendedView
-{
-    UIView *view = [[UIView alloc] init];
-    view.alpha = 0.5;
-    view.backgroundColor = SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR;
-    
-    return view;
-}
-
-- (UIView *)leftBlendedView
-{
-    if (_leftBlendedView == nil) {
-        _leftBlendedView = [self createGenericBlendedView];
-    }
-    return _leftBlendedView;
-}
-
-- (UIView *)rightBlendedView
-{
-    if (_rightBlendedView == nil) {
-        _rightBlendedView = [self createGenericBlendedView];
-    }
-    return _rightBlendedView;
-}
 
 - (UIScrollView *)scrollView
 {
@@ -158,16 +162,6 @@
     
     self.scrollView.contentSize = self.scrollView.frame.size;
     
-    self.rightBlendedView.frame = CGRectMake(self.bounds.size.width - kSpaceBetweenViews,
-                                             0,
-                                             kSpaceBetweenViews,
-                                             self.bounds.size.height);
-    
-    self.leftBlendedView.frame = CGRectMake(0,
-                                            0,
-                                            kSpaceBetweenViews,
-                                            self.bounds.size.height);
-    
     [self layoutViewControllersInScrollView];
 }
 
@@ -189,7 +183,9 @@
     self.currentPageIndex = [self indexOfVisibleViewController];
 }
 
-- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
+- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView
+                     withVelocity:(CGPoint)velocity
+              targetContentOffset:(inout CGPoint *)targetContentOffset
 {
     NSInteger newPage = self.currentPageIndex;
     if (velocity.x == 0) {
@@ -235,6 +231,14 @@
     return self.bounds.size.width - 2*kLeftBoundsOffset;
 }
 
+- (CGFloat)alphaViewAtIndex:(NSUInteger)index withScrollViewContentOffsetX:(CGFloat)contentXOffset
+{
+    CGPoint basePoint = [self targetPointForPageIndex:index];
+    CGFloat interVCWidth =  self.bounds.size.width - kLeftBoundsOffset - kSpaceBetweenViews;
+    CGFloat alpha = 1 - 0.5 * (fabs((contentXOffset - basePoint.x)) / interVCWidth);
+    return (alpha < 1.0) ? alpha : 1;
+}
+
 - (NSUInteger)indexOfPageForContentOffset:(CGFloat)contentXOffset
 {
     CGFloat midOfPageXOffset = contentXOffset + self.bounds.size.width / 2;
@@ -275,7 +279,9 @@
     [UIView animateWithDuration:duration
                           delay:0
                         options:animationOptions
-                     animations:^{ self.scrollView.contentOffset = targetPoint; }
+                     animations:^{
+                         self.scrollView.contentOffset = targetPoint;
+                     }
                      completion:nil];
 }
 
