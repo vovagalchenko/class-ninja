@@ -26,7 +26,7 @@ class create_target(HTTP_Response_Builder):
         creditsWillConsume = len(self.event_ids)
         
         if user_profile.credits < creditsWillConsume:
-            creditsRequired = creditsWillConsume - user.profile.credits
+            creditsRequired = creditsWillConsume - user_profile.credits
             raise API_Exception("402 Payment Required", {'credits_required' : creditsRequired})
 
         for event_id in self.event_ids:
