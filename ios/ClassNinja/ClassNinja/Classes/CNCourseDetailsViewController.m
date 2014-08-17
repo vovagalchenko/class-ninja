@@ -25,7 +25,7 @@
 #define kClassNameLabelHeight 60
 
 #define kTableOffsetX 20
-#define kTableOffsetY (kCloseButtonHeight + 16)
+#define kTableOffsetY (kCloseButtonYOffset + kCloseButtonHeight)
 #define kTableHeaderHeight (kHeaderQuestionHeight + kClassNameLabelHeight)
 
 #define kTrackButtonHeight 40
@@ -73,7 +73,8 @@
     
     self.view.backgroundColor = [UIColor clearColor];
     self.tableView.backgroundColor = [UIColor clearColor];
-    self.tableView.allowsSelection = NO;
+    self.tableView.allowsSelection = YES;
+    self.tableView.allowsMultipleSelection = YES;
     
     self.view.autoresizingMask = UIViewAutoresizingNone;
     
@@ -292,7 +293,11 @@
 - (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isExpanded
 {
     NSIndexPath *cellIndexPath = [self.tableView indexPathForCell:cell];
-
+    
+    if (cellIndexPath == nil) {
+        return;
+    }
+    
     if (isExpanded) {
         [self.expandedIndexPaths addObject:cellIndexPath];
     } else {

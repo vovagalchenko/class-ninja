@@ -87,6 +87,7 @@
         
         _statusLEDView = [[UIView alloc] init];
         _dateTimeLabel = [[UILabel alloc] init];
+        _dateTimeLabel.userInteractionEnabled = NO;
         
         [self addSubview:_separationLineView];
         [self addSubview:_targetButton];
@@ -175,7 +176,11 @@
 
 - (void)expandButtonPressed:(id)sender
 {
-    BOOL isExpanded = !self.expandButton.selected;
+    [self setExpandedStateTo:!self.expandButton.selected];
+}
+
+- (void)setExpandedStateTo:(BOOL)isExpanded
+{
     self.expandButton.selected = isExpanded;
     [self.delegate expandStateOnCell:self changedTo:isExpanded];
 }
@@ -212,6 +217,12 @@
 
 
 // real logic lives here
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+{
+    [super setSelected:selected animated:animated];
+    [self setExpandedStateTo:selected];
+}
+
 - (void)updateDateTimeLabelForEvent:(CNEvent *)event
 {
     NSDictionary *daysOfWeekAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
