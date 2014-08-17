@@ -8,21 +8,24 @@
 #import "CNCourseDetailsViewController.h"
 #import "CNAPIClient.h"
 
-#define kCloseButtonWidth  22
-#define kCloseButtonHeight 22
+#define kCloseButtonWidth  44
+#define kCloseButtonHeight 44
 
-#define kCloseButtonXOffset 20
-#define kCloseButtonYOffset 15
+#define kCloseButtonXOffset 9
+#define kCloseButtonYOffset 6
 
 #define kHeaderQuestionHeight  60
 #define kHeaderQuestionOffsetX 5
 
+#define kHeaderBackgroundColor ([UIColor r:57 g:65 b:76])
+#define kHeaderClassNameTextColor  ([UIColor r:30 g:30 b:30])
+#define kHeaderQuestionTextColor  ([UIColor whiteColor])
 
 #define kClassNameLabelXOffset 0
 #define kClassNameLabelHeight 60
 
 #define kTableOffsetX 20
-#define kTableOffsetY (20 + kCloseButtonYOffset)
+#define kTableOffsetY (kCloseButtonHeight + 16)
 #define kTableHeaderHeight (kHeaderQuestionHeight + kClassNameLabelHeight)
 
 #define kTrackButtonHeight 40
@@ -68,7 +71,6 @@
     CGSize size = self.view.bounds.size;
     self.tableView.tableHeaderView = [self headerViewWithWidth:size.width height:kTableHeaderHeight];
     
-    // FIXME: change color to gradient
     self.view.backgroundColor = [UIColor clearColor];
     self.tableView.backgroundColor = [UIColor clearColor];
     self.tableView.allowsSelection = NO;
@@ -139,7 +141,7 @@
                                                                     kClassNameLabelHeight)];
     classLabel.text = self.course.name;
     classLabel.numberOfLines = 2;
-    classLabel.textColor = [UIColor purpleColor];
+    classLabel.textColor = kHeaderClassNameTextColor;
     classLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     return classLabel;
@@ -148,7 +150,7 @@
 - (UIView *)questionViewWithWidth:(CGFloat)width
 {
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, width, kHeaderQuestionHeight)];
-    [view setBackgroundColor:[UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]];
+    [view setBackgroundColor:kHeaderBackgroundColor];
     view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(kHeaderQuestionOffsetX,
@@ -158,7 +160,7 @@
     
     label.text = @"Which classes do you want to track?";
     label.numberOfLines = 2;
-    label.textColor = [UIColor whiteColor];
+    label.textColor = kHeaderQuestionTextColor;
     label.font = [UIFont cnSystemFontOfSize:18];
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
