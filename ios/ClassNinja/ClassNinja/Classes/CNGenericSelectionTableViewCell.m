@@ -41,7 +41,7 @@
     if (selected) {
         self.backgroundColor = [UIColor colorWithRed:239/255.0 green:242/255.0 blue:246/255.0 alpha:1.0];
         self.textLabel.textColor = [UIColor colorWithRed:54/255.0 green:91/255.0 blue:145/255.0 alpha:1.0];
-        self.textLabel.font = [UIFont cnBoldSystemFontOfSize:kFontSize];
+        self.textLabel.font = [UIFont cnSystemFontOfSize:kFontSize];
     } else {
         self.backgroundColor = [UIColor whiteColor];
         self.textLabel.textColor = [UIColor colorWithRed:90/255.0 green:91/255.0 blue:91/255.0 alpha:1.0];

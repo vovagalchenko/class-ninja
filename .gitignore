@@ -22,6 +22,8 @@ xcuserdata
 .lib/
 dist/*
 backend/target/
+backend/project/target/
+backend/project/project/target/
 lib_managed/
 src_managed/
 project/boot/
