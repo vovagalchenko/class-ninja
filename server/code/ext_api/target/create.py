@@ -13,7 +13,10 @@ import uuid
 class create_target(HTTP_Response_Builder): 
     event_ids = Parameter("event_ids", required = True, parameter_type = Array_Parameter_Type)    
     
-    def do_controller_specific_work(self):
+    def do_controller_specific_work(self):    
+        if self.user is None:
+            raise Authorization_Exception("You must be logged in to list your targets.")
+
         db_session = DB_Session_Factory.get_db_session() 
         user_profile = db_session.query(UserProfile).get(self.user.phonenumber)
 
