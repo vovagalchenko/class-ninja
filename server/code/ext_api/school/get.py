@@ -7,5 +7,5 @@ from model.department import Department
 class get_school(HTTP_Response_Builder): 
     def do_controller_specific_work(self):
         db_session = DB_Session_Factory.get_db_session()
-        departments = db_session.query(Department).filter(Department.school_id == self.resource_id).all()
+        departments = db_session.query(Department).filter(Department.school_id == self.resource_id).order_by(Department.name.asc()).all()
         return HTTP_Response('200 OK', {'school_departments' : departments})
