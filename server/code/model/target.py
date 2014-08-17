@@ -11,8 +11,3 @@ class Target(Base, Ninja_Model_Mixin):
     user_phone_number = Column('user_phone_number', String(254), ForeignKey("authentication.phonenumber"), nullable = False)
 
     event = relationship("Event", backref = "target")
-
-    def __init__(self, taget_id, event_id, user_phone_number):
-        self.target_id = target_id
-        self.event_id = event_id
-        self.user_phone_number = user_phone_number

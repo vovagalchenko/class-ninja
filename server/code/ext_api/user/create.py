@@ -37,7 +37,7 @@ class create_user(HTTP_Response_Builder):
                 user.confirmation_token = self.generate_confirmation_token()
                 user.confirmation_deadline = current_ts + timedelta(minutes = 5)
                 user.last_request_ts = current_ts
-                
+               
                 db_session.add(user)
                 db_session.commit()
             
