@@ -7,6 +7,7 @@
 
 #import "CNCourseDetailsViewController.h"
 #import "CNAPIClient.h"
+#import "CNAppDelegate.h"
 
 #define kCloseButtonWidth  44
 #define kCloseButtonHeight 44
@@ -321,8 +322,17 @@
 
 - (void)trackButtonPressed:(id)sender
 {
-    // FIXME: Handle success block
-    [[CNAPIClient sharedInstance] targetEvents:self.targetEvents successBlock:nil];
+    [[CNAPIClient sharedInstance] targetEvents:self.targetEvents successBlock:^(BOOL success){
+        if (success) {
+            [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
+        } else {
+            [[[UIAlertView alloc] initWithTitle:@"Error"
+                                        message:@"Unable to set the target"
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+        }
+    }];
 }
 
 @end

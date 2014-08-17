@@ -239,7 +239,7 @@ authenticationRequired:(BOOL)authRequired
                        } else {
                            NSLog(@"Targetting failed with response %@", response);
                            if (successBlock) {
-                               successBlock(YES);
+                               successBlock(NO);
                            }
                        }
                    }];
