@@ -6,9 +6,9 @@ class DB_Session_Factory(object):
     session = None
 
     @staticmethod
-    def get_db_session():
+    def get_db_session(debug=False):
         if DB_Session_Factory.session is None:
-            db_engine = create_engine(CFG.get_instance().get('db', 'dsn'), echo=False)
+            db_engine = create_engine(CFG.get_instance().get('db', 'dsn'), echo=debug)
             Session = sessionmaker(bind = db_engine)
             DB_Session_Factory.session = Session()
         return DB_Session_Factory.session
