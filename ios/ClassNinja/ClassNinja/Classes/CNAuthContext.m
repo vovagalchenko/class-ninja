@@ -24,9 +24,16 @@
 - (void)authenticateWithCompletion:(void (^)())completionBlock
 {
     self.authenticationCompletionBlock = completionBlock;
-    [APP_DELEGATE.window.rootViewController presentViewController:[[CNAuthViewController alloc] initWithDelegate:self]
-                                                         animated:YES
-                                                       completion:nil];
+ 
+    UIViewController *topController = APP_DELEGATE.window.rootViewController;
+    
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+    
+    CNAuthViewController *authVC = [[CNAuthViewController alloc] initWithDelegate:self];
+    
+    [topController presentViewController:authVC animated:YES completion:nil];
 }
 
 - (void)authViewController:(CNAuthViewController *)authViewController

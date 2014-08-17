@@ -322,7 +322,8 @@
 
 - (void)trackButtonPressed:(id)sender
 {
-    NSLog(@"Track button pressed");
+    // FIXME: Handle success block
+    [[CNAPIClient sharedInstance] targetEvents:self.targetEvents successBlock:nil];
 }
 
 @end

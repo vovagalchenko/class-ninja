@@ -185,6 +185,39 @@ authenticationRequired:(BOOL)authRequired
     }];
 }
 
+#pragma mark targets
+- (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock
+{
+    NSMutableArray *event_ids = [[NSMutableArray alloc] initWithCapacity:events.count];
+    for (CNEvent *event in events) {
+        [event_ids addObject:event.eventId];
+    }
+    
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:@"target"
+                                                              HTTPMethod:@"POST"
+                                                      HTTPBodyParameters:@{
+                                                                           @"event_ids" : event_ids,
+                                                                           }];
+    [self makeURLRequest:request
+       authenticationRequired:YES
+               withAuthPolicy:CNForceAuthenticationOnAuthFailure
+                   completion:^(NSDictionary *response) {
+                       NSNumber *creditsLeft = [response objectForKey:@"credits"];
+                       if (creditsLeft) {
+                           NSLog(@"Targetting successful, user has %@ credits left", creditsLeft);
+                           if (successBlock) {
+                               successBlock(YES);
+                           }
+                       } else {
+                           NSLog(@"Targetting failed with response %@", response);
+                           if (successBlock) {
+                               successBlock(YES);
+                           }
+                       }
+                   }];
+
+}
+
 #pragma mark Auth
 
 @end
