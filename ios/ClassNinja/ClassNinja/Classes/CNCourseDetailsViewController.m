@@ -207,6 +207,11 @@
 - (void)closeButtonPressed:(id)sender
 {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)dealloc
+{
+    // test code for testing deletion of the targets
     for (CNSection *cnSection in self.listOfSections) {
         for (CNEvent *event in cnSection.events) {
             [[CNAPIClient sharedInstance] removeEventFromTargetting:event successBlock:^(BOOL success){

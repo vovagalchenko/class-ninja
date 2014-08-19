@@ -19,7 +19,7 @@
 @interface CNCourseDetailsTableViewCell : UITableViewCell
 
 @property (nonatomic) CNEvent *event;
-@property (nonatomic) id <CourseDetailsTableViewCellProtocol>delegate;
+@property (nonatomic, weak) id <CourseDetailsTableViewCellProtocol>delegate;
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting;
 + (CGFloat)collapsedHeight;
