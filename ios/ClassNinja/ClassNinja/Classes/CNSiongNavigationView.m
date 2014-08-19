@@ -317,12 +317,12 @@
     
     if (animated) {
         [UIView animateWithDuration:kPushDuration animations:^{
-            self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:self.currentPageIndex];
+            self.scrollView.contentOffset = [self targetPointForPageIndex:self.currentPageIndex];
         } completion:^(BOOL finished) {
-            if (!finished) NSLog(@"FIXME: POPPING ANIMATION ENDED ABRUPTLY!");
             localCompletion();
         }];
     } else {
+        self.scrollView.contentOffset = [self targetPointForPageIndex:self.currentPageIndex];
         localCompletion();
     }
 }
