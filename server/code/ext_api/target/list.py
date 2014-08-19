@@ -29,7 +29,9 @@ class list_target(HTTP_Response_Builder):
                 events = []
                 for event_in_this_section in events_by_section_id[section.section_id]:
                     event_dict = event_in_this_section.for_api()
-                    event_dict['target_id'] = targets_by_event_id.get(event_in_this_section.event_id, None)
+                    target_id_number = targets_by_event_id.get(event_in_this_section.event_id, None)
+                    if target_id_number is not None:
+                         event_dict['target_id'] = str(target_id_number)
                     events.append(event_dict)
                 section_dict['events'] = events
                 sections_list.append(section_dict)

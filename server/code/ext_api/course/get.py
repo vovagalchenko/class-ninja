@@ -32,6 +32,8 @@ class get_course(HTTP_Response_Builder):
         eventsCollection = []
         for event in events:
             event_dict = event.for_api()
-            event_dict['target_id'] = targets.get(event.event_id, None)
+            target_id = targets.get(event.event_id, None)
+            if target_id is not None:
+                event_dict['target_id'] = str(target_id)
             eventsCollection.append(event_dict)
         return eventsCollection
