@@ -4,12 +4,10 @@ from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
 from model.target import Target
 
 
-class update_target(HTTP_Response_Builder): 
-    confirmation_token = Parameter("confirmation_token", required = True, parameter_type = String_Parameter_Type)    
-
+class delete_target(HTTP_Response_Builder): 
     def do_controller_specific_work(self):
         if self.user is None:
-            raise Authorization_Exception("You must be logged in to list your targets.")
+            raise Authorization_Exception("You must be logged in to delete your targets.")
         
         target_id = self.resource_id
 
@@ -17,11 +15,11 @@ class update_target(HTTP_Response_Builder):
         target = db_session.query(Target).get(self.resource_id)
         if target is None:
             raise API_Exception("404 Not Found", "Entry does not exist in DB")
-            return
+        
         if target.user_phone_number == self.user.phonenumber:        
             db_session.delete(target)
             db_session.commit()
             return HTTP_Response('200 OK', {'removed_target_id' : self.resource_id})
         else:
-            rause Authorization_Exception("You can only delete targets associated with your account.")
+            raise Authorization_Exception("You can only delete targets associated with your account.")
  
