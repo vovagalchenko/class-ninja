@@ -207,6 +207,17 @@
 - (void)closeButtonPressed:(id)sender
 {
     [self dismissViewControllerAnimated:YES completion:nil];
+    for (CNSection *cnSection in self.listOfSections) {
+        for (CNEvent *event in cnSection.events) {
+            [[CNAPIClient sharedInstance] removeEventFromTargetting:event successBlock:^(BOOL success){
+                if (success) {
+                    NSLog(@"Removed target for event %@", event);
+                } else {
+                    NSLog(@"Failed to removed target for event %@", event);
+                }
+            }];
+        }
+    }
 }
 
 -(BOOL)prefersStatusBarHidden
@@ -265,10 +276,10 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CNCourseDetailsTableViewCell *cell = [[CNCourseDetailsTableViewCell alloc] initWithReuseIdentifier:@"classcell" usedForTargetting:YES];
-    CNSection *cnSection = [self.listOfSections objectAtIndex:indexPath.section];
-    
-    cell.event = [cnSection.events objectAtIndex:indexPath.row];
     cell.delegate = self;
+    CNSection *cnSection = [self.listOfSections objectAtIndex:indexPath.section];
+    cell.event = [cnSection.events objectAtIndex:indexPath.row];
+
     return cell;
 }
 
@@ -319,6 +330,8 @@
         }
     }
 }
+
+// code for testing deletion of the target
 
 - (void)trackButtonPressed:(id)sender
 {

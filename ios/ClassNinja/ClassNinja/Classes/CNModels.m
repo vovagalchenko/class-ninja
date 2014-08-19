@@ -51,7 +51,7 @@
 @implementation CNEvent
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Event id %@, type = %@, times / location = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.eventType, self.timesAndLocations, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
+    return [NSString stringWithFormat:@"Event id %@, targetId = %@, type = %@, times / location = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.targetId, self.eventType, self.timesAndLocations, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
 }
 
 - (NSString *)name

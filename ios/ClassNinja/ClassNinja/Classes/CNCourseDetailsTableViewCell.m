@@ -145,17 +145,22 @@
 - (void)targetButtonPressed:(id)sender
 {
     BOOL isTargetedByUser = !self.targetButton.isSelected;
-    self.targetButton.selected = isTargetedByUser;
+    [self setTargetStateTo:isTargetedByUser];
+}
+
+- (void)setTargetStateTo:(BOOL)isTargetted
+{
+    self.targetButton.selected = isTargetted;
     
     UIImage *buttonImage = nil;
-    if (isTargetedByUser) {
+    if (isTargetted) {
         buttonImage = [UIImage imageNamed:@"checkbox-checked"];
     } else {
         buttonImage = [UIImage imageNamed:@"checkbox-unchecked"];
     }
     
     [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
-    [self.delegate targetingStateOnCell:self changedTo:isTargetedByUser];
+    [self.delegate targetingStateOnCell:self changedTo:isTargetted];
 }
 
 - (UIView *)expandAccessoryView
@@ -194,6 +199,7 @@
         self.statusLEDView.backgroundColor = [self colorForEvent:event];
         [self updateCellDetailsForEvent:event];
         [self updateDateTimeLabelForEvent:event];
+        [self setTargetStateTo:self.event.targetId != nil];
     }
 }
 

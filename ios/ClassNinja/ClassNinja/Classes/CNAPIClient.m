@@ -187,33 +187,28 @@ authenticationRequired:(BOOL)authRequired
 }
 
 #pragma mark targets
-- (void)removeTarget:(CNTarget *)target successBlock:(void (^)(BOOL success))successBlock
+- (void)removeEventFromTargetting:(CNEvent *)event successBlock:(void (^)(BOOL success))successBlock
 {
-    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:[@"target" stringByAppendingPathComponent:target.targetId]
+    NSString *targetId = event.targetId;
+    if (targetId == nil) {
+        return;
+    }
+    
+    NSString *urlString = [@"target" stringByAppendingPathComponent:event.targetId];
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:urlString
                                                               HTTPMethod:@"DELETE"
                                                       HTTPBodyParameters:nil];
-
+    
     [self makeURLRequest:request
   authenticationRequired:YES
-          withAuthPolicy:CNFailRequestOnAuthFailure
+          withAuthPolicy:CNForceAuthenticationOnAuthFailure
               completion:^(NSDictionary *response) {
-                  NSNumber *creditsLeft = [response objectForKey:@"credits"];
-                  if (creditsLeft) {
-                      NSLog(@"Removed target successfully");
-                      if (successBlock) {
-                          successBlock(YES);
-                      }
-                  } else {
-                      NSLog(@"Failed to remove target");
-                      if (successBlock) {
-                          successBlock(YES);
-                      }
+                  if (successBlock) {
+                      successBlock(response != nil);
                   }
               }];
-
     
 }
-
 - (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock
 {
     NSMutableArray *event_ids = [[NSMutableArray alloc] initWithCapacity:events.count];
