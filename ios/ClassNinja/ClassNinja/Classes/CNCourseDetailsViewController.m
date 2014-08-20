@@ -211,7 +211,7 @@
 
 - (void)dealloc
 {
-    // test code for testing deletion of the targets
+    // FIXME: test code for testing deletion of the targets
     for (CNSection *cnSection in self.listOfSections) {
         for (CNEvent *event in cnSection.events) {
             [[CNAPIClient sharedInstance] removeEventFromTargetting:event successBlock:^(BOOL success){
@@ -275,6 +275,12 @@
 {
     CNSection *cnSection = [self.listOfSections objectAtIndex:section];
     return cnSection.events.count;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    CNSection *courseSection = [self.listOfSections objectAtIndex:section];
+    return [NSString stringWithFormat:@"%@: %@", courseSection.name, courseSection.staffName];
 }
 
 #pragma Cell management

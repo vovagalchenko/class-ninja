@@ -21,7 +21,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
+    configureStaticAppearance();
     
     CNWelcomeViewController *welcomeVC = [[CNWelcomeViewController alloc] init];
     self.window.rootViewController = welcomeVC;

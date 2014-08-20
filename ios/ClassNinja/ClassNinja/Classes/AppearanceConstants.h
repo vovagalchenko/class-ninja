@@ -20,6 +20,8 @@
 #define DISABLED_GRAY_COLOR     [UIColor colorWithRed:116.0/255.0 green:125.0/255.0 blue:132.0/255.0 alpha:1.0]
 #define CONFIRMATION_COLOR      [UIColor colorWithRed:47.0/255.0 green:198.0/255.0 blue:183.0/255.0 alpha:1.0]
 
+#define DARK_GRAY_TEXT_COLOR    [UIColor colorWithRed:121/255.0 green:121/255.0 blue:121/255.0 alpha:1]
+
 #define FOCAL_LABEL_TEXT_SIZE   30
 #define INSTRUCTION_LABEL_FONT  [UIFont cnSystemFontOfSize:18.0]
 
@@ -28,5 +30,13 @@
 #define SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:230/255.0 alpha:1.0])
 
 #define TAPPABLE_AREA_DIMENSION     44.0
+
+static inline void configureStaticAppearance()
+{
+    UIFont *headerFooterFont = [UIFont cnBoldSystemFontOfSize:12.0];
+    UILabel *appearanceOfLabelInsideTableHeader = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil];
+    appearanceOfLabelInsideTableHeader.font = headerFooterFont;
+    appearanceOfLabelInsideTableHeader.textColor = DARK_GRAY_TEXT_COLOR;
+}
 
 #endif

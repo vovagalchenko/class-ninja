@@ -23,7 +23,6 @@
 #define kStatusLEDClassClosedColor      ([UIColor colorWithRed:220/255.0 green:39/255.0 blue:39/255.0 alpha:1])
 
 #define kDaysOFWeekColor                ([UIColor colorWithRed:180/255.0 green:180/255.0 blue:181/255.0 alpha:1])
-#define kTimeOfWeekColor                ([UIColor colorWithRed:121/255.0 green:121/255.0 blue:121/255.0 alpha:1])
 #define kDaysTimeLabelFont              ([UIFont cnBoldSystemFontOfSize:12.0])
 #define kDetailsLabelFont               ([UIFont cnSystemFontOfSize:12.0])
 
@@ -230,7 +229,7 @@
     NSMutableAttributedString *daysOfWeek = [[NSMutableAttributedString alloc] initWithString:[event daysOfWeek]
                                                                                    attributes:daysOfWeekAttributes];
     NSDictionary *hoursAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     kTimeOfWeekColor, NSForegroundColorAttributeName,
+                                     DARK_GRAY_TEXT_COLOR, NSForegroundColorAttributeName,
                                      kDaysTimeLabelFont, NSFontAttributeName, nil];
     
     NSAttributedString *hours = [[NSAttributedString alloc] initWithString:[event hours]
@@ -260,7 +259,7 @@
     
     NSDictionary *nonStatusAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                          kDetailsLabelFont, NSFontAttributeName,
-                                         kTimeOfWeekColor, NSForegroundColorAttributeName, nil];
+                                         DARK_GRAY_TEXT_COLOR, NSForegroundColorAttributeName, nil];
     
     NSAttributedString *nonStatus = [[NSAttributedString alloc] initWithString:nonStatusString attributes:nonStatusAttributes];
     
