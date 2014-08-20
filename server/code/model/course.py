@@ -12,6 +12,7 @@ class Course(Base, Ninja_Model_Mixin):
     department_id = Column('department_id', String(254), ForeignKey("departments.department_id"), nullable = False)
     department_specific_course_id = Column('department_specific_course_id', String(254), nullable = False)
     name = Column('name', String(254), nullable = False)
+    index_within_department = Column('index_within_department', Integer, nullable = False)
     context = Column('context', String(254), nullable = False)
 
     sections = relationship('Section', backref = backref('course', lazy='joined'), lazy='dynamic')

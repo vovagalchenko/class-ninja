@@ -7,5 +7,5 @@ from model.department import Department
 class get_department(HTTP_Response_Builder): 
     def do_controller_specific_work(self):
         db_session = DB_Session_Factory.get_db_session()
-        courses = db_session.query(Course).filter(Course.department_id == self.resource_id).all()
+        courses = db_session.query(Course).filter(Course.department_id == self.resource_id).order_by(Course.index_within_department.asc()).all()
         return HTTP_Response('200 OK', {'department_courses' : courses})
