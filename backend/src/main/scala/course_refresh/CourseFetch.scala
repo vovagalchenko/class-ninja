@@ -174,11 +174,6 @@ object CourseFetch extends LazyLogging {
               work(freshDepartment, courses)
             }
             futureResultsOfWork
-            // This is not clear to me, but for whatever reason, if I don't block here and instead flatMap on the result
-            // of fetchDepartment, the script never finishes or fails with weird connection errors. It's not critical
-            // for this to be non-blocking as we're already fetching all of the courses for a given department
-            // concurrently. Still... it'd be super nice to understand this.
-//            Await.result(futureResultsOfWork, Duration(1, TimeUnit.HOURS))
           }
           Future.sequence(allWork)
         }

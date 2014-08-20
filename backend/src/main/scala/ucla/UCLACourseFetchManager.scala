@@ -30,13 +30,13 @@ object UCLACourseFetchManager extends SchoolManager with LazyLogging {
     val coursesRequest = UCLARequestFactory("/crsredir.aspx", Map("termsel" -> term, "subareasel" -> department.schoolSpecificId))
     HTTPManager.execute(coursesRequest) { nodeSeq =>
       val courseNodes: NodeSeq = (nodeSeq \\ "select").filterByLiteralAttribute("id", "ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal") \\ "option"
-      courseNodes map { node: Node =>
+      courseNodes.zipWithIndex map { case (node: Node, index: Int) =>
         val departmentSpecificCourseId :: courseName :: _ = node.text.split(" - ", 2).toList
         val request = UCLARequestFactory(
           path = "/detselect.aspx",
           queryParams = Map("termsel" -> term, "subareasel" -> department.schoolSpecificId, "idxcrs" -> node.attribute("value").get.text)
         )
-        Course(SchoolId.UCLA, department.primaryKey, departmentSpecificCourseId, courseName, HTTPManager.reqFromHTTPRequest(request).url)
+        Course(SchoolId.UCLA, department.primaryKey, departmentSpecificCourseId, courseName, index, HTTPManager.reqFromHTTPRequest(request).url)
       }
     }
   }
