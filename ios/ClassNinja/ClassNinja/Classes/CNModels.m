@@ -31,7 +31,7 @@
 
 @end
 
-@implementation CNTarget
+@implementation CNTargetedCourse
 
 - (NSString *)description
 {

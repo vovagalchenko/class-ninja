@@ -23,13 +23,15 @@
 
 - (void)authenticateWithCompletion:(void (^)())completionBlock
 {
-    self.authenticationCompletionBlock = completionBlock;
- 
     UIViewController *topController = APP_DELEGATE.window.rootViewController;
     
     while (topController.presentedViewController) {
         topController = topController.presentedViewController;
     }
+    
+    self.authenticationCompletionBlock = ^{
+        [topController dismissViewControllerAnimated:YES completion:completionBlock];
+    };
     
     CNAuthViewController *authVC = [[CNAuthViewController alloc] initWithDelegate:self];
     

@@ -39,7 +39,7 @@
 {
     [super viewDidAppear:animated];
     [self setNeedsStatusBarAppearanceUpdate];
-    [[CNAPIClient sharedInstance] list:[CNTarget class]
+    [[CNAPIClient sharedInstance] list:[CNTargetedCourse class]
                             authPolicy:CNFailRequestOnAuthFailure
                             completion:^(NSArray *targets) {
         NSLog(@"Targets: %@", targets);

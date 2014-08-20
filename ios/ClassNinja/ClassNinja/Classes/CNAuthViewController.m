@@ -268,9 +268,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
                      receivedConfirmationCode:self.textField.text
                                forPhoneNumber:self.phoneNumber
                        doneProcessingCallback:^(BOOL success) {
-                        if (success) {
-                            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-                        } else {
+                        if (!success) {
                             self.phoneNumber = nil;
                             [self changeState:CNAuthViewControllerStatePhoneNumberEntry animated:YES];
                             [[[UIAlertView alloc] initWithTitle:@"Error"

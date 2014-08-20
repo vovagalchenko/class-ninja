@@ -39,7 +39,7 @@
 @interface CNSectionAPIResource : NSObject<CNAPIResource>
 @end
 
-@interface CNTargetAPIResource : NSObject<CNAPIResource>
+@interface CNTargetedCourseAPIResource : NSObject<CNAPIResource>
 @end
 
 @interface CNRootAPIResource : NSObject<CNAPIResource>

@@ -29,13 +29,6 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-    /*
-    CNUser *user = [[CNUser alloc] init];
-    user.phoneNumber = @"4089126890";
-    user.accessToken = @"acf73667-b4c7-4674-9fd4-e94767e978cb";
-    [[[CoreAPIClient sharedInstance] authContext] setLoggedInUser:user];
-    */
-    
     return YES;
 }
 

@@ -199,13 +199,13 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
 
 #pragma mark ##### TARGET #####
 
-@implementation CNTargetAPIResource
+@implementation CNTargetedCourseAPIResource
 
 @synthesize model;
 
 + (id<CNModel>)modelWithDictionary:(NSDictionary *)dictionary
 {
-    CNTarget *target = [[CNTarget alloc] init];
+    CNTargetedCourse *target = [[CNTargetedCourse alloc] init];
     target.courseId = [dictionary valueForKey:@"course_id"];
     target.name = [dictionary valueForKey:@"name"];
     target.departmentSpecificCourseId = [dictionary valueForKey:@"department_specific_course_id"];
