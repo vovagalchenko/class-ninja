@@ -51,10 +51,10 @@ object UCLACourseFetchManager extends SchoolManager with LazyLogging {
         val sections = sectionNodes map { sectionNode: Node =>
           val sectionNodes: NodeSeq = sectionNode \\ "span"
           val sectionName: String = sectionNodes.filterByAttribute("id", _.matches(sectionNameRegex))(0).text
-          val staff: String = sectionNodes.filterByAttribute("id", _.matches(staffRegex)).text.
-            trim().
-            replaceAllLiterally("\u00a0", "").
-            replaceAll(" {2,}", "")
+          val staff: String = sectionNodes.filterByAttribute("id", _.matches(staffRegex)).text
+            .replaceAllLiterally("\u00a0", "")
+            .replaceAll(" {2,}", "")
+            .trim()
           Section(
             sectionName,
             staff,

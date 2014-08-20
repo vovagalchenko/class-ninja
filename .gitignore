@@ -48,6 +48,7 @@ server/environment.conf
 /*.bat
 */.idea/workspace.xml
 */.idea/highlighting.xml
+*/.idea/libraries
 *.class
 out
 build
