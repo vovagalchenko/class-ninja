@@ -28,7 +28,7 @@ class Courses(tag: Tag) extends Table[Course](tag, "courses") {
   def context = column[String]("context")
 
   def schoolDerivedIndex = index("crs_school_derived_index", (departmentId, departmentSpecificCourseId), unique = true)
-  def departmentIdAndIndexWithinDepartmentIndex = index("department_id_index_within_department_index", (departmentId, indexWithinDepartment), unique = true)
+  def departmentIdAndIndexWithinDepartmentIndex = index("department_id_index_within_department_index", (departmentId, indexWithinDepartment))
   def school = foreignKey("crs_school_fk", schoolId, TableQuery[Schools])(_.schoolId)
   def department = foreignKey("crs_department_fk", departmentId, TableQuery[Departments])(_.departmentId)
 
