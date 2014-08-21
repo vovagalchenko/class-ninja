@@ -11,6 +11,8 @@
 
 @interface CNInAppPurchaseHelper : NSObject <SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
-- (void)validateProductIdentifiers:(NSArray *)productIdentifiers;
++ (instancetype)sharedInstance;
 
+- (void)validateProductIdentifiers:(NSArray *)productIdentifiers;
+- (void)testIAP;
 @end

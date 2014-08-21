@@ -8,6 +8,7 @@
 #import "CNCourseDetailsViewController.h"
 #import "CNAPIClient.h"
 #import "CNAppDelegate.h"
+#import "CNInAppPurchaseHelper.h"
 
 #define kCloseButtonWidth  44
 #define kCloseButtonHeight 44
@@ -350,11 +351,14 @@
         if (success) {
             [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
         } else {
+            [[CNInAppPurchaseHelper sharedInstance] testIAP];
             [[[UIAlertView alloc] initWithTitle:@"Error"
                                         message:@"Unable to set the target"
                                        delegate:nil
                               cancelButtonTitle:@"OK"
                               otherButtonTitles:nil] show];
+            
+
         }
     }];
 }

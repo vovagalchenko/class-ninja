@@ -30,6 +30,7 @@ typedef enum : NSUInteger {
           completion:(void (^)(NSArray *))completionBlock;
 
 
+- (void)verify:(NSData *)receipt successBlock:(void (^)(BOOL success))successBlock;
 - (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock;
 - (void)removeEventFromTargetting:(CNEvent *)event successBlock:(void (^)(BOOL success))successBlock;
 

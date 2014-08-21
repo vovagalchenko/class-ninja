@@ -15,7 +15,24 @@
 
 @implementation CNInAppPurchaseHelper
 
++ (instancetype)sharedInstance
+{
+    static dispatch_once_t onceToken;
+    static CNInAppPurchaseHelper *iapHelper = nil;
+    dispatch_once(&onceToken, ^{
+        iapHelper = [[CNInAppPurchaseHelper alloc] init];
+    });
+    return iapHelper;
+}
+
+
 // Custom method
+- (void)testIAP
+{
+    NSString *productId = @"UQ_9_99";
+    [self validateProductIdentifiers:@[productId]];
+}
+
 - (void)validateProductIdentifiers:(NSArray *)productIdentifiers
 {
     self.productsRequest = [[SKProductsRequest alloc]
@@ -41,6 +58,17 @@
         SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
         payment.quantity = 1;
         [[SKPaymentQueue defaultQueue] addPayment:payment];
+    } else {
+        NSString *wrongReceipt = @"wrongreceiptdata";
+        NSData *receipt = [wrongReceipt dataUsingEncoding:NSASCIIStringEncoding];
+        [[CNAPIClient sharedInstance] verify:receipt successBlock:^(BOOL success){
+            if (success) {
+                NSLog(@"Receipt verification succeeded! Woohoo!");
+            } else {
+                NSLog(@"Receipt validation failed");
+            }
+        }];
+
     }
 }
 
@@ -63,6 +91,21 @@
         SKPaymentTransactionState transactionState = transaction.transactionState;
         if (transactionState == SKPaymentTransactionStatePurchased) {
             NSData *receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
+            
+            NSFileManager *fm = [NSFileManager defaultManager];
+            NSURL *documentURL = [[fm URLsForDirectory:NSDocumentDirectory inDomains:NSAllDomainsMask] lastObject];
+            NSString *path = [[documentURL absoluteString] stringByAppendingString:@"iapreceipt.data"];
+            [receipt writeToFile:path atomically:YES];
+            NSLog(@"Filed located %@", path);
+            
+            [[CNAPIClient sharedInstance] verify:receipt successBlock:^(BOOL success){
+                if (success) {
+                    NSLog(@"Receipt verification succeeded! Woohoo!");
+                } else {
+                    NSLog(@"Receipt validation failed");
+                }
+            }];
+            
             NSLog(@"Make post to our server to verify receipt with %@", receipt);
             
         } else if (transactionState == SKPaymentTransactionStateFailed) {

@@ -209,6 +209,35 @@ authenticationRequired:(BOOL)authRequired
               }];
     
 }
+
+- (void)verify:(NSData *)receipt successBlock:(void (^)(BOOL success))successBlock
+{
+    NSString *receiptString = [receipt base64EncodedStringWithOptions:0];
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:@"ios_payment"
+                                                              HTTPMethod:@"POST"
+                                                      HTTPBodyParameters:@{
+                                                                           @"receipt_data" : receiptString,
+                                                                           }];
+    [self makeURLRequest:request
+  authenticationRequired:YES
+          withAuthPolicy:CNForceAuthenticationOnAuthFailure
+              completion:^(NSDictionary *response) {
+                  NSNumber *creditsLeft = [response objectForKey:@"credits"];
+                  if (creditsLeft) {
+                      NSLog(@"IAP receipt verification succeeded. User has %@ credits left", creditsLeft);
+                      if (successBlock) {
+                          successBlock(YES);
+                      }
+                  } else {
+                      NSLog(@"IAP receipt verification failed with response %@", response);
+                      if (successBlock) {
+                          successBlock(NO);
+                      }
+                  }
+              }];
+
+}
+
 - (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock
 {
     NSMutableArray *event_ids = [[NSMutableArray alloc] initWithCapacity:events.count];
