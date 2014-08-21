@@ -1,7 +1,7 @@
 from model.db_session import DB_Session_Factory
 from ext_api.exceptions import API_Exception
 from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
-from ext_api.parameter import Parameter, Base_64_Encoded_String_Parameter_Type
+from ext_api.parameter import Parameter, String_Parameter_Type
 
 from model.user_model import User
 from model.user_profile import UserProfile
@@ -10,7 +10,7 @@ import requests
 import json
 
 class create_ios_payment(HTTP_Response_Builder): 
-    appleReceiptData = Parameter("receipt_data", required = True, parameter_type = Base_64_Encoded_String_Parameter_Type) 
+    appleReceiptData = Parameter("receipt_data", required = True, parameter_type = String_Parameter_Type) 
     
     def do_controller_specific_work(self):    
         if self.user is None:
@@ -32,9 +32,9 @@ class create_ios_payment(HTTP_Response_Builder):
         iapResponse = requests.post(url, json.dumps({'receipt-data': self.appleReceiptData}), verify=False)
         if iapResponse.status_code != 200:
             raise API_Exception("400 Bad Request", "Failed to connect to iTunes server")
-
-        
-        iapStatus = json.loads(iapResponse.content)
+  
+        responseContentDict = json.loads(iapResponse.content)
+        iapStatus = responseContentDict['status']
         
         if iapStatus != 0:
             raise API_Exception("400 Bad Request", {'iap_status' : str(iapStatus)})
