@@ -11,6 +11,7 @@
 
 @interface CNInAppPurchaseHelper ()
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
+@property (nonatomic) SKReceiptRefreshRequest *refresh;
 @end
 
 @implementation CNInAppPurchaseHelper
@@ -25,8 +26,21 @@
     return iapHelper;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+    }
+    return self;
+}
 
-// Custom method
+- (void)restoreTransactions
+{
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+}
+
+// Custom test method
 - (void)testIAP
 {
     NSString *productId = @"UQ_9_99";
@@ -41,34 +55,15 @@
     [self.productsRequest start];
 }
 
-- (void)dealloc
-{
-    
-}
-
-
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
 {
-    NSLog(@"response = %@, request = %@", request, response);
     NSArray *products = [response products];
     
     if ([products count] > 0) {
-        [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
         SKProduct *product = products[0];
         SKMutablePayment *payment = [SKMutablePayment paymentWithProduct:product];
         payment.quantity = 1;
         [[SKPaymentQueue defaultQueue] addPayment:payment];
-    } else {
-        NSString *wrongReceipt = @"wrongreceiptdata";
-        NSData *receipt = [wrongReceipt dataUsingEncoding:NSASCIIStringEncoding];
-        [[CNAPIClient sharedInstance] verify:receipt successBlock:^(BOOL success){
-            if (success) {
-                NSLog(@"Receipt verification succeeded! Woohoo!");
-            } else {
-                NSLog(@"Receipt validation failed");
-            }
-        }];
-
     }
 }
 
@@ -92,16 +87,12 @@
         if (transactionState == SKPaymentTransactionStatePurchased) {
             NSData *receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
             
-            NSFileManager *fm = [NSFileManager defaultManager];
-            NSURL *documentURL = [[fm URLsForDirectory:NSDocumentDirectory inDomains:NSAllDomainsMask] lastObject];
-            NSString *path = [[documentURL absoluteString] stringByAppendingString:@"iapreceipt.data"];
-            [receipt writeToFile:path atomically:YES];
-            NSLog(@"Filed located %@", path);
-            
             [[CNAPIClient sharedInstance] verify:receipt successBlock:^(BOOL success){
                 if (success) {
                     NSLog(@"Receipt verification succeeded! Woohoo!");
+                    [queue finishTransaction:transaction];
                 } else {
+                    
                     NSLog(@"Receipt validation failed");
                 }
             }];
@@ -110,6 +101,7 @@
             
         } else if (transactionState == SKPaymentTransactionStateFailed) {
             NSLog(@"State failed");
+            [queue finishTransaction:transaction];
         } else if (transactionState == SKPaymentTransactionStateRestored) {
             NSLog(@"State restored");
         }
