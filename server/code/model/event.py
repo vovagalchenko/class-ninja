@@ -1,6 +1,7 @@
 from base import Base, Ninja_Model_Mixin
 from sqlalchemy import Column, String, Enum, ForeignKey, Integer, TEXT
 from sqlalchemy.orm import backref, relationship
+import json
 
 class Event(Base, Ninja_Model_Mixin):
     __tablename__ = 'events'
@@ -18,6 +19,6 @@ class Event(Base, Ninja_Model_Mixin):
 
     def for_api(self):
         base_dict = super(Event, self).for_api()
-        times_and_locations_dict = eval(self.times_and_locations)[0]
-        base_dict["times_and_locations"] = times_and_locations_dict
+        times_and_locations_dict_array = json.loads(self.times_and_locations)
+        base_dict["times_and_locations"] = times_and_locations_dict_array
         return base_dict
