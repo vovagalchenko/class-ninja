@@ -59,10 +59,14 @@
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
     
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, self.bounds.size.height);
+
+    // FIXME: PROPER SIZING NEEDS TO APPLE TO DATETIME LABEL!
+    // intentionally doing it this way, because we don't have updated design yet for
+    // displaying more than one time / locations entry. so essentially cheap test of API
     self.dateTimeLabel.frame = CGRectMake(kDateTimeLabelXOffset,
                                           kDateTimeLabelYOffset,
                                           self.bounds.size.width - kDateTimeLabelXOffset - kDateTimeLabelXRightMargin,
-                                          kCollapsedHeight - kDateTimeLabelYOffset);
+                                          80);
     
     self.targetButton.frame = CGRectMake(kStatusLEDWidth, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
     self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
@@ -85,6 +89,7 @@
         
         _statusLEDView = [[UIView alloc] init];
         _dateTimeLabel = [[UILabel alloc] init];
+        _dateTimeLabel.numberOfLines = 0;
         _dateTimeLabel.userInteractionEnabled = NO;
         
         [self addSubview:_separationLineView];
@@ -119,7 +124,7 @@
 {
     if (_multilineDetailsLeftFieldLabel == nil) {
         _multilineDetailsLeftFieldLabel = [[UILabel alloc] init];
-        _multilineDetailsLeftFieldLabel.text = @"Status\n\nType\n\nLocation";
+        _multilineDetailsLeftFieldLabel.text = @"Status\n\nType";
         _multilineDetailsLeftFieldLabel.numberOfLines = 0;
         _multilineDetailsLeftFieldLabel.font = kDetailsLabelFont;
         _multilineDetailsLeftFieldLabel.textColor = kDaysOFWeekColor;
@@ -222,25 +227,37 @@
 
 - (void)updateDateTimeLabelForEvent:(CNEvent *)event
 {
-    NSDictionary *daysOfWeekAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                          kDaysOFWeekColor, NSForegroundColorAttributeName,
-                                          kDaysTimeLabelFont, NSFontAttributeName, nil];
-    
-    NSMutableAttributedString *daysOfWeek = [[NSMutableAttributedString alloc] initWithString:[event daysOfWeek]
-                                                                                   attributes:daysOfWeekAttributes];
-    NSDictionary *hoursAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     DARK_GRAY_TEXT_COLOR, NSForegroundColorAttributeName,
-                                     kDaysTimeLabelFont, NSFontAttributeName, nil];
-    
-    NSAttributedString *hours = [[NSAttributedString alloc] initWithString:[event hours]
-                                                                attributes:hoursAttributes];
-    
-    NSAttributedString *space = [[NSAttributedString alloc] initWithString:@"   "];
-    
-    [daysOfWeek appendAttributedString:space];
-    [daysOfWeek appendAttributedString:hours];
-    
-    self.dateTimeLabel.attributedText = daysOfWeek;
+    NSMutableAttributedString *resultString = [[NSMutableAttributedString alloc] init];
+    for (CNScheduleSlot *slot in event.scheduleSlots) {
+        NSDictionary *daysOfWeekAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                              kDaysOFWeekColor, NSForegroundColorAttributeName,
+                                              kDaysTimeLabelFont, NSFontAttributeName, nil];
+        
+        NSMutableAttributedString *daysOfWeek = [[NSMutableAttributedString alloc] initWithString:[slot daysOfWeek]
+                                                                                       attributes:daysOfWeekAttributes];
+        NSDictionary *hoursAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         DARK_GRAY_TEXT_COLOR, NSForegroundColorAttributeName,
+                                         kDaysTimeLabelFont, NSFontAttributeName, nil];
+        
+        NSAttributedString *hours = [[NSAttributedString alloc] initWithString:[slot hours]
+                                                                    attributes:hoursAttributes];
+        
+        NSAttributedString *location = [[NSAttributedString alloc] initWithString:[slot location]
+                                                                       attributes:hoursAttributes];
+        
+        
+        NSAttributedString *space = [[NSAttributedString alloc] initWithString:@"   "];
+        NSAttributedString *newLine = [[NSAttributedString alloc] initWithString:@"\n"];
+        
+        [daysOfWeek appendAttributedString:space];
+        [daysOfWeek appendAttributedString:hours];
+        [daysOfWeek appendAttributedString:newLine];
+        [daysOfWeek appendAttributedString:location];
+
+        [resultString appendAttributedString:daysOfWeek];
+        [resultString appendAttributedString:newLine];
+    }
+    self.dateTimeLabel.attributedText = resultString;
 }
 
 
@@ -254,8 +271,8 @@
     NSMutableAttributedString *status = [[NSMutableAttributedString alloc] initWithString:event.status
                                                                                attributes:statusAttributes];
     
-    // stands next to "\nType\nLocation"
-    NSString *nonStatusString = [NSString stringWithFormat:@"\n\n%@\n\n%@", event.eventType, event.location];
+    // stands next to "\nType"
+    NSString *nonStatusString = [NSString stringWithFormat:@"\n\n%@", event.eventType];
     
     NSDictionary *nonStatusAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                          kDetailsLabelFont, NSFontAttributeName,

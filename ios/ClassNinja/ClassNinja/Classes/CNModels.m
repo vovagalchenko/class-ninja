@@ -48,16 +48,13 @@
 
 @end
 
-@implementation CNEvent
+@implementation CNScheduleSlot
+
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Event id %@, targetId = %@, type = %@, times / location = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.targetId, self.eventType, self.timesAndLocations, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
+    return [NSString stringWithFormat:@"%@ at %@ in %@", [self daysOfWeek], [self hours], [self location]];
 }
 
-- (NSString *)name
-{
-    return [NSString stringWithFormat:@"%@ %@ %@", self.eventType, self.timesAndLocations, self.status];
-}
 
 - (NSString *)daysOfWeek
 {
@@ -72,6 +69,19 @@
 - (NSString *)location
 {
     return [self.timesAndLocations objectForKey:@"location"];
+}
+
+@end
+
+@implementation CNEvent
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"Event id %@, targetId = %@, type = %@, times / location = %@, status = %@, waitlisted = %@, enrolled = %@, waitlist capacity = %@", self.eventId, self.targetId, self.eventType, self.scheduleSlots, self.status, self.numberWaitlisted, self.numberEnrolled, self.waitlistCapacity];
+}
+
+- (NSString *)name
+{
+    return [NSString stringWithFormat:@"%@ %@ %@", self.eventType, self.scheduleSlots, self.status];
 }
 
 - (BOOL)isClosed

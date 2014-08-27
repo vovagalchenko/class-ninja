@@ -59,6 +59,16 @@
 
 @end
 
+@interface CNScheduleSlot : NSObject
+
+@property (nonatomic) NSDictionary *timesAndLocations;
+
+- (NSString *)daysOfWeek;
+- (NSString *)hours;
+- (NSString *)location;
+
+@end
+
 @interface CNEvent : NSObject<CNModel>
 
 // Q: Why there is no pointer to CNSection?
@@ -70,15 +80,12 @@
 @property (nonatomic) NSString *status;
 @property (nonatomic) NSString *eventType;
 @property (nonatomic) NSString *schoolSpecificEventId;
-@property (nonatomic) NSDictionary *timesAndLocations;
+@property (nonatomic) NSArray  *scheduleSlots;
 @property (nonatomic) NSNumber *enrollmentCap;
 @property (nonatomic) NSNumber *numberWaitlisted;
 @property (nonatomic) NSNumber *numberEnrolled;
 @property (nonatomic) NSNumber *waitlistCapacity;
 
-- (NSString *)daysOfWeek;
-- (NSString *)hours;
-- (NSString *)location;
 - (BOOL)isClosed;
 @end
 

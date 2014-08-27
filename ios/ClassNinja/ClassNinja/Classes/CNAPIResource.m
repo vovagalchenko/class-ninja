@@ -145,7 +145,17 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
     event.eventType = [eventDict valueForKey:@"event_type"];
     event.targetId = [eventDict valueForKey:@"target_id"];
     event.schoolSpecificEventId = [eventDict valueForKey:@"school_specific_event_id"];
-    event.timesAndLocations = [eventDict valueForKey:@"times_and_locations"];
+    NSArray *scheduleSlotsDictArray =[eventDict valueForKey:@"times_and_locations"];
+
+    NSMutableArray *scheduleSlots = [[NSMutableArray alloc] init];
+    for (NSDictionary *dict in scheduleSlotsDictArray) {
+        CNScheduleSlot *slot = [[CNScheduleSlot alloc] init];
+        slot.timesAndLocations = dict;
+        [scheduleSlots addObject:slot];
+    }
+
+    event.scheduleSlots = [scheduleSlots copy];
+    
     event.enrollmentCap = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"enrollment_cap"] unsignedIntegerValue]];
     event.numberWaitlisted = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"number_waitlisted"] unsignedIntegerValue]];
     event.numberEnrolled = [NSNumber numberWithUnsignedInteger:[[eventDict valueForKey:@"number_enrolled"] unsignedIntegerValue]];
