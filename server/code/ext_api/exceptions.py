@@ -27,3 +27,7 @@ class Invalid_API_Method_Exception(Invalid_API_Call_Exception):
 class Authorization_Exception(API_Exception):
     def __init__(self, message):
         super(Authorization_Exception, self).__init__("401 Unauthorized", message)
+
+class Unprocessable_Entity_Exception(API_Exception):
+    def __init__(self, message):
+        super(Unprocessable_Entity_Exception, self).__init__("422 Unprocessable Entity", message)

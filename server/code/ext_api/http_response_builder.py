@@ -106,8 +106,11 @@ class HTTP_Response(object):
     
     def get_body_string(self):
         if self.serialized_body_cache is None:
-            dthandler = lambda obj: serialize(obj)
-            self.serialized_body_cache = dumps(self.body, default = dthandler)
+            if self.body is None:
+                self.serialized_body_cache = ''
+            else:
+                dthandler = lambda obj: serialize(obj)
+                self.serialized_body_cache = dumps(self.body, default = dthandler)
         return self.serialized_body_cache
     
     def get_headers(self):
