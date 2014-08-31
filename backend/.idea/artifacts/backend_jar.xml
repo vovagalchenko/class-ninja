@@ -23,6 +23,10 @@
       <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/org.ccil.cowan.tagsoup/tagsoup/jars/tagsoup-1.2.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/com.ning/async-http-client/jars/async-http-client-1.8.10.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/net.databinder.dispatch/dispatch-tagsoup_2.10/jars/dispatch-tagsoup_2.10-0.11.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/com.notnoop.apns/apns/jars/apns-0.2.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/jars/jackson-core-2.1.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/jars/jackson-annotations-2.1.4.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/jars/jackson-databind-2.1.4.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

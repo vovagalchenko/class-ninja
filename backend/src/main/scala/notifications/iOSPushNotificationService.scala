@@ -16,29 +16,34 @@ object iOSPushNotificationService extends LazyLogging {
     implicit val dbManager = new DBManager(dbConfig)
     NotificationQueue withMessageExchange { messageExchange =>
       messageExchange.enterNotificationReceivingRunloop("ios") { (target: Target, event: Event, session: Session) =>
-        logger.info(s"Processing notification for $target")
-        implicit val s = session
-        val sectionCourseQuery = for {
-          s <- dbManager.sections.filter(_.sectionId === event.sectionId)
-          c <- dbManager.courses if s.courseId === c.courseId
-        } yield (s, c)
-        val sectionCourseTuple: (Section, Course) = sectionCourseQuery.first
-        val payload: String = APNSPayloadForEvent(event, sectionCourseTuple._2)
-        logger.info(s"Calculated payload: $payload")
-        val notificationInterfaces: Seq[NotificationInterface] = dbManager.notificationInterfaces
-          .filter(_.userPhoneNumber === target.userPhoneNumber)
-          .filter(_.kind inSet "iOS" :: "iOS-sandbox" :: Nil)
-          .list
-        if (notificationInterfaces.length == 0) {
-          logger.error(s"User <${target.userPhoneNumber}> hasn't set up any notification interfaces.")
-        }
-        notificationInterfaces foreach { notificationInterface: NotificationInterface =>
-          val apnsService = notificationInterface.kind match {
-            case "iOS" => prodService
-            case "iOS-sandbox" => sandboxService
+        try {
+          logger.info(s"Processing notification for $target")
+          implicit val s = session
+          val sectionCourseQuery = for {
+            s <- dbManager.sections.filter(_.sectionId === event.sectionId)
+            c <- dbManager.courses if s.courseId === c.courseId
+          } yield (s, c)
+          val sectionCourseTuple: (Section, Course) = sectionCourseQuery.first
+          val payload: String = APNSPayloadForEvent(event, sectionCourseTuple._2)
+          logger.info(s"Calculated payload: $payload")
+          val notificationInterfaces: Seq[NotificationInterface] = dbManager.notificationInterfaces
+            .filter(_.userPhoneNumber === target.userPhoneNumber)
+            .filter(_.kind inSet "iOS" :: "iOS-sandbox" :: Nil)
+            .list
+          if (notificationInterfaces.length == 0) {
+            logger.error(s"User <${target.userPhoneNumber}> hasn't set up any notification interfaces.")
           }
-          logger.info(s"Sending APN to ${notificationInterface.notificationInterfaceName} for $event")
-          apnsService.push(notificationInterface.notificationInterfaceKey, payload)
+          notificationInterfaces foreach { notificationInterface: NotificationInterface =>
+            val apnsService = notificationInterface.kind match {
+              case "iOS" => prodService
+              case "iOS-sandbox" => sandboxService
+            }
+            logger.info(s"Sending APN to ${notificationInterface.notificationInterfaceName} for $event")
+            apnsService.push(notificationInterface.notificationInterfaceKey, payload)
+          }
+        } catch {
+          case e: Throwable =>
+            logger.error(s"Uncaught exception while processing notification for $target", e)
         }
       }
     }
