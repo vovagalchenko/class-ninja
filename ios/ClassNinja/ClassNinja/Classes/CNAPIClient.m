@@ -280,7 +280,12 @@ authenticationRequired:(BOOL)authRequired
     NSMutableURLRequest *req = [self mutableURLRequestForAPIEndpoint:@"notification_interface"
                                                           HTTPMethod:@"POST"
                                                   HTTPBodyParameters:@{
-                                                                       @"kind" : @"iOS",
+                                                                       @"kind" :
+#ifdef DEBUG
+                                                                           @"iOS-sandbox",
+#else
+                                                                           @"iOS",
+#endif
                                                                        @"notification_interface_key" : tokenString,
                                                                        @"notification_interface_name" : [[UIDevice currentDevice] name],
                                                                        }];

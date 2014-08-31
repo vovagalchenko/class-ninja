@@ -34,7 +34,7 @@
 
 - (void)registerForPushNotifications
 {
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert];
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound];
 }
 
 #define PUSH_NOTIFICATION_KNOWN_TOKENS_USER_DEFAULTS_KEY    @"known_tokens"

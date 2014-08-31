@@ -282,7 +282,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
         }
         default:
         {
-            NSAssert(NO, @"Confirmation button pressed in unexpected state: %d", self.currentState);
+            NSAssert(NO, @"Confirmation button pressed in unexpected state: %d", (int)self.currentState);
             break;
         }
     }
@@ -324,7 +324,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
                 [self.textField resignFirstResponder];
                 break;
             default:
-                NSAssert(NO, @"Unknown state: %d", state);
+                NSAssert(NO, @"Unknown state: %d", (int)state);
                 break;
         }
         self.currentState = state;

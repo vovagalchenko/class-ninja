@@ -43,7 +43,7 @@ class MessageExchange(connection: Connection, exchangeConfig: MessageExchangeCon
   }
 
   // This method never exits
-  def enterNotificationReceivingRunloop(queueName: String)(alertProcessor: (Target, Event) => Unit)
+  def enterNotificationReceivingRunloop(queueName: String)(alertProcessor: (Target, Event, Session) => Unit)
                                        (implicit dbManager: DBManager) = {
     channel.queueDeclare(queueName, true, false, false, null)
     channel.queueBind(queueName, exchangeConfig.name, "")
@@ -60,7 +60,7 @@ class MessageExchange(connection: Connection, exchangeConfig: MessageExchangeCon
       dbManager withSession { implicit session =>
         val target = dbManager.targets.filter(_.targetId === targetId).first
         val event = dbManager.events.filter(_.eventId === eventId).first
-        alertProcessor(target, event)
+        alertProcessor(target, event, session)
       }
     }
   }

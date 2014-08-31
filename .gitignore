@@ -31,6 +31,9 @@ project/plugins/project/
 server/data
 server/environment.conf
 
+#APNS certs
+/backend/certs/
+
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
