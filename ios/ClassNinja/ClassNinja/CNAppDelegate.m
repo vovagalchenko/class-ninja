@@ -32,10 +32,37 @@
     return YES;
 }
 
-- (void)dealloc
+- (void)registerForPushNotifications
 {
-    
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert];
 }
+
+#define PUSH_NOTIFICATION_KNOWN_TOKENS_USER_DEFAULTS_KEY    @"known_tokens"
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *knownTokensCache = [userDefaults objectForKey:PUSH_NOTIFICATION_KNOWN_TOKENS_USER_DEFAULTS_KEY];
+    CNAPIClient *apiClient = [CNAPIClient sharedInstance];
+    NSString *currentUserPhoneNumber = [[[apiClient authContext] loggedInUser] phoneNumber];
+    NSArray *knownTokensForUser = [knownTokensCache objectForKey:currentUserPhoneNumber];
+    if (![knownTokensForUser containsObject:deviceToken]) {
+        [apiClient registerDeviceForPushNotifications:deviceToken completion:^(BOOL success) {
+            if (success) {
+                NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:knownTokensCache ?: @{}];
+                [dict setObject:[knownTokensForUser ?: @[] arrayByAddingObject:deviceToken] forKey:currentUserPhoneNumber];
+                [userDefaults setObject:dict forKey:PUSH_NOTIFICATION_KNOWN_TOKENS_USER_DEFAULTS_KEY];
+                [userDefaults synchronize];
+            }
+        }];
+    }
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
+{
+    NSLog(@"%@", error);
+}
+
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {

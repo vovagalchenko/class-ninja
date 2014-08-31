@@ -11,6 +11,7 @@
 #import "CNSiongNavigationViewController.h"
 #import "CNAPIClient.h"
 #import "AppearanceConstants.h"
+#import "CNAppDelegate.h"
 
 @interface CNWelcomeViewController ()
 
@@ -42,7 +43,9 @@
     [[CNAPIClient sharedInstance] list:[CNTargetedCourse class]
                             authPolicy:CNFailRequestOnAuthFailure
                             completion:^(NSArray *targets) {
-        NSLog(@"Targets: %@", targets);
+        if (targets.count) {
+            [APP_DELEGATE registerForPushNotifications];
+        }
     }];
 }
 

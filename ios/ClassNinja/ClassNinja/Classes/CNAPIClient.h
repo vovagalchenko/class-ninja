@@ -34,6 +34,8 @@ typedef enum : NSUInteger {
 - (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock;
 - (void)removeEventFromTargetting:(CNEvent *)event successBlock:(void (^)(BOOL success))successBlock;
 
+- (void)registerDeviceForPushNotifications:(NSData *)token completion:(void (^)(BOOL success))completion;
+
 - (NSMutableURLRequest *)mutableURLRequestForAPIEndpoint:(NSString *)endpoint
                                               HTTPMethod:(NSString *)httpMethod
                                       HTTPBodyParameters:(NSDictionary *)httpBodyParams;

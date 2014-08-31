@@ -270,4 +270,26 @@ authenticationRequired:(BOOL)authRequired
 
 }
 
+- (void)registerDeviceForPushNotifications:(NSData *)token completion:(void (^)(BOOL success))completion
+{
+    NSMutableString *tokenString = [NSMutableString stringWithCapacity:token.length*2];
+    const unsigned char *bytes = token.bytes;
+    for (int i = 0; i < token.length; i++) {
+        [tokenString appendFormat:@"%02x", bytes[i]];
+    }
+    NSMutableURLRequest *req = [self mutableURLRequestForAPIEndpoint:@"notification_interface"
+                                                          HTTPMethod:@"POST"
+                                                  HTTPBodyParameters:@{
+                                                                       @"kind" : @"iOS",
+                                                                       @"notification_interface_key" : tokenString,
+                                                                       @"notification_interface_name" : [[UIDevice currentDevice] name],
+                                                                       }];
+    [self makeURLRequest:req
+  authenticationRequired:YES
+          withAuthPolicy:CNForceAuthenticationOnAuthFailure
+              completion:^(NSDictionary *response) {
+                  completion(response != nil);
+              }];
+}
+
 @end
