@@ -45,15 +45,24 @@ class get_school(HTTP_Response_Builder):
     def search_for_courses(self, whereClause):
         sqlQuery = "SELECT course_id from " + Course.__tablename__ + " " + whereClause + " LIMIT 20"
         course_ids = self.single_row_query(sqlQuery)
+        if len(course_ids) == 0:
+            return []
         courses = self.db_session.query(Course).filter(Course.course_id.in_(course_ids)).all()
         return courses
 
     def search_for_departments(self, whereClause):
         sqlQuery = "SELECT department_id from " + Department.__tablename__ + " "+ whereClause + " LIMIT 20"
         department_ids = self.single_row_query(sqlQuery)
+        if len(department_ids) == 0:
+            return []
+       
         department_ids_with_active_courses = map(lambda row: row[0], self.db_session.query(Course.department_id).distinct().filter(Course.school_id == self.resource_id).all())
         #filter out department_ids that don't have any active courses
         department_ids = list(set(department_ids) & set(department_ids_with_active_courses))
+        
+        if len(department_ids) == 0:
+           return []
+        
         departments = self.db_session.query(Department).filter(Department.department_id.in_(department_ids)).all()
         return departments
 
