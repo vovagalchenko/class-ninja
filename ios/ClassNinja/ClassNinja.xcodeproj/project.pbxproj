@@ -32,6 +32,7 @@
 		707F985A196899BC00D6E552 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9859196899BC00D6E552 /* XCTest.framework */; };
 		707F985B196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
 		707F985C196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
+		70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A5F36E19B444780060EB0C /* CNSearchViewController.m */; };
 		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
 		70E7618E19A0013D003F3984 /* checkbox-checked.png in Resources */ = {isa = PBXBuildFile; fileRef = 70E7618019A0013C003F3984 /* checkbox-checked.png */; };
 		70E7618F19A0013D003F3984 /* checkbox-checked@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 70E7618119A0013C003F3984 /* checkbox-checked@2x.png */; };
@@ -106,6 +107,8 @@
 		707F9859196899BC00D6E552 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		707F989619689D8700D6E552 /* CNModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNModels.h; sourceTree = "<group>"; };
 		707F989719689D8700D6E552 /* CNModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNModels.m; sourceTree = "<group>"; };
+		70A5F36D19B444780060EB0C /* CNSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSearchViewController.h; sourceTree = "<group>"; };
+		70A5F36E19B444780060EB0C /* CNSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSearchViewController.m; sourceTree = "<group>"; };
 		70DB470C198D967000F81F43 /* CNGenericSelectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGenericSelectionTableViewCell.h; sourceTree = "<group>"; };
 		70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionTableViewCell.m; sourceTree = "<group>"; };
 		70E7618019A0013C003F3984 /* checkbox-checked.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "checkbox-checked.png"; sourceTree = "<group>"; };
@@ -294,6 +297,8 @@
 		DC08B6A2198D7D910092EE90 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				70A5F36D19B444780060EB0C /* CNSearchViewController.h */,
+				70A5F36E19B444780060EB0C /* CNSearchViewController.m */,
 				DC08B699198AB1780092EE90 /* AppearanceConstants.h */,
 				DC4220581996D96100739068 /* CNActivityIndicator.h */,
 				DC4220591996D96100739068 /* CNActivityIndicator.m */,
@@ -481,6 +486,7 @@
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */,
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
 				DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */,
+				70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */,
 				DCE7E7F2198DA60600E14E3E /* CNNumberEntryTextField.m in Sources */,
 				DCE7E7EF198D97DD00E14E3E /* CNAuthViewController.m in Sources */,
 				70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */,

@@ -8,6 +8,7 @@
 
 #import "CNSiongNavigationViewController.h"
 #import "AppearanceConstants.h"
+#import "CNSearchViewController.h"
 
 #import "CNSiongNavigationView.h"
 
@@ -38,6 +39,15 @@
 - (void)backButtonPressed:(id)sender
 {
     [self popViewControllerAnimated:YES deselectRows:YES];
+}
+
+- (void)searchButtonPressed:(id)sender
+{
+    CNSearchViewController *searchVC = [[CNSearchViewController alloc] init];
+    searchVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    searchVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    searchVC.modalPresentationCapturesStatusBarAppearance = YES;
+    [self presentViewController:searchVC animated:YES completion:nil];
 }
 
 - (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController

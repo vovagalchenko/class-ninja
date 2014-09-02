@@ -13,10 +13,10 @@
 
 #pragma mark Misc. Helpers
 
-static inline NSURL *baseURL()
+static inline NSString *baseURLString()
 {
     // TODO: Get this from info plist
-    return [NSURL URLWithString:@"http://vova.class-ninja.com/api"];
+    return @"http://boris.class-ninja.com/api";
 }
 
 static inline NSTimeInterval urlRequestTimeoutInterval()
@@ -106,13 +106,60 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
               }];
 }
 
+- (void)searchInSchool:(CNSchool *)school
+          searchString:(NSString *)searchString
+            completion:(void (^)(NSArray *departments, NSArray *courses))completionBlock
+{
+
+    NSString *endpoint = [[CNRootAPIResource rootAPIResourceForModel:[school class]] resourceTypeName];
+   
+    NSString *escapedSearchQuery = [searchString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    
+    NSString *requestString = [endpoint stringByAppendingPathComponent:school.schoolId];
+    requestString = [requestString stringByAppendingFormat:@"?query=%@",escapedSearchQuery];
+    
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:requestString
+                                                              HTTPMethod:@"GET"
+                                                      HTTPBodyParameters:nil];
+
+    [self makeURLRequest:request
+  authenticationRequired:NO
+          withAuthPolicy:CNFailRequestOnAuthFailure
+              completion:^(NSDictionary *jsonResult) {
+                  if (jsonResult == nil) {
+                      if (completionBlock) {
+                          completionBlock(nil, nil);
+                      }
+                  } else {
+                      NSArray *courses_dicts = [jsonResult objectForKey:@"searched_courses"];
+                      NSArray *departments_dicts = [jsonResult objectForKey:@"searched_departments"];
+                      NSMutableArray *courses = [[NSMutableArray alloc] init];
+                      for (NSDictionary *course_dict in courses_dicts) {
+                          [courses addObject:[CNCourseAPIResource modelWithDictionary:course_dict]];
+                      }
+
+                      NSMutableArray *departments = [[NSMutableArray alloc] init];
+                      for (NSDictionary *departments_dict in departments_dicts) {
+                          [departments addObject:[CNDepartmentAPIResource modelWithDictionary:departments_dict]];
+                      }
+                      
+                      if (completionBlock) {
+                          completionBlock(departments, courses);
+                      }
+                  }
+              }];
+
+}
+
 #pragma API Utilities
 
 - (NSMutableURLRequest *)mutableURLRequestForAPIEndpoint:(NSString *)endpoint
                                               HTTPMethod:(NSString *)httpMethod
                                       HTTPBodyParameters:(NSDictionary *)httpBodyParams
 {
-    NSURL *url = [baseURL() URLByAppendingPathComponent:endpoint];
+    NSString *urlString = [baseURLString() stringByAppendingPathComponent:endpoint];
+    NSURL *url = [NSURL URLWithString:urlString];
+
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
                                                               cachePolicy:NSURLRequestReloadIgnoringCacheData
                                                           timeoutInterval:urlRequestTimeoutInterval()];

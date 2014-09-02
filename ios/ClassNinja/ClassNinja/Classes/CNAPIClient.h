@@ -29,6 +29,9 @@ typedef enum : NSUInteger {
           authPolicy:(CNAuthenticationPolicy)authPolicy
           completion:(void (^)(NSArray *))completionBlock;
 
+- (void)searchInSchool:(CNSchool *)school
+          searchString:(NSString *)string
+            completion:(void (^)(NSArray *departments, NSArray *courses))completionBlock;
 
 - (void)verify:(NSData *)receipt successBlock:(void (^)(BOOL success))successBlock;
 - (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock;

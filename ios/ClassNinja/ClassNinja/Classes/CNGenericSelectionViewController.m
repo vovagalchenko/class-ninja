@@ -153,7 +153,7 @@
         label.font = [UIFont cnSystemFontOfSize:18];
         
         [view addSubview:label];
-        [view setBackgroundColor:[UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]];
+        [view setBackgroundColor:QUESTION_TITLE_BACKGROUND_COLOR];
 
         _titleView = view;
     }

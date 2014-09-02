@@ -10,6 +10,7 @@
 
 @protocol CNGenericNavigationProtocol <NSObject>
 - (void)backButtonPressed:(id)sender;
+- (void)searchButtonPressed:(id)sender;
 @end
 
 @interface CNSiongNavigationView : UIView
@@ -17,8 +18,8 @@
 @property (nonatomic, weak) id <CNGenericNavigationProtocol> navigationDelegate;
 @property (nonatomic) NSUInteger currentPageIndex;
 
+
 - (void)addNavigationView:(UIView *)view;
-//- (NSUInteger)indexOfVisibleViewController;
 - (void)pushView:(UIView *)view;
 - (void)popViewAtIndex:(NSUInteger)viewIndex
               animated:(BOOL)animated

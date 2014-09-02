@@ -14,6 +14,12 @@
 #define kButtonOriginX 9
 #define kButtonOriginY 24
 
+
+#define kSearchButtonWidth 44
+#define kSearchButtonPaddingX 9
+#define kSearchButtonPaddingY 24
+
+
 #define kHeaderOriginY 35
 
 #define kLeftBoundsOffset 24.0
@@ -27,6 +33,7 @@
 
 @property (nonatomic) UIScrollView *scrollView;
 @property (nonatomic) UIButton *backButton;
+@property (nonatomic) UIButton *searchButton;
 @property (nonatomic) UILabel *headerLabel;
 
 @property (nonatomic) NSMutableArray *scrollViews;
@@ -43,6 +50,7 @@
         _scrollViews = [[NSMutableArray alloc] init];
         
         [self addSubview:self.backButton];
+        [self addSubview:self.searchButton];
         [self addSubview:self.headerLabel];
         [self addSubview:self.scrollView];
         
@@ -130,6 +138,19 @@
     return _headerLabel;
 }
 
+- (UIButton *)searchButton
+{
+    if (_searchButton == nil) {
+        _searchButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_searchButton setImage:[UIImage imageNamed:@"search"] forState:UIControlStateNormal];
+        [_searchButton addTarget:self.navigationDelegate
+                          action:@selector(searchButtonPressed:)
+                forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    return _searchButton;
+}
+
 - (UIButton *)backButton
 {
     if (_backButton == nil) {
@@ -159,6 +180,10 @@
     CGRect rect = CGRectMake(kButtonOriginX, kButtonOriginY, kBackButtonWidth, kBackButtonWidth);
     self.backButton.frame = rect;
     self.headerLabel.frame = CGRectMake(0, kHeaderOriginY, scrollFrame.size.width, 20);
+    
+    self.searchButton.frame = CGRectMake(self.bounds.size.width - kSearchButtonWidth - kSearchButtonPaddingX,
+                                         kSearchButtonPaddingY,
+                                         kSearchButtonWidth, kSearchButtonWidth);
     
     self.scrollView.contentSize = self.scrollView.frame.size;
     
