@@ -267,6 +267,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"search"];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"search"];
+        cell.textLabel.numberOfLines = 2;
     }
     
     NSString *title = nil;
@@ -279,19 +280,32 @@
               indexPath, self.departmentsForLastSearch, self.coursesForLastSearch);
     }
     
-    NSMutableAttributedString *boldedTitle = [[NSMutableAttributedString alloc] initWithString:title];
-//    NSDictionary *boldAttrs = nil; //[NSDictionary dictionaryWithObjectsAndKeys:(id), ..., nil];
-//    
-//    for (NSString *term in self.lastUsedSearchTerms) {
-//        [title enumerateSubstringsInRange:NSRangeFromString(title)
-//                                  options:NSStringEnumerationByComposedCharacterSequences
-//                               usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
-//                                   [boldedTitle setAttributes:boldAttrs range:substringRange];
-//                               }];
-//    }
+    NSDictionary *defaultAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0]};
+    NSMutableAttributedString *boldedTitle = [[NSMutableAttributedString alloc] initWithString:title attributes:defaultAttributes];
+    
+    for (NSString *term in self.lastUsedSearchTerms) {
+        boldedTitle = [self setBoldTerms:term inText:boldedTitle];
+    }
     
     cell.textLabel.attributedText = boldedTitle;
     return cell;
+}
+
+- (NSMutableAttributedString *)setBoldTerms:(NSString*)term inText:(NSMutableAttributedString*)boldedTitle
+{
+    NSUInteger length = [boldedTitle length];
+    NSRange range = NSMakeRange(0, length);
+    
+    while(range.location != NSNotFound) {
+        range = [[boldedTitle string] rangeOfString:term options:NSCaseInsensitiveSearch range:range];
+        if(range.location != NSNotFound) {
+            NSDictionary *boldAttrs = @{NSFontAttributeName : [UIFont boldSystemFontOfSize:12.0]};
+            [boldedTitle setAttributes:boldAttrs range:range];
+            range = NSMakeRange(range.location + range.length, length - (range.location + range.length));
+        }
+    }
+    
+    return boldedTitle;
 }
 
 @end
