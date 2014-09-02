@@ -10,7 +10,6 @@ import re
 
 class get_school(HTTP_Response_Builder): 
     search_query = Parameter("query", required = False, parameter_type = String_Parameter_Type)
-    db_session = DB_Session_Factory.get_db_session()
 
     def do_controller_specific_work(self):
         if self.search_query is None:
@@ -19,8 +18,9 @@ class get_school(HTTP_Response_Builder):
             return self.search(self.search_query)
 
     def departmentLookup(self):
-        department_ids = map(lambda row: row[0], self.db_session.query(Course.department_id).distinct().filter(Course.school_id == self.resource_id).all())
-        departments = self.db_session.query(Department).filter(Department.department_id.in_(department_ids)).order_by(Department.name.asc()).all()
+        db_session = DB_Session_Factory.get_db_session()
+        department_ids = map(lambda row: row[0], db_session.query(Course.department_id).distinct().filter(Course.school_id == self.resource_id).all())
+        departments = db_session.query(Department).filter(Department.department_id.in_(department_ids)).order_by(Department.name.asc()).all()
         return HTTP_Response('200 OK', {'school_departments' : departments})
 
     def search(self, requestString):
@@ -43,27 +43,29 @@ class get_school(HTTP_Response_Builder):
         return HTTP_Response('200 OK', {'searched_departments' : departments, 'searched_courses' : courses})
 
     def search_for_courses(self, whereClause):
+        db_session = DB_Session_Factory.get_db_session()
         sqlQuery = "SELECT course_id from " + Course.__tablename__ + " " + whereClause + " LIMIT 20"
         course_ids = self.single_row_query(sqlQuery)
         if len(course_ids) == 0:
             return []
-        courses = self.db_session.query(Course).filter(Course.course_id.in_(course_ids)).all()
+        courses = db_session.query(Course).filter(Course.course_id.in_(course_ids)).all()
         return courses
 
     def search_for_departments(self, whereClause):
+        db_session = DB_Session_Factory.get_db_session()
         sqlQuery = "SELECT department_id from " + Department.__tablename__ + " "+ whereClause + " LIMIT 20"
         department_ids = self.single_row_query(sqlQuery)
         if len(department_ids) == 0:
             return []
        
-        department_ids_with_active_courses = map(lambda row: row[0], self.db_session.query(Course.department_id).distinct().filter(Course.school_id == self.resource_id).all())
+        department_ids_with_active_courses = map(lambda row: row[0], db_session.query(Course.department_id).distinct().filter(Course.school_id == self.resource_id).all())
         #filter out department_ids that don't have any active courses
         department_ids = list(set(department_ids) & set(department_ids_with_active_courses))
         
         if len(department_ids) == 0:
            return []
         
-        departments = self.db_session.query(Department).filter(Department.department_id.in_(department_ids)).all()
+        departments = db_session.query(Department).filter(Department.department_id.in_(department_ids)).all()
         return departments
 
     def form_where_clause_for_search_terms(self, searchTerms):
@@ -79,7 +81,8 @@ class get_school(HTTP_Response_Builder):
         return result
 
     def single_row_query(self, sqlQuery): 
-        query_result = self.db_session.execute(sqlQuery)
+        db_session = DB_Session_Factory.get_db_session()
+        query_result = db_session.execute(sqlQuery)
         searched_department_ids = []
         for row in query_result:
             searched_department_ids.append(row[0])
