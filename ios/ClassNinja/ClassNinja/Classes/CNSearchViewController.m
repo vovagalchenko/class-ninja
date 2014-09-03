@@ -34,6 +34,7 @@
 @property (nonatomic) NSArray *departmentsForLastSearch;
 @property (nonatomic) NSArray *coursesForLastSearch;
 @property (nonatomic) NSArray *lastUsedSearchTerms;
+@property (nonatomic) NSString *lastSearchString;
 
 @end
 
@@ -83,13 +84,17 @@
     if ([searchTerms.firstObject length] >= 3) {
         CNSchool *school = [[CNSchool alloc] init];
         school.schoolId = @"1";
+        __weak CNSearchViewController *me = self;
+        self.lastSearchString = searchString;
         [[CNAPIClient sharedInstance] searchInSchool:school
                                         searchString:searchString
                                           completion:^(NSArray *departments, NSArray *courses) {
-                                              self.departmentsForLastSearch = departments;
-                                              self.coursesForLastSearch = courses;
-                                              self.lastUsedSearchTerms = searchTerms;
-                                              [self.resultsView reloadData];
+                                              if (searchString == me.lastSearchString) {
+                                                  me.departmentsForLastSearch = departments;
+                                                  me.coursesForLastSearch = courses;
+                                                  me.lastUsedSearchTerms = searchTerms;
+                                                  [me.resultsView reloadData];
+                                              }
                                           }];
     } else {
         self.departmentsForLastSearch = nil;
