@@ -19,7 +19,6 @@
 @property (nonatomic) NSUInteger currentPageIndex;
 
 
-- (void)addNavigationView:(UIView *)view;
 - (void)pushView:(UIView *)view;
 - (void)popViewAtIndex:(NSUInteger)viewIndex
               animated:(BOOL)animated

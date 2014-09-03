@@ -7,6 +7,7 @@
 //
 
 #import "CNSiongNavigationView.h"
+#import "CNUserProfile.h"
 
 #define kScrollYOffset 75.0
 
@@ -101,13 +102,10 @@
     [self.scrollViews addObject:view];
     [self.scrollView addSubview:view];
     [self scrollToIndex:viewIndex];
+
+    [self.searchButton setHidden:([CNUserProfile defaultSchool] == nil)];
 }
 
-- (void)addNavigationView:(UIView *)view
-{
-    [self.scrollViews addObject:view];
-    [self.scrollView addSubview:view];
-}
 
 #pragma mark private helpers
 
@@ -334,6 +332,7 @@
         }
 
         self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:self.currentPageIndex];
+        [self.searchButton setHidden:([CNUserProfile defaultSchool] == nil)];
         if (completionBlock) {
             completionBlock();
         }

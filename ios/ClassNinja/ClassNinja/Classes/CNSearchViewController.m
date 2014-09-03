@@ -8,6 +8,7 @@
 
 #import "CNSearchViewController.h"
 #import "CNAPIClient.h"
+#import "CNUserProfile.h"
 
 #define kCloseButtonWidth  44
 #define kCloseButtonHeight 44
@@ -72,6 +73,12 @@
 
 - (void)searchBarTextDidChange:(id)sender
 {
+    CNSchool *school = [CNUserProfile defaultSchool];
+    if (school == nil) {
+        NSLog(@"%@ shown without user profile having deafult school", self);
+        return;
+    }
+
     NSString *searchString = self.searchBar.text;
     NSArray *searchTerms = [searchString componentsSeparatedByString:@" "];
     
@@ -82,8 +89,6 @@
     searchTerms = [searchTerms sortedArrayUsingDescriptors:@[sortDescriptor]];
 
     if ([searchTerms.firstObject length] >= 3) {
-        CNSchool *school = [[CNSchool alloc] init];
-        school.schoolId = @"1";
         __weak CNSearchViewController *me = self;
         self.lastSearchString = searchString;
         [[CNAPIClient sharedInstance] searchInSchool:school

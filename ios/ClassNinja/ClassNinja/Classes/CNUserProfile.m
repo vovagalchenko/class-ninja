@@ -25,6 +25,7 @@ static CNSchool *currentSchool = nil;
     if (currentSchool == nil) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:[self defaultSchoolFilePath]];
         currentSchool = [CNSchoolAPIResource modelWithDictionary:dict];
+
     }
 
     return currentSchool;

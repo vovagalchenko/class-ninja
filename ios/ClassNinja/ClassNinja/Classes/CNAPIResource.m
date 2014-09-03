@@ -38,6 +38,10 @@ static inline Class<CNAPIResource>resourceClassForModelClass(Class<CNModel>model
 
 + (id<CNModel>)modelWithDictionary:(NSDictionary *)dictionary
 {
+    if (dictionary == nil) {
+        return nil;
+    }
+    
     CNSchool *school = [[CNSchool alloc] init];
     school.currentTermCode = [dictionary valueForKey:@"current_term_code"];
     school.currentTermName = [dictionary valueForKey:@"current_term_name"];
