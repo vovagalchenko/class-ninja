@@ -59,7 +59,7 @@
     self.titleLabel.text = @"Search Classes and Courses";
     self.searchBar.backgroundColor = [UIColor whiteColor];
     
-    [self.resultsView reloadData];
+    self.resultsView.hidden = YES;
     
     [self.searchBar addTarget:self action:@selector(searchBarTextDidChange:) forControlEvents:UIControlEventEditingChanged];
     [self.searchBar becomeFirstResponder];
@@ -98,10 +98,15 @@
                                                   me.departmentsForLastSearch = departments;
                                                   me.coursesForLastSearch = courses;
                                                   me.lastUsedSearchTerms = searchTerms;
+                                                  if (courses.count > 0 || departments > 0) {
+                                                      self.resultsView.hidden = NO;
+                                                  }
+
                                                   [me.resultsView reloadData];
                                               }
                                           }];
     } else {
+        self.resultsView.hidden = YES;
         self.departmentsForLastSearch = nil;
         self.coursesForLastSearch = nil;
         self.lastUsedSearchTerms = nil;
@@ -158,8 +163,6 @@
     self.resultsView.frame = CGRectMake(kTableViewOffsetX, kTableViewOffsetY,
                                         self.view.bounds.size.width - 2*kTableViewOffsetX,
                                         self.view.bounds.size.height - kTableViewOffsetY);
-    
-
 }
 
 - (UITextField *)searchBar
