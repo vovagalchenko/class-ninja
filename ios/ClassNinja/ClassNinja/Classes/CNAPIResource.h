@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "CNModels.h"
 
-@protocol CNModel;
 @protocol CNAPIResource <NSObject>
 
 @property (nonatomic) id<CNModel>model;
@@ -28,6 +28,7 @@
 @end
 
 @interface CNSchoolAPIResource : NSObject<CNAPIResource>
++ (NSDictionary *)dictionaryFromSchool:(CNSchool *)school;
 @end
 
 @interface CNDepartmentAPIResource : NSObject<CNAPIResource>

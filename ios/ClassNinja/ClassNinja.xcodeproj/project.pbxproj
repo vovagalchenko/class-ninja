@@ -32,6 +32,7 @@
 		707F985A196899BC00D6E552 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9859196899BC00D6E552 /* XCTest.framework */; };
 		707F985B196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
 		707F985C196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
+		708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 708D688A19B6D6A600BE9156 /* CNUserProfile.m */; };
 		70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A5F36E19B444780060EB0C /* CNSearchViewController.m */; };
 		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
 		70E7618E19A0013D003F3984 /* checkbox-checked.png in Resources */ = {isa = PBXBuildFile; fileRef = 70E7618019A0013C003F3984 /* checkbox-checked.png */; };
@@ -107,6 +108,8 @@
 		707F9859196899BC00D6E552 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		707F989619689D8700D6E552 /* CNModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNModels.h; sourceTree = "<group>"; };
 		707F989719689D8700D6E552 /* CNModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNModels.m; sourceTree = "<group>"; };
+		708D688919B6D6A600BE9156 /* CNUserProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNUserProfile.h; sourceTree = "<group>"; };
+		708D688A19B6D6A600BE9156 /* CNUserProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNUserProfile.m; sourceTree = "<group>"; };
 		70A5F36D19B444780060EB0C /* CNSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSearchViewController.h; sourceTree = "<group>"; };
 		70A5F36E19B444780060EB0C /* CNSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSearchViewController.m; sourceTree = "<group>"; };
 		70DB470C198D967000F81F43 /* CNGenericSelectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGenericSelectionTableViewCell.h; sourceTree = "<group>"; };
@@ -261,6 +264,8 @@
 		707F989319689D8700D6E552 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				708D688919B6D6A600BE9156 /* CNUserProfile.h */,
+				708D688A19B6D6A600BE9156 /* CNUserProfile.m */,
 				DCCAA3981985FABA00BC4E7D /* Model */,
 				DC08B6A2198D7D910092EE90 /* UI */,
 				70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */,
@@ -492,6 +497,7 @@
 				70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */,
 				DC08B6A4198D8DD00092EE90 /* CNModels.m in Sources */,
 				DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */,
+				708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */,
 				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
 				DC42205A1996D96100739068 /* CNActivityIndicator.m in Sources */,
 				DCCAA3921985ECB200BC4E7D /* CNAPIClient.m in Sources */,

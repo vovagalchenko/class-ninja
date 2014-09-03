@@ -8,10 +8,20 @@
 
 #import "CNModels.h"
 @implementation CNSchool
+
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"School %@, id = %@, term code = %@, term name = %@", self.name, self.schoolId, self.currentTermCode, self.currentTermName];
     
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        CNSchool *rightSchool = (CNSchool *)object;
+        return [self.schoolId isEqualToString:rightSchool.schoolId] && [self.name isEqualToString:rightSchool.name];
+    }
+    return NO;
 }
 @end
 

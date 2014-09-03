@@ -41,9 +41,17 @@ static inline Class<CNAPIResource>resourceClassForModelClass(Class<CNModel>model
     CNSchool *school = [[CNSchool alloc] init];
     school.currentTermCode = [dictionary valueForKey:@"current_term_code"];
     school.currentTermName = [dictionary valueForKey:@"current_term_name"];
-    school.schoolId = [NSString stringWithFormat:@"%lu", (unsigned long)[[dictionary valueForKey:@"school_id"] unsignedIntegerValue]];
+    school.schoolId = [[dictionary valueForKey:@"school_id"] stringValue];
     school.name = [dictionary valueForKey:@"school_name"];
     return school;
+}
+
++ (NSDictionary *)dictionaryFromSchool:(CNSchool *)school
+{
+    return @{@"current_term_code" : school.currentTermCode,
+             @"current_term_name" : school.currentTermName,
+             @"school_id" : [NSNumber numberWithInteger:[school.schoolId integerValue]],
+             @"school_name" : school.name};
 }
 
 - (Class<CNAPIResource>)childResourceClass

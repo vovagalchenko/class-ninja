@@ -12,6 +12,7 @@
 #import "AppearanceConstants.h"
 #import "CNCourseDetailsViewController.h"
 #import "CNActivityIndicator.h"
+#import "CNUserProfile.h"
 
 #define kTitleViewHeight 90
 #define kTitleLabelXOffset 20
@@ -191,6 +192,14 @@
                                     self.activityIndicator.alpha = 0.0;
                                 }];
                                 [self reloadResults:children];
+                                
+                                CNSchool *school = [CNUserProfile defaultSchool];
+                                NSUInteger defaultSchoolIndex = [children indexOfObject:school];
+                                if (defaultSchoolIndex != NSNotFound) {
+                                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:defaultSchoolIndex inSection:0];
+                                    [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+                                    [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
+                                }
                             }];
 }
 
@@ -198,6 +207,14 @@
 {
     return [CNDepartmentViewController class];
 }
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CNSchool *school = [self modelForIndexPath:indexPath];
+    [CNUserProfile  setDefaultSchool:school];
+    [super tableView:tableView didSelectRowAtIndexPath:indexPath];
+}
+
 @end
 
 @implementation CNDepartmentViewController
