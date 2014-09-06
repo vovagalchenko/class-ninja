@@ -177,7 +177,31 @@
 
 @end
 
+@interface CNSchoolViewController()
+@property (nonatomic) BOOL didNavigateToDefaultSchool;
+@end
+
 @implementation CNSchoolViewController
+
+- (void)tryNavigatingToDefaultSchool
+{
+    if (self.didNavigateToDefaultSchool == NO) {
+        CNSchool *school = [CNUserProfile defaultSchool];
+        NSUInteger defaultSchoolIndex = [self.childrenOfRootModel indexOfObject:school];
+        if (defaultSchoolIndex != NSNotFound && defaultSchoolIndex < self.childrenOfRootModel.count) {
+            self.didNavigateToDefaultSchool = YES;
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:defaultSchoolIndex inSection:0];
+            [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+            [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
+        }
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [self tryNavigatingToDefaultSchool];
+}
 - (NSString *)headerText
 {
     return @"Which university are you attending?";
@@ -192,14 +216,7 @@
                                     self.activityIndicator.alpha = 0.0;
                                 }];
                                 [self reloadResults:children];
-                                
-                                CNSchool *school = [CNUserProfile defaultSchool];
-                                NSUInteger defaultSchoolIndex = [children indexOfObject:school];
-                                if (defaultSchoolIndex != NSNotFound) {
-                                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:defaultSchoolIndex inSection:0];
-                                    [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-                                    [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
-                                }
+                                [self tryNavigatingToDefaultSchool];
                             }];
 }
 
