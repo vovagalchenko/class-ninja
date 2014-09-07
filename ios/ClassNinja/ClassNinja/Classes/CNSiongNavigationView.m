@@ -94,8 +94,7 @@
                     withScrollViewContentOffsetX:scrollContentOffsetX];
     }
 
-
-    self.headerLabel.text = [self.navigationDelegate navbarTitleForIndex:self.currentPageIndex];
+    self.headerLabel.text = [self.navigationDelegate navbarTitleForIndex:[self indexOfVisibleViewController]];
     self.headerLabel.alpha = [self headerAlphaForViewAtIndex:self.currentPageIndex
                                 withScrollViewContentOffsetX:scrollContentOffsetX];
 }
