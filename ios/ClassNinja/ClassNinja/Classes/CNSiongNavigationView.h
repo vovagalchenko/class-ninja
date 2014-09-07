@@ -20,7 +20,7 @@
 @property (nonatomic) NSUInteger currentPageIndex;
 @property (nonatomic, readonly) UILabel *headerLabel;
 
-- (void)pushView:(UIView *)view;
+- (void)pushView:(UIView *)view animated:(BOOL)animated;
 - (void)popViewAtIndex:(NSUInteger)viewIndex
               animated:(BOOL)animated
        completionBlock:(dispatch_block_t)completionBlock;

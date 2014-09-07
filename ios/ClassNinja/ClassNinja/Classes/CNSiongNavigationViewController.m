@@ -33,7 +33,7 @@
         self.view = self.siongView;
 
         rootViewController.siongNavigationController = self;
-        [self.siongView pushView:rootViewController.view];
+        [self.siongView pushView:rootViewController.view animated:NO];
     }
     return self;
 }
@@ -67,7 +67,7 @@
     }
 }
 
-- (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController
+- (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController animated:(BOOL)animated
 {
     NSUInteger currentVCIndex = self.siongView.currentPageIndex;
     viewController.siongNavigationController = self;
@@ -79,7 +79,7 @@
         [self.viewControllers addObject:viewController];
     }
     
-    [self.siongView pushView:viewController.view];
+    [self.siongView pushView:viewController.view animated:animated];
 }
 
 - (UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex

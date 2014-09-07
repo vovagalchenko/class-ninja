@@ -101,7 +101,7 @@
 }
 
 #pragma public methods
-- (void)pushView:(UIView *)view
+- (void)pushView:(UIView *)view animated:(BOOL)animated
 {
     NSUInteger viewIndex = self.scrollViews.count;
     
@@ -110,7 +110,7 @@
     
     [self.scrollViews addObject:view];
     [self.scrollView addSubview:view];
-    [self scrollToIndex:viewIndex];
+    [self scrollToIndex:viewIndex animated:animated];
 
     [self.searchButton setHidden:([CNUserProfile defaultSchool] == nil)];
 }
@@ -212,7 +212,7 @@
     
     self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:self.scrollViews.count - 1];
     
-    [self scrollToIndex:self.currentPageIndex];
+    [self scrollToIndex:self.currentPageIndex animated:NO];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
@@ -245,7 +245,7 @@
     }
     
     *targetContentOffset = [self targetPointForPageIndex:newPage];
-    [self scrollToIndex:newPage];
+    [self scrollToIndex:newPage animated:YES];
 }
 
 - (CGSize)scrollViewcontentSizeForVCIndex:(NSUInteger)vcIndex
@@ -306,30 +306,37 @@
     return newContentOffset;
 }
 
-- (void)scrollToIndex:(NSUInteger)index
+- (void)scrollToIndex:(NSUInteger)index animated:(BOOL)animated
 {
     self.currentPageIndex = index;
-    // I wanted to keep contant velocity for all the kinds of scrolling to index page.
-    // user might select next view controller, or drag to the next one.
-    // thus in this two scenarios distance is going to be different.
-    // V = pushDistance / kPushDuration.
-    // We want V to be const for all kinds of scrolling to the next page (next VC)
-    // Thus for drag induced scrolls we have following formula for duration:
-    // duration = currentScrollDistance * (kPushDuration / viewControllerPushDistance)
-    CGFloat viewControllerPushDistance = [self childVCWidth];
     CGPoint targetPoint = [self targetPointForPageIndex:index];
-    CGFloat currentScrollDistance = fabs(self.scrollView.contentOffset.x  - targetPoint.x);
-    CGFloat duration = currentScrollDistance * kPushDuration / viewControllerPushDistance;
+    dispatch_block_t localCompletion = ^{
+        self.scrollView.contentOffset = targetPoint;
+    };
     
-    // UIViewAnimationOptionCurveLinear option also felt good IMO
-    UIViewAnimationOptions animationOptions = UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState;
-    [UIView animateWithDuration:duration
-                          delay:0
-                        options:animationOptions
-                     animations:^{
-                         self.scrollView.contentOffset = targetPoint;
-                     }
-                     completion:nil];
+    if (animated) {
+        // I wanted to keep contant velocity for all the kinds of scrolling to index page.
+        // user might select next view controller, or drag to the next one.
+        // thus in this two scenarios distance is going to be different.
+        // V = pushDistance / kPushDuration.
+        // We want V to be const for all kinds of scrolling to the next page (next VC)
+        // Thus for drag induced scrolls we have following formula for duration:
+        // duration = currentScrollDistance * (kPushDuration / viewControllerPushDistance)
+        CGFloat viewControllerPushDistance = [self childVCWidth];
+        
+        CGFloat currentScrollDistance = fabs(self.scrollView.contentOffset.x  - targetPoint.x);
+        CGFloat duration = currentScrollDistance * kPushDuration / viewControllerPushDistance;
+        
+        // UIViewAnimationOptionCurveLinear option also felt good IMO
+        UIViewAnimationOptions animationOptions = UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState;
+        [UIView animateWithDuration:duration
+                              delay:0
+                            options:animationOptions
+                         animations:localCompletion
+                         completion:nil];
+    } else {
+        localCompletion();
+    }
 }
 
 

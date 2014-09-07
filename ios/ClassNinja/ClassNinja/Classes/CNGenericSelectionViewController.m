@@ -136,7 +136,7 @@
         for (int i = VCs.count; i < searchModels.count; i++) {
             cursorVC = [[[cursorVC nextVCClass] alloc] init];
             cursorVC.selectedModel = [searchModels objectAtIndex:i];;
-            [self.siongNavigationController pushViewController:cursorVC];
+            [self.siongNavigationController pushViewController:cursorVC animated:NO];
         }
     } else {
         [cursorVC tableView:cursorVC.tableView didSelectRowAtIndexPath:indexPath];
@@ -175,14 +175,19 @@
     return [self.childrenOfRootModel objectAtIndex:indexPath.row];
 }
 
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+- (void)navigateToModelAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated
 {
     self.selectedModel = [self modelForIndexPath:indexPath];
     CNGenericSelectionViewController *nextVC = [[[self nextVCClass] alloc] init];
     nextVC.rootModel = self.selectedModel;
     self.lastSelectedRow =  indexPath;
-    [self.siongNavigationController pushViewController:nextVC];
+    [self.siongNavigationController pushViewController:nextVC animated:animated];
+}
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [self navigateToModelAtIndexPath:indexPath animated:YES];
 }
 
 - (void)setLastSelectedRow:(NSIndexPath *)indexPath
@@ -245,7 +250,7 @@
         NSIndexPath *indexPath = [self selectRowForSelectedModel:self.selectedModel];
         if (indexPath) {
             self.didNavigateToDefaultSchool = YES;
-            [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
+            [self navigateToModelAtIndexPath:indexPath animated:NO];
         }
     }
 }
@@ -321,7 +326,6 @@
     return nil;
 }
 
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     self.selectedModel = [self modelForIndexPath:indexPath];
@@ -333,8 +337,5 @@
     nextVC.modalPresentationCapturesStatusBarAppearance = YES;
     [self.siongNavigationController presentViewController:nextVC animated:YES completion:nil];
 }
-
-
-
 
 @end
