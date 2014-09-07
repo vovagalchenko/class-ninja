@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CNSearchViewController.h"
 
 @class CNSiongNavigationViewController;
 
@@ -17,12 +18,18 @@
 
 @interface CNSiongNavigationViewController : UIViewController
 
-- (id)initWithRootViewController:(UIViewController<SiongNavigationProtocol> *)rootViewController; // Convenience method pushes the root view controller without animation.
+@property (nonatomic, weak) id <CNSearchViewControllerDelegateProtocol> searchDelegate;
+@property (nonatomic, copy, readonly) NSMutableArray *viewControllers;
+
+// Convenience method pushes the root view controller without animation.
+- (id)initWithRootViewController:(UIViewController<SiongNavigationProtocol> *)rootViewController;
 
  // Uses a horizontal scroll transition. Has no effect if the view controller is already in the stack.
 - (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController;
-
-@property(nonatomic,readonly) UIViewController *topViewController; // The top view controller on the stack.
+- (UIViewController *)popViewControllerAtIndex:(NSUInteger)vcIndex
+                                      animated:(BOOL)animated
+                                  deselectRows:(BOOL)deselectRows;
+- (UIViewController <SiongNavigationProtocol> *)rootVC;
 
 @end
 

@@ -13,7 +13,7 @@
 #import "CNSiongNavigationView.h"
 
 @interface CNSiongNavigationViewController () <CNGenericNavigationProtocol>
-@property (nonatomic) NSMutableArray *viewControllers;
+@property (nonatomic, readwrite) NSMutableArray *viewControllers;
 @property (nonatomic) CNSiongNavigationView *siongView;
 @end
 
@@ -23,6 +23,8 @@
 {
     self = [super init];
     if (self) {
+        self.modalPresentationStyle = UIModalPresentationFullScreen;
+        
         _viewControllers = [NSMutableArray array];
         [_viewControllers addObject:rootViewController];
         
@@ -36,6 +38,11 @@
     return self;
 }
 
+- (UIViewController<SiongNavigationProtocol> *)rootVC
+{
+    return [self.viewControllers firstObject];
+}
+
 - (void)backButtonPressed:(id)sender
 {
     [self popViewControllerAnimated:YES deselectRows:YES];
@@ -44,6 +51,7 @@
 - (void)searchButtonPressed:(id)sender
 {
     CNSearchViewController *searchVC = [[CNSearchViewController alloc] init];
+    searchVC.searchDelegate = self.searchDelegate;
     searchVC.modalPresentationStyle = UIModalPresentationFullScreen;
     searchVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     searchVC.modalPresentationCapturesStatusBarAppearance = YES;
@@ -109,11 +117,6 @@
     return [self popViewControllerAtIndex:currentPageIndex
                                  animated:animated
                              deselectRows:deselectRows];
-}
-
-- (UIViewController *)topViewController
-{
-    return [self.viewControllers lastObject];
 }
 
 @end

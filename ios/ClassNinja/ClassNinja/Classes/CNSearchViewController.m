@@ -9,6 +9,7 @@
 #import "CNSearchViewController.h"
 #import "CNAPIClient.h"
 #import "CNUserProfile.h"
+#import "CNCourseDetailsViewController.h"
 
 #define kCloseButtonWidth  44
 #define kCloseButtonHeight 44
@@ -79,12 +80,12 @@
         return;
     }
 
-    NSString *searchString = self.searchBar.text;
+    NSString *searchString = [self.searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSArray *searchTerms = [searchString componentsSeparatedByString:@" "];
     
     NSSortDescriptor *sortDescriptor;
     sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"length"
-                                                  ascending:YES];
+                                                  ascending:NO];
     
     searchTerms = [searchTerms sortedArrayUsingDescriptors:@[sortDescriptor]];
 
@@ -302,6 +303,30 @@
     
     cell.textLabel.attributedText = boldedTitle;
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([self isDepartmentsSection:indexPath.section]) {
+        CNSchool *school = [CNUserProfile defaultSchool];
+        NSMutableArray *searchResults = [NSMutableArray arrayWithObject:school];
+        id <CNModel> model = [self.departmentsForLastSearch objectAtIndex:indexPath.row];
+        [searchResults addObject:model];
+        [self.searchDelegate buildUIForSearchResults:searchResults];
+        [self dismissViewControllerAnimated:YES completion:nil];
+    } else if ([self isCoursesSection:indexPath.section]) {
+        CNCourse *course = [self.coursesForLastSearch objectAtIndex:indexPath.row];
+        CNCourseDetailsViewController *nextVC = [[CNCourseDetailsViewController alloc] init];
+        nextVC.course = course;
+        nextVC.modalPresentationStyle = UIModalPresentationFullScreen;
+        nextVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+        [self presentViewController:nextVC animated:YES completion:nil];
+    } else {
+        NSLog(@"Requesting invalid cell for indexpath =%@ ! departments = %@, courses = %@",
+              indexPath, self.departmentsForLastSearch, self.coursesForLastSearch);
+    }
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
 - (NSMutableAttributedString *)setBoldTerms:(NSString*)term inText:(NSMutableAttributedString*)boldedTitle

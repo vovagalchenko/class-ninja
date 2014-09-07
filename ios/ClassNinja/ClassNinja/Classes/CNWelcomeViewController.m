@@ -17,7 +17,7 @@
 
 @property (nonatomic) UITableViewController *tableViewController;
 @property (nonatomic) CNWelcomeStatusView *statusView;
-
+@property (nonatomic) CNSiongNavigationViewController *siongsNavigationController;
 @end
 
 @implementation CNWelcomeViewController
@@ -178,9 +178,23 @@
 - (void)addClassesButtonPressed:(id)sender
 {
     CNSchoolViewController *schoolVC = [[CNSchoolViewController alloc] init];
-    CNSiongNavigationViewController *navController = [[CNSiongNavigationViewController alloc] initWithRootViewController:schoolVC];
-    navController.modalPresentationStyle = UIModalPresentationFullScreen;
-    [self presentViewController:navController animated:YES completion:nil];
+    self.siongsNavigationController = [[CNSiongNavigationViewController alloc] initWithRootViewController:schoolVC];
+    self.siongsNavigationController.searchDelegate = self;
+    [self presentViewController:self.siongsNavigationController animated:YES completion:nil];
+}
+
+- (void)buildUIForSearchResults:(NSArray *)models
+{
+    CNSchoolViewController *schoolVC= nil;
+    if (self.siongsNavigationController == nil) {
+        schoolVC = [[CNSchoolViewController alloc] init];
+        self.siongsNavigationController = [[CNSiongNavigationViewController alloc] initWithRootViewController:schoolVC];
+        [self presentViewController:self.siongsNavigationController animated:NO completion:nil];
+    } else {
+        schoolVC = (CNSchoolViewController *)[self.siongsNavigationController rootVC];
+    }
+    [schoolVC handleSearchResult:models];
+
 }
 
 @end

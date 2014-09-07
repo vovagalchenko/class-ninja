@@ -25,6 +25,8 @@
 @property (nonatomic) UIView *titleView;
 @property (nonatomic) NSIndexPath *lastSelectedRow;
 @property (nonatomic) CNActivityIndicator *activityIndicator;
+@property (nonatomic) id <CNModel> selectedModel;
+@property (nonatomic) BOOL didNavigateToSelectedModel;
 
 - (void)reloadResults:(NSArray *)children;
 - (id <CNModel>)modelForIndexPath:(NSIndexPath *)indexPath;
@@ -39,6 +41,20 @@
 
 
 @implementation CNGenericSelectionViewController
+
+- (NSIndexPath *)selectRowForSelectedModel:(id <CNModel>)selectedModel
+{
+    if (self.childrenOfRootModel != nil) {
+        NSUInteger selectedModelIndex = [self.childrenOfRootModel indexOfObject:selectedModel];
+        if (selectedModelIndex != NSNotFound && selectedModelIndex < self.childrenOfRootModel.count) {
+            self.didNavigateToSelectedModel = YES;
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:selectedModelIndex inSection:0];
+            [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+            return indexPath;
+        }
+    }
+    return nil;
+}
 
 - (void)viewDidLoad
 {
@@ -96,6 +112,33 @@
                                     }];
 }
 
+- (void)handleSearchResult:(NSArray *)searchModels
+{
+    [self.siongNavigationController popViewControllerAtIndex:searchModels.count
+                                                    animated:NO
+                                                deselectRows:YES];
+    NSArray *VCs = [self.siongNavigationController viewControllers];
+    
+    CNGenericSelectionViewController *cursorVC = nil;
+    NSIndexPath *indexPath = nil;
+    for (int i = 0; i < VCs.count; i++) {
+        cursorVC = [VCs objectAtIndex:i];
+        cursorVC.selectedModel = [searchModels objectAtIndex:i];
+        indexPath = [cursorVC selectRowForSelectedModel:cursorVC.selectedModel];
+    }
+    
+    if (VCs.count < searchModels.count) {
+        for (int i = VCs.count; i < searchModels.count; i++) {
+            cursorVC = [[[cursorVC nextVCClass] alloc] init];
+            cursorVC.selectedModel = [searchModels objectAtIndex:i];;
+            [self.siongNavigationController pushViewController:cursorVC];
+        }
+    } else {
+        [cursorVC tableView:cursorVC.tableView didSelectRowAtIndexPath:indexPath];
+    }
+}
+
+
 - (Class)nextVCClass
 {
     return [CNGenericSelectionViewController class];
@@ -127,11 +170,12 @@
     return [self.childrenOfRootModel objectAtIndex:indexPath.row];
 }
 
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id <CNModel> model = [self modelForIndexPath:indexPath];
+    self.selectedModel = [self modelForIndexPath:indexPath];
     CNGenericSelectionViewController *nextVC = [[[self nextVCClass] alloc] init];
-    nextVC.rootModel = model;
+    nextVC.rootModel = self.selectedModel;
     self.lastSelectedRow =  indexPath;
     [self.siongNavigationController pushViewController:nextVC];
 }
@@ -187,11 +231,11 @@
 {
     if (self.didNavigateToDefaultSchool == NO) {
         CNSchool *school = [CNUserProfile defaultSchool];
-        NSUInteger defaultSchoolIndex = [self.childrenOfRootModel indexOfObject:school];
-        if (defaultSchoolIndex != NSNotFound && defaultSchoolIndex < self.childrenOfRootModel.count) {
+        self.selectedModel = school;
+        
+        NSIndexPath *indexPath = [self selectRowForSelectedModel:self.selectedModel];
+        if (indexPath) {
             self.didNavigateToDefaultSchool = YES;
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:defaultSchoolIndex inSection:0];
-            [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
             [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
         }
     }
@@ -270,9 +314,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id <CNModel> model = [self modelForIndexPath:indexPath];
+    self.selectedModel = [self modelForIndexPath:indexPath];
     CNCourseDetailsViewController *nextVC = [[CNCourseDetailsViewController alloc] init];
-    nextVC.course = (CNCourse *)model;
+    nextVC.course = (CNCourse *)self.selectedModel;
     self.lastSelectedRow =  indexPath;
     nextVC.modalPresentationStyle = UIModalPresentationFullScreen;
     nextVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;

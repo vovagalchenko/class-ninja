@@ -12,6 +12,9 @@
 
 @interface CNGenericSelectionViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, SiongNavigationProtocol>
 @property (nonatomic, weak) CNSiongNavigationViewController *siongNavigationController;
+
+- (void)handleSearchResult:(NSArray *)searchModels;
+
 @end
 
 @interface CNSchoolViewController : CNGenericSelectionViewController

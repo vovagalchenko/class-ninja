@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CNSearchViewController : UIViewController
+@protocol CNSearchViewControllerDelegateProtocol <NSObject>
+- (void)buildUIForSearchResults:(NSArray *)models;
+@end
 
+@interface CNSearchViewController : UIViewController
+@property (nonatomic, weak) id <CNSearchViewControllerDelegateProtocol> searchDelegate;
 @end
