@@ -31,6 +31,18 @@
     return [NSString stringWithFormat:@"Department %@, id = %@, school id = %@", self.name, self.departmentId, self.schoolId];
 }
 
+- (BOOL)isEqual:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        CNDepartment *rightDepartment = (CNDepartment *)object;
+        return  [self.schoolId isEqualToString:rightDepartment.schoolId] &&
+                [self.departmentId isEqualToString:rightDepartment.departmentId] &&
+                [self.name isEqualToString:rightDepartment.name];
+    }
+    return NO;
+}
+
+
 @end
 
 @implementation CNCourse
@@ -39,6 +51,16 @@
     return [NSString stringWithFormat:@"Course %@, id = %@,  dept spec course id = %@, deptId = %@, ", self.name, self.courseId, self.departmentSpecificCourseId, self.departmentId];
 }
 
+- (BOOL)isEqual:(id)object
+{
+    if ([object isKindOfClass:[self class]]) {
+        CNCourse *rightCourse = (CNCourse *)object;
+        return  [self.courseId isEqualToString:rightCourse.courseId] &&
+                [self.departmentSpecificCourseId isEqualToString:rightCourse.departmentSpecificCourseId] &&
+                [self.departmentId isEqualToString:rightCourse.departmentId];
+    }
+    return NO;
+}
 @end
 
 @implementation CNTargetedCourse

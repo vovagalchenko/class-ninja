@@ -88,7 +88,7 @@ static inline Class<CNAPIResource>resourceClassForModelClass(Class<CNModel>model
     CNDepartment *department = [[CNDepartment alloc] init];
     department.departmentId = [dictionary valueForKey:@"department_id"];
     department.name = [dictionary valueForKey:@"name"];
-    department.schoolId = [dictionary valueForKey:@"school_id"];
+    department.schoolId = [[dictionary valueForKey:@"school_id"] stringValue];
     return department;
 }
 
