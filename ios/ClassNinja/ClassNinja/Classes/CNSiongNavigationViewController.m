@@ -58,6 +58,15 @@
     [self presentViewController:searchVC animated:YES completion:nil];
 }
 
+- (NSString *)navbarTitleForIndex:(NSInteger)index
+{
+    if (index <= self.viewControllers.count) {
+        return [[self.viewControllers objectAtIndex:index] siongNavBarTitle];
+    } else {
+        return nil;
+    }
+}
+
 - (void)pushViewController:(UIViewController<SiongNavigationProtocol> *)viewController
 {
     NSUInteger currentVCIndex = self.siongView.currentPageIndex;

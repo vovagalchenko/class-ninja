@@ -42,6 +42,11 @@
 
 @implementation CNGenericSelectionViewController
 
+- (NSString *)siongNavBarTitle
+{
+    return self.rootModel.name;
+}
+
 - (NSIndexPath *)selectRowForSelectedModel:(id <CNModel>)selectedModel
 {
     if (self.childrenOfRootModel != nil) {
@@ -227,12 +232,16 @@
 
 @implementation CNSchoolViewController
 
+- (NSString *)siongNavBarTitle
+{
+    return @"Add class";
+}
+
 - (void)tryNavigatingToDefaultSchool
 {
     if (self.didNavigateToDefaultSchool == NO) {
         CNSchool *school = [CNUserProfile defaultSchool];
         self.selectedModel = school;
-        
         NSIndexPath *indexPath = [self selectRowForSelectedModel:self.selectedModel];
         if (indexPath) {
             self.didNavigateToDefaultSchool = YES;
@@ -246,6 +255,7 @@
     [super viewDidAppear:animated];
     [self tryNavigatingToDefaultSchool];
 }
+
 - (NSString *)headerText
 {
     return @"Which university are you attending?";

@@ -11,13 +11,14 @@
 @protocol CNGenericNavigationProtocol <NSObject>
 - (void)backButtonPressed:(id)sender;
 - (void)searchButtonPressed:(id)sender;
+- (NSString *)navbarTitleForIndex:(NSInteger)index;
 @end
 
 @interface CNSiongNavigationView : UIView
 
 @property (nonatomic, weak) id <CNGenericNavigationProtocol> navigationDelegate;
 @property (nonatomic) NSUInteger currentPageIndex;
-
+@property (nonatomic, readonly) UILabel *headerLabel;
 
 - (void)pushView:(UIView *)view;
 - (void)popViewAtIndex:(NSUInteger)viewIndex

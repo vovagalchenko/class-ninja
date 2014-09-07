@@ -20,6 +20,8 @@
 #define kSearchButtonPaddingX 9
 #define kSearchButtonPaddingY 24
 
+#define kNavbarTitleOriginX (kButtonOriginX + kBackButtonWidth + 5)
+#define kNavbarTitlePaddingX (kSearchButtonWidth + kSearchButtonPaddingX + 5)
 
 #define kHeaderOriginY 35
 
@@ -36,7 +38,6 @@
 @property (nonatomic) UIButton *backButton;
 @property (nonatomic) UIButton *searchButton;
 @property (nonatomic) UILabel *headerLabel;
-
 @property (nonatomic) NSMutableArray *scrollViews;
 
 @end
@@ -75,20 +76,28 @@
     NSInteger leftViewIndex = index - 1;
     NSInteger rightViewIndex = index + 1;
 
+    CGFloat scrollContentOffsetX = self.scrollView.contentOffset.x;
+    
     UIView *centerView = [self.scrollViews objectAtIndex:index];
-    centerView.alpha = [self alphaViewAtIndex:self.currentPageIndex withScrollViewContentOffsetX:self.scrollView.contentOffset.x];
+    centerView.alpha = [self alphaViewAtIndex:self.currentPageIndex withScrollViewContentOffsetX:scrollContentOffsetX];
     
     if (leftViewIndex >= 0) {
         leftView = [self.scrollViews objectAtIndex:leftViewIndex];
         leftView.alpha  = [self alphaViewAtIndex:leftViewIndex
-                    withScrollViewContentOffsetX:self.scrollView.contentOffset.x];
+                    withScrollViewContentOffsetX:scrollContentOffsetX];
+        
     }
     
     if (rightViewIndex < self.scrollViews.count) {
         rightView = [self.scrollViews objectAtIndex:rightViewIndex];
         rightView.alpha = [self alphaViewAtIndex:rightViewIndex
-                    withScrollViewContentOffsetX:self.scrollView.contentOffset.x];
+                    withScrollViewContentOffsetX:scrollContentOffsetX];
     }
+
+
+    self.headerLabel.text = [self.navigationDelegate navbarTitleForIndex:self.currentPageIndex];
+    self.headerLabel.alpha = [self headerAlphaForViewAtIndex:self.currentPageIndex
+                                withScrollViewContentOffsetX:scrollContentOffsetX];
 }
 
 #pragma public methods
@@ -128,8 +137,8 @@
     if (_headerLabel == nil) {
         _headerLabel = [[UILabel alloc] init];
         _headerLabel.textColor = [UIColor colorWithRed:32/255.0 green:48/255.0 blue:66/255.0 alpha:1.0];
-        _headerLabel.text = @"Add Class";
         _headerLabel.font = [UIFont cnSystemFontOfSize:14];
+        _headerLabel.text = @"Add class";
         _headerLabel.userInteractionEnabled = NO;
         _headerLabel.textAlignment = NSTextAlignmentCenter;
     }
@@ -177,7 +186,7 @@
     
     CGRect rect = CGRectMake(kButtonOriginX, kButtonOriginY, kBackButtonWidth, kBackButtonWidth);
     self.backButton.frame = rect;
-    self.headerLabel.frame = CGRectMake(0, kHeaderOriginY, scrollFrame.size.width, 20);
+    self.headerLabel.frame = CGRectMake(kNavbarTitleOriginX, kHeaderOriginY, scrollFrame.size.width - kNavbarTitleOriginX - kNavbarTitlePaddingX, 20);
     
     self.searchButton.frame = CGRectMake(self.bounds.size.width - kSearchButtonWidth - kSearchButtonPaddingX,
                                          kSearchButtonPaddingY,
@@ -255,6 +264,16 @@
 {
     return self.bounds.size.width - 2*kLeftBoundsOffset;
 }
+
+
+- (CGFloat)headerAlphaForViewAtIndex:(NSUInteger)index withScrollViewContentOffsetX:(CGFloat)contentXOffset
+{
+    CGPoint basePoint = [self targetPointForPageIndex:index];
+    CGFloat interVCWidth =  self.bounds.size.width - kLeftBoundsOffset - kSpaceBetweenViews;
+    CGFloat alpha = fabs(1- 2*(fabs((contentXOffset - basePoint.x)) / interVCWidth));
+    return (alpha < 1.0) ? alpha : 1;
+}
+
 
 - (CGFloat)alphaViewAtIndex:(NSUInteger)index withScrollViewContentOffsetX:(CGFloat)contentXOffset
 {
