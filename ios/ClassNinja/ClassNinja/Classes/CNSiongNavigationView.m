@@ -39,7 +39,7 @@
 @property (nonatomic) UIButton *searchButton;
 @property (nonatomic) UILabel *headerLabel;
 @property (nonatomic) NSMutableArray *scrollViews;
-
+@property (nonatomic) BOOL didSetFrames;
 @end
 
 @implementation CNSiongNavigationView
@@ -179,22 +179,25 @@
 
 - (void)layoutSubviews
 {
-    CGRect scrollFrame = self.bounds;
-    scrollFrame.origin.y += kScrollYOffset;
-    scrollFrame.size.height -= kScrollYOffset;
-    self.scrollView.frame = scrollFrame;
-    
-    CGRect rect = CGRectMake(kButtonOriginX, kButtonOriginY, kBackButtonWidth, kBackButtonWidth);
-    self.backButton.frame = rect;
-    self.headerLabel.frame = CGRectMake(kNavbarTitleOriginX, kHeaderOriginY, scrollFrame.size.width - kNavbarTitleOriginX - kNavbarTitlePaddingX, 20);
-    
-    self.searchButton.frame = CGRectMake(self.bounds.size.width - kSearchButtonWidth - kSearchButtonPaddingX,
-                                         kSearchButtonPaddingY,
-                                         kSearchButtonWidth, kSearchButtonWidth);
-    
-    self.scrollView.contentSize = self.scrollView.frame.size;
-    
-    [self layoutViewControllersInScrollView];
+    if (self.didSetFrames == NO) {
+        self.didSetFrames = YES;
+        CGRect scrollFrame = self.bounds;
+        scrollFrame.origin.y += kScrollYOffset;
+        scrollFrame.size.height -= kScrollYOffset;
+        self.scrollView.frame = scrollFrame;
+        
+        CGRect rect = CGRectMake(kButtonOriginX, kButtonOriginY, kBackButtonWidth, kBackButtonWidth);
+        self.backButton.frame = rect;
+        self.headerLabel.frame = CGRectMake(kNavbarTitleOriginX, kHeaderOriginY, scrollFrame.size.width - kNavbarTitleOriginX - kNavbarTitlePaddingX, 20);
+        
+        self.searchButton.frame = CGRectMake(self.bounds.size.width - kSearchButtonWidth - kSearchButtonPaddingX,
+                                             kSearchButtonPaddingY,
+                                             kSearchButtonWidth, kSearchButtonWidth);
+        
+        self.scrollView.contentSize = self.scrollView.frame.size;
+        
+        [self layoutViewControllersInScrollView];
+    }
     
     [super layoutSubviews];
 }
