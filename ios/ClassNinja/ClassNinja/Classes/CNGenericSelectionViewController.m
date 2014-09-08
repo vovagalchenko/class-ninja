@@ -139,7 +139,7 @@
             [self.siongNavigationController pushViewController:cursorVC animated:NO];
         }
     } else {
-        [cursorVC tableView:cursorVC.tableView didSelectRowAtIndexPath:indexPath];
+        [cursorVC navigateToModelAtIndexPath:indexPath animated:NO];
     }
 }
 

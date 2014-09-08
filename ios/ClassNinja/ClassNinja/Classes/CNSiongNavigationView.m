@@ -273,6 +273,12 @@
     CGPoint basePoint = [self targetPointForPageIndex:index];
     CGFloat interVCWidth =  self.bounds.size.width - kLeftBoundsOffset - kSpaceBetweenViews;
     CGFloat alpha = fabs(1- 2*(fabs((contentXOffset - basePoint.x)) / interVCWidth));
+    // hack to prevent showing navbar title when scrolling between two views and having
+    // same navbar title fade out and fade in again.
+    // This has also an upside of having no title when views take almost equal amount of space on the screen
+    if (alpha < 0.04) {
+        alpha = 0;
+    }
     return (alpha < 1.0) ? alpha : 1;
 }
 
@@ -288,7 +294,7 @@
 - (NSUInteger)indexOfPageForContentOffset:(CGFloat)contentXOffset
 {
     CGFloat midOfPageXOffset = contentXOffset + self.bounds.size.width / 2;
-    CGFloat interVCWidth =  self.bounds.size.width - kLeftBoundsOffset - kSpaceBetweenViews;
+    CGFloat interVCWidth =  self.bounds.size.width - kLeftBoundsOffset - (kSpaceBetweenViews / 2);
     NSUInteger index = (NSUInteger)((midOfPageXOffset / interVCWidth));
     return index;
 }
