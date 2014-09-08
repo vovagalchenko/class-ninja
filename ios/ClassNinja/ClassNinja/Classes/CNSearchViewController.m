@@ -117,6 +117,8 @@
 
 @property (nonatomic) NSArray *departmentsForLastSearch;
 @property (nonatomic) NSArray *coursesForLastSearch;
+@property (nonatomic) NSMutableDictionary *courseDepartmentNameByIDLookup;
+
 @property (nonatomic) NSArray *lastUsedSearchTerms;
 @property (nonatomic) NSString *lastSearchString;
 
@@ -182,10 +184,16 @@
         self.lastSearchString = searchString;
         [[CNAPIClient sharedInstance] searchInSchool:school
                                         searchString:searchString
-                                          completion:^(NSArray *departments, NSArray *courses) {
+                                          completion:^(NSArray *departments, NSArray *courses, NSArray *departments_for_courses) {
                                               if (searchString == me.lastSearchString) {
                                                   me.departmentsForLastSearch = departments;
                                                   me.coursesForLastSearch = courses;
+                                                  
+                                                  self.courseDepartmentNameByIDLookup = [[NSMutableDictionary alloc] init];
+                                                  for (CNDepartment *dept in departments_for_courses) {
+                                                      [self.courseDepartmentNameByIDLookup setObject:dept.name forKey:dept.departmentId];
+                                                  }
+                                                  
                                                   me.lastUsedSearchTerms = searchTerms;
                                                   if (courses.count > 0 || departments > 0) {
                                                       self.resultsView.hidden = NO;
@@ -403,7 +411,8 @@
 
     NSString *subtitle = nil;
     if ([self isCoursesSection:indexPath.section]){
-        subtitle = @"Department Name";
+        CNCourse *course = [self.coursesForLastSearch objectAtIndex:indexPath.row];
+        subtitle = [self.courseDepartmentNameByIDLookup objectForKey:course.departmentId];
     }
 
     [cell setTitle:title subtitle:subtitle searchTerms:self.lastUsedSearchTerms];

@@ -31,7 +31,7 @@ typedef enum : NSUInteger {
 
 - (void)searchInSchool:(CNSchool *)school
           searchString:(NSString *)string
-            completion:(void (^)(NSArray *departments, NSArray *courses))completionBlock;
+            completion:(void (^)(NSArray *departments, NSArray *courses, NSArray *departments_for_courses))completionBlock;
 
 - (void)verify:(NSData *)receipt successBlock:(void (^)(BOOL success))successBlock;
 - (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock;

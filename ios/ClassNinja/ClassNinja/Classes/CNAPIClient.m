@@ -108,7 +108,7 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
 
 - (void)searchInSchool:(CNSchool *)school
           searchString:(NSString *)searchString
-            completion:(void (^)(NSArray *departments, NSArray *courses))completionBlock
+            completion:(void (^)(NSArray *departments, NSArray *courses, NSArray *departments_for_courses))completionBlock
 {
 
     NSString *endpoint = [[CNRootAPIResource rootAPIResourceForModel:[school class]] resourceTypeName];
@@ -128,11 +128,13 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
               completion:^(NSDictionary *jsonResult) {
                   if (jsonResult == nil) {
                       if (completionBlock) {
-                          completionBlock(nil, nil);
+                          completionBlock(nil, nil, nil);
                       }
                   } else {
                       NSArray *courses_dicts = [jsonResult objectForKey:@"searched_courses"];
                       NSArray *departments_dicts = [jsonResult objectForKey:@"searched_departments"];
+                      NSArray *departments_for_courses_dicts = [jsonResult objectForKeyedSubscript:@"searched_courses_departments"];
+                      
                       NSMutableArray *courses = [[NSMutableArray alloc] init];
                       for (NSDictionary *course_dict in courses_dicts) {
                           [courses addObject:[CNCourseAPIResource modelWithDictionary:course_dict]];
@@ -143,8 +145,13 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
                           [departments addObject:[CNDepartmentAPIResource modelWithDictionary:departments_dict]];
                       }
                       
+                      NSMutableArray *departments_for_courses = [[NSMutableArray alloc] init];
+                      for (NSDictionary *departments_dict in departments_for_courses_dicts) {
+                          [departments_for_courses addObject:[CNDepartmentAPIResource modelWithDictionary:departments_dict]];
+                      }
+                      
                       if (completionBlock) {
-                          completionBlock(departments, courses);
+                          completionBlock(departments, courses, departments_for_courses);
                       }
                   }
               }];
