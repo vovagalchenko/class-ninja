@@ -25,6 +25,88 @@
 #define kTableViewOffsetX 20
 #define kTableViewOffsetY (kSearchBarOffsetY + kSearchBarHeight + 10)
 
+#define kSectionHeaderOffsetX 20
+#define kDepartmentsResultsCellHeight 44
+#define kCoursesResultsCellHeight 59
+
+@interface CNSearchResultsCell : UITableViewCell
+@property (nonatomic) UIView *separatorLine;
+- (instancetype)init;
+@end
+
+@implementation CNSearchResultsCell
+
+- (instancetype)init
+{
+    self = [super initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"search"];
+
+    if(self) {
+        // have to add our own separator line because it is not possible to adjust
+        // 1) content inset that would not also be content inset for the tableview section
+        // 2) height of separator line
+        self.separatorLine = [[UIView alloc] init];
+        self.separatorLine.backgroundColor = [UIColor opaqueWhiteWithIntensity:230];
+        [self addSubview:self.separatorLine];
+        
+        self.textLabel.numberOfLines = 2;
+        self.textLabel.font = [UIFont cnSystemFontOfSize:12];
+        self.textLabel.textColor = [UIColor opaqueWhiteWithIntensity:90];
+        
+        self.detailTextLabel.font = [UIFont cnSystemFontOfSize:9];
+        self.detailTextLabel.textColor = [UIColor opaqueWhiteWithIntensity:180];
+        
+        self.backgroundColor = [UIColor whiteColor];
+    }
+    return self;
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    CGSize cellSize = self.frame.size;
+    self.separatorLine.frame = CGRectMake(0, cellSize.height - 2, cellSize.width, 2);
+}
+
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    self.detailTextLabel.text = nil;
+}
+
+- (void)setTitle:(NSString *)title subtitle:(NSString *)subtitle searchTerms:(NSArray *)searchTerms
+{
+    NSDictionary *defaultAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0]};
+    NSMutableAttributedString *boldedTitle = [[NSMutableAttributedString alloc] initWithString:title
+                                                                                    attributes:defaultAttributes];
+    
+    for (NSString *term in searchTerms) {
+        boldedTitle = [self setBoldTerms:term inText:boldedTitle];
+    }
+    
+    self.textLabel.attributedText = boldedTitle;
+    self.detailTextLabel.text = subtitle;
+}
+
+- (NSMutableAttributedString *)setBoldTerms:(NSString*)term inText:(NSMutableAttributedString*)boldedTitle
+{
+    NSUInteger length = [boldedTitle length];
+    NSRange range = NSMakeRange(0, length);
+    
+    while(range.location != NSNotFound) {
+        range = [[boldedTitle string] rangeOfString:term options:NSCaseInsensitiveSearch range:range];
+        if(range.location != NSNotFound) {
+            NSDictionary *boldAttrs = @{NSFontAttributeName : [UIFont boldSystemFontOfSize:12.0]};
+            [boldedTitle setAttributes:boldAttrs range:range];
+            range = NSMakeRange(range.location + range.length, length - (range.location + range.length));
+        }
+    }
+    
+    return boldedTitle;
+}
+
+
+@end
+
 
 @interface CNSearchViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
 
@@ -40,7 +122,13 @@
 
 @end
 
+
 @implementation CNSearchViewController
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
 
 - (void)viewDidLoad
 {
@@ -217,7 +305,11 @@
         _resultsView = [[UITableView alloc] init];
         _resultsView.delegate = self;
         _resultsView.dataSource = self;
+        [_resultsView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         _resultsView.backgroundColor = [UIColor whiteColor];
+        [_resultsView setSeparatorInset:UIEdgeInsetsMake(0, 20, 0, 0)];
+        _resultsView.sectionIndexBackgroundColor = [UIColor redColor];
+        _resultsView.sectionIndexColor = [UIColor yellowColor];
     }
     return _resultsView;
 }
@@ -276,12 +368,27 @@
     return nil;
 }
 
+- (void)tableView:(UITableView *)tableView willDisplayHeaderView:(UIView *)view forSection:(NSInteger)section
+{
+    UITableViewHeaderFooterView *header = (UITableViewHeaderFooterView *)view;
+    header.contentView.backgroundColor = [UIColor opaqueWhiteWithIntensity:240];
+    [header.textLabel setTextColor:[UIColor opaqueWhiteWithIntensity:172]];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([self isDepartmentsSection:indexPath.section]) {
+        return kDepartmentsResultsCellHeight;
+    } else {
+        return kCoursesResultsCellHeight;
+    }
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"search"];
+    CNSearchResultsCell *cell = [tableView dequeueReusableCellWithIdentifier:@"search"];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"search"];
-        cell.textLabel.numberOfLines = 2;
+        cell = [[CNSearchResultsCell alloc] init];
     }
     
     NSString *title = nil;
@@ -293,15 +400,14 @@
         NSLog(@"Requesting invalid cell for indexpath =%@ ! departments = %@, courses = %@",
               indexPath, self.departmentsForLastSearch, self.coursesForLastSearch);
     }
-    
-    NSDictionary *defaultAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0]};
-    NSMutableAttributedString *boldedTitle = [[NSMutableAttributedString alloc] initWithString:title attributes:defaultAttributes];
-    
-    for (NSString *term in self.lastUsedSearchTerms) {
-        boldedTitle = [self setBoldTerms:term inText:boldedTitle];
+
+    NSString *subtitle = nil;
+    if ([self isCoursesSection:indexPath.section]){
+        subtitle = @"Department Name";
     }
+
+    [cell setTitle:title subtitle:subtitle searchTerms:self.lastUsedSearchTerms];
     
-    cell.textLabel.attributedText = boldedTitle;
     return cell;
 }
 
@@ -327,23 +433,6 @@
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-}
-
-- (NSMutableAttributedString *)setBoldTerms:(NSString*)term inText:(NSMutableAttributedString*)boldedTitle
-{
-    NSUInteger length = [boldedTitle length];
-    NSRange range = NSMakeRange(0, length);
-    
-    while(range.location != NSNotFound) {
-        range = [[boldedTitle string] rangeOfString:term options:NSCaseInsensitiveSearch range:range];
-        if(range.location != NSNotFound) {
-            NSDictionary *boldAttrs = @{NSFontAttributeName : [UIFont boldSystemFontOfSize:12.0]};
-            [boldedTitle setAttributes:boldAttrs range:range];
-            range = NSMakeRange(range.location + range.length, length - (range.location + range.length));
-        }
-    }
-    
-    return boldedTitle;
 }
 
 @end
