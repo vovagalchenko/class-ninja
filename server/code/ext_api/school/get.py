@@ -39,8 +39,9 @@ class get_school(HTTP_Response_Builder):
         where_clause = self.form_where_clause_for_search_terms(search_terms)
         departments = self.search_for_departments(where_clause)
         courses = self.search_for_courses(where_clause)
+        departments_of_courses = self.search_for_departments_of_courses(courses)
         
-        return HTTP_Response('200 OK', {'searched_departments' : departments, 'searched_courses' : courses})
+        return HTTP_Response('200 OK', {'searched_departments' : departments, 'searched_courses' : courses, 'searched_courses_departments' : departments_of_courses})
 
     def search_for_courses(self, whereClause):
         db_session = DB_Session_Factory.get_db_session()
@@ -50,6 +51,19 @@ class get_school(HTTP_Response_Builder):
             return []
         courses = db_session.query(Course).filter(Course.course_id.in_(course_ids)).all()
         return courses
+
+    def search_for_departments_of_courses(self, courses):
+        db_session = DB_Session_Factory.get_db_session()
+        department_ids_for_courses = map(lambda course: course.department_id, courses)
+        return self.search_for_departments_by_dept_ids(department_ids_for_courses)
+
+    def search_for_departments_by_dept_ids(self, department_ids): 
+        db_session = DB_Session_Factory.get_db_session()
+        if len(department_ids) == 0:
+           return []
+        
+        departments = db_session.query(Department).filter(Department.department_id.in_(department_ids)).all()
+        return departments
 
     def search_for_departments(self, whereClause):
         db_session = DB_Session_Factory.get_db_session()
@@ -61,12 +75,8 @@ class get_school(HTTP_Response_Builder):
         department_ids_with_active_courses = map(lambda row: row[0], db_session.query(Course.department_id).distinct().filter(Course.school_id == self.resource_id).all())
         #filter out department_ids that don't have any active courses
         department_ids = list(set(department_ids) & set(department_ids_with_active_courses))
-        
-        if len(department_ids) == 0:
-           return []
-        
-        departments = db_session.query(Department).filter(Department.department_id.in_(department_ids)).all()
-        return departments
+
+        return self.search_for_departments_by_dept_ids(department_ids)
 
     def form_where_clause_for_search_terms(self, searchTerms):
         whereClause = "WHERE school_id=" + self.resource_id
