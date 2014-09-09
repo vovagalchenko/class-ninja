@@ -22,6 +22,7 @@
 @property (nonatomic, weak) id <CourseDetailsTableViewCellProtocol>delegate;
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting;
-+ (CGFloat)collapsedHeight;
-+ (CGFloat)expandedHeight;
++ (CGFloat)collapsedHeightForEvent:(CNEvent *)event;
++ (CGFloat)expandedHeightForEvent:(CNEvent *)event;
+
 @end

@@ -30,9 +30,78 @@
 #define kDetailsFieldHeight 80
 
 #define kCollapsedHeight 44.0
-#define kExpandedHeight 150.0
+#define kExpandedHeight 114.0
+
+#define kLabelTypeOffsetX   56.0
+#define kLabelTypeOffsetY   0
+#define kLabelTypeHeight    44.0
+#define kLabelTypeWidth     40.0
 
 #define kStatusDetailsXOffset 135
+
+#define kSchedulSlotOffsetX 110
+#define kSchedulSlotRightPadding 30
+#define kScheduleFirstSlotOffsetY 16
+#define kScheduleYDistanceBetweenSlots 10
+#define kSlotViewHeight 12
+#define kSlotViewDayOfWeeksWidth 30
+#define kSlotViewSpaceBetweenTimeAnDay 6
+
+@interface CNScheduelSlotView : UIView
+@property (nonatomic) UILabel *daysOfWeekLabel;
+@property (nonatomic) UILabel *hoursLabel;
+@end
+
+@implementation CNScheduelSlotView
+- (UILabel *)daysOfWeekLabel
+{
+    if (_daysOfWeekLabel == nil) {
+        _daysOfWeekLabel = [[UILabel alloc] init];
+        _daysOfWeekLabel.numberOfLines = 1;
+        _daysOfWeekLabel.font = kDetailsLabelFont;
+        _daysOfWeekLabel.textAlignment = NSTextAlignmentLeft;
+        _daysOfWeekLabel.textColor = DARK_GRAY_TEXT_COLOR;
+    }
+    
+    return _daysOfWeekLabel;
+}
+
+- (UILabel *)hoursLabel
+{
+    if (_hoursLabel == nil) {
+        _hoursLabel = [[UILabel alloc] init];
+        _hoursLabel.numberOfLines = 1;
+        _hoursLabel.font = kDetailsLabelFont;
+        _hoursLabel.textAlignment = NSTextAlignmentLeft;
+        _hoursLabel.textColor = DARK_GRAY_TEXT_COLOR;
+    }
+    return _hoursLabel;
+}
+
+- (instancetype)initWithSlot:(CNScheduleSlot *)slot
+{
+    self = [super init];
+    if (self) {
+        [self addSubview:self.hoursLabel];
+        [self addSubview:self.daysOfWeekLabel];
+        
+        self.hoursLabel.text = slot.hours;
+        self.daysOfWeekLabel.text = slot.daysOfWeek;
+    }
+    return self;
+}
+
+
+- (void)layoutSubviews
+{
+    self.daysOfWeekLabel.frame = CGRectMake(0, 0, kSlotViewDayOfWeeksWidth, kSlotViewHeight);
+    self.hoursLabel.frame = CGRectMake(kSlotViewDayOfWeeksWidth + kSlotViewSpaceBetweenTimeAnDay, 0,
+                                       self.bounds.size.width - (kSlotViewDayOfWeeksWidth + kSlotViewSpaceBetweenTimeAnDay),
+                                       kSlotViewHeight);
+}
+
+@end
+
 
 @interface CNCourseDetailsTableViewCell ()
 
@@ -48,6 +117,10 @@
 @property (nonatomic) UILabel *multilineDetailsLeftFieldLabel;
 @property (nonatomic) UILabel *multilineDetailsRightFieldLabel;
 
+@property (nonatomic) UILabel *typeLabel;
+
+@property (nonatomic) NSMutableArray *scheduleSlotSubviews;
+
 @end
 
 @implementation CNCourseDetailsTableViewCell
@@ -56,26 +129,60 @@
 {
     self.backgroundColor = kCellBackgroundColor;
     
+    self.typeLabel.frame = CGRectMake(kLabelTypeOffsetX, kLabelTypeOffsetY, kLabelTypeWidth, kLabelTypeHeight);
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
-    
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, self.bounds.size.height);
-
-    // FIXME: PROPER SIZING NEEDS TO APPLE TO DATETIME LABEL!
-    // intentionally doing it this way, because we don't have updated design yet for
-    // displaying more than one time / locations entry. so essentially cheap test of API
-    self.dateTimeLabel.frame = CGRectMake(kDateTimeLabelXOffset,
-                                          kDateTimeLabelYOffset,
-                                          self.bounds.size.width - kDateTimeLabelXOffset - kDateTimeLabelXRightMargin,
-                                          80);
     
     self.targetButton.frame = CGRectMake(kStatusLEDWidth, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
     self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
 
-    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset, kCollapsedHeight, kDetailsFieldWidth, kDetailsFieldHeight);
-    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
-                                                            kCollapsedHeight,
-                                                            self.bounds.size.width - kDateTimeLabelXRightMargin - kStatusDetailsXOffset,
-                                                            kDetailsFieldHeight);
+    [self layoutScheduleSlotsSubviews];
+    
+//    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset, kCollapsedHeight, kDetailsFieldWidth, kDetailsFieldHeight);
+//    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
+//                                                            kCollapsedHeight,
+//                                                            self.bounds.size.width - kDateTimeLabelXRightMargin - kStatusDetailsXOffset,
+//                                                            kDetailsFieldHeight);
+}
+- (void)prepareForReuse
+{
+    for (UIView *view in self.scheduleSlotSubviews) {
+        [view removeFromSuperview];
+    }
+    self.scheduleSlotSubviews = nil;
+}
+- (void)setEvent:(CNEvent *)event
+{
+    if (_event != event) {
+        _event = event;
+        
+        self.statusLEDView.backgroundColor = [self colorForEvent:event];
+        self.typeLabel.text = event.eventType;
+        
+        [self addSubviewforEventScheduleSlots:event.scheduleSlots];
+        [self updateCellDetailsForEvent:event];
+        [self updateDateTimeLabelForEvent:event];
+        [self setTargetStateTo:self.event.targetId != nil];
+    }
+}
+
+- (void)layoutScheduleSlotsSubviews
+{
+    CGFloat width = self.bounds.size.width - kSchedulSlotOffsetX - kSchedulSlotRightPadding;
+    for (int i = 0; i < self.scheduleSlotSubviews.count; i++) {
+        UIView *view = [self.scheduleSlotSubviews objectAtIndex:i];
+        view.frame = CGRectMake(kSchedulSlotOffsetX, kScheduleFirstSlotOffsetY + i * (kScheduleYDistanceBetweenSlots + kSlotViewHeight) , width, kSlotViewHeight);
+    }
+}
+
+- (void)addSubviewforEventScheduleSlots:(NSArray *)scheduleSlots
+{
+    self.scheduleSlotSubviews = [NSMutableArray array];
+    for (CNScheduleSlot *slot in scheduleSlots) {
+        CNScheduelSlotView *slotView = [[CNScheduelSlotView alloc] initWithSlot:slot];
+        [self.scheduleSlotSubviews addObject:slotView];
+        [self addSubview:slotView];
+    }
 }
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting
@@ -97,14 +204,30 @@
         [self addSubview:_dateTimeLabel];
         [self addSubview:self.expandAccessoryView];
         [self addSubview:self.targetButton];
-        [self addSubview:self.multilineDetailsRightFieldLabel];
-        [self addSubview:self.multilineDetailsLeftFieldLabel];
+//        [self addSubview:self.multilineDetailsRightFieldLabel];
+//        [self addSubview:self.multilineDetailsLeftFieldLabel];
+
+        [self addSubview:self.typeLabel];
         
         self.clipsToBounds = YES;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     return self;
 }
+
+- (UILabel *)typeLabel
+{
+    if (_typeLabel == nil) {
+        _typeLabel = [[UILabel alloc] init];
+        _typeLabel.numberOfLines = 1;
+        _typeLabel.textAlignment = NSTextAlignmentLeft;
+        _typeLabel.font = kDetailsLabelFont;
+        _typeLabel.textColor = DARK_GRAY_TEXT_COLOR;
+    }
+    
+    return _typeLabel;
+}
+
 
 - (UILabel *)multilineDetailsRightFieldLabel
 {
@@ -195,26 +318,14 @@
     }
 }
 
-- (void)setEvent:(CNEvent *)event
++ (CGFloat)collapsedHeightForEvent:(CNEvent *)event
 {
-    if (_event != event) {
-        _event = event;
-        
-        self.statusLEDView.backgroundColor = [self colorForEvent:event];
-        [self updateCellDetailsForEvent:event];
-        [self updateDateTimeLabelForEvent:event];
-        [self setTargetStateTo:self.event.targetId != nil];
-    }
+    return kCollapsedHeight + 20 * (event.scheduleSlots.count - 1);
 }
 
-+ (CGFloat)collapsedHeight
++ (CGFloat)expandedHeightForEvent:(CNEvent *)event
 {
-    return kCollapsedHeight;
-}
-
-+ (CGFloat)expandedHeight
-{
-    return kExpandedHeight;;
+    return kExpandedHeight + (20 + 66) * (event.scheduleSlots.count - 1);
 }
 
 

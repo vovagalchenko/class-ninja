@@ -284,13 +284,18 @@
     return [NSString stringWithFormat:@"%@: %@", courseSection.name, courseSection.staffName];
 }
 
+- (CNEvent *)eventForIndexPath:(NSIndexPath *)indexPath
+{
+    CNSection *cnSection = [self.listOfSections objectAtIndex:indexPath.section];
+    return [cnSection.events objectAtIndex:indexPath.row];
+}
+
 #pragma Cell management
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CNCourseDetailsTableViewCell *cell = [[CNCourseDetailsTableViewCell alloc] initWithReuseIdentifier:@"classcell" usedForTargetting:YES];
     cell.delegate = self;
-    CNSection *cnSection = [self.listOfSections objectAtIndex:indexPath.section];
-    cell.event = [cnSection.events objectAtIndex:indexPath.row];
+    cell.event = [self eventForIndexPath:indexPath];
 
     return cell;
 }
@@ -298,9 +303,9 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([self.expandedIndexPaths containsObject:indexPath]) {
-        return [CNCourseDetailsTableViewCell expandedHeight];
+        return [CNCourseDetailsTableViewCell expandedHeightForEvent:[self eventForIndexPath:indexPath]];
     } else {
-        return [CNCourseDetailsTableViewCell collapsedHeight];
+        return [CNCourseDetailsTableViewCell collapsedHeightForEvent:[self eventForIndexPath:indexPath]];
     }
 }
 
