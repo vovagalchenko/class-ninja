@@ -303,7 +303,8 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([self.expandedIndexPaths containsObject:indexPath]) {
-        return [CNCourseDetailsTableViewCell expandedHeightForEvent:[self eventForIndexPath:indexPath]];
+        return [CNCourseDetailsTableViewCell expandedHeightForEvent:[self eventForIndexPath:indexPath]
+                                                              width:self.tableView.bounds.size.width];
     } else {
         return [CNCourseDetailsTableViewCell collapsedHeightForEvent:[self eventForIndexPath:indexPath]];
     }

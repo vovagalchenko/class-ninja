@@ -15,7 +15,8 @@
 
 #define kStatusLEDWidth 5
 
-#define kDateTimeLabelXOffset 66
+
+#define kDateTimeLabelXOffset 56.0
 #define kDateTimeLabelYOffset 0
 #define kDateTimeLabelXRightMargin (kDisclousureWidthAndHeight + 3)
 
@@ -26,18 +27,19 @@
 #define kDaysTimeLabelFont              ([UIFont cnBoldSystemFontOfSize:12.0])
 #define kDetailsLabelFont               ([UIFont cnSystemFontOfSize:12.0])
 
-#define kDetailsFieldWidth 55
-#define kDetailsFieldHeight 80
-
 #define kCollapsedHeight 44.0
-#define kExpandedHeight 114.0
+#define kExpandedHeight 214.0
+
+#define kDetailsFieldMaxHeight (1000)
+#define kDetailsFieldWidth 55
 
 #define kLabelTypeOffsetX   56.0
 #define kLabelTypeOffsetY   0
 #define kLabelTypeHeight    44.0
 #define kLabelTypeWidth     40.0
 
-#define kStatusDetailsXOffset 135
+#define kStatusDetailsXOffset kSchedulSlotOffsetX
+#define kStatusDetailsPadding 10
 
 #define kSchedulSlotOffsetX 110
 #define kSchedulSlotRightPadding 30
@@ -46,6 +48,10 @@
 #define kSlotViewHeight 12
 #define kSlotViewDayOfWeeksWidth 30
 #define kSlotViewSpaceBetweenTimeAnDay 6
+
+#define kCellBottomPadding 18
+
+#define kParagraphLineSpacing 6
 
 @interface CNScheduelSlotView : UIView
 @property (nonatomic) UILabel *daysOfWeekLabel;
@@ -138,12 +144,28 @@
 
     [self layoutScheduleSlotsSubviews];
     
-//    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset, kCollapsedHeight, kDetailsFieldWidth, kDetailsFieldHeight);
-//    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
-//                                                            kCollapsedHeight,
-//                                                            self.bounds.size.width - kDateTimeLabelXRightMargin - kStatusDetailsXOffset,
-//                                                            kDetailsFieldHeight);
+    CGFloat yOffset = [[self class] collapsedHeightForEvent:self.event];
+    
+    NSAttributedString *stringToSize = self.multilineDetailsLeftFieldLabel.attributedText;
+    CGRect boundingRect = [stringToSize boundingRectWithSize:CGSizeMake(kDetailsFieldWidth, kDetailsFieldMaxHeight)
+                                                     options:NSStringDrawingUsesLineFragmentOrigin
+                                                     context:nil];
+    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset,
+                                                           yOffset,
+                                                           ceilf(boundingRect.size.width),
+                                                           ceilf(boundingRect.size.height)+1);
+    
+    stringToSize = self.multilineDetailsRightFieldLabel.attributedText;
+    CGFloat width = self.bounds.size.width - kStatusDetailsXOffset - kStatusDetailsPadding;
+    boundingRect = [stringToSize boundingRectWithSize:CGSizeMake(width, kDetailsFieldMaxHeight)
+                                              options:NSStringDrawingUsesLineFragmentOrigin
+                                              context:nil];
+    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
+                                                            yOffset,
+                                                            ceilf(boundingRect.size.width),
+                                                            ceilf(boundingRect.size.height)+1);
 }
+
 - (void)prepareForReuse
 {
     for (UIView *view in self.scheduleSlotSubviews) {
@@ -151,16 +173,17 @@
     }
     self.scheduleSlotSubviews = nil;
 }
+
 - (void)setEvent:(CNEvent *)event
 {
     if (_event != event) {
         _event = event;
         
-        self.statusLEDView.backgroundColor = [self colorForEvent:event];
+        self.statusLEDView.backgroundColor = [[self class] colorForEvent:event];
         self.typeLabel.text = event.eventType;
         
         [self addSubviewforEventScheduleSlots:event.scheduleSlots];
-        [self updateCellDetailsForEvent:event];
+        self.multilineDetailsRightFieldLabel.attributedText = [[self class] attributedStringForEventDetails:self.event];
         [self updateDateTimeLabelForEvent:event];
         [self setTargetStateTo:self.event.targetId != nil];
     }
@@ -204,8 +227,9 @@
         [self addSubview:_dateTimeLabel];
         [self addSubview:self.expandAccessoryView];
         [self addSubview:self.targetButton];
-//        [self addSubview:self.multilineDetailsRightFieldLabel];
-//        [self addSubview:self.multilineDetailsLeftFieldLabel];
+        [self addSubview:self.multilineDetailsLeftFieldLabel];
+        [self addSubview:self.multilineDetailsRightFieldLabel];
+
 
         [self addSubview:self.typeLabel];
         
@@ -238,6 +262,7 @@
         _multilineDetailsRightFieldLabel.font = kDetailsLabelFont;
         _multilineDetailsRightFieldLabel.textColor = kDaysOFWeekColor;
         _multilineDetailsRightFieldLabel.clipsToBounds = YES;
+        _multilineDetailsRightFieldLabel.lineBreakMode = NSLineBreakByCharWrapping;
     }
     
     return _multilineDetailsRightFieldLabel;
@@ -247,11 +272,18 @@
 {
     if (_multilineDetailsLeftFieldLabel == nil) {
         _multilineDetailsLeftFieldLabel = [[UILabel alloc] init];
-        _multilineDetailsLeftFieldLabel.text = @"Status\n\nType";
+        _multilineDetailsLeftFieldLabel.textAlignment = NSTextAlignmentLeft;
         _multilineDetailsLeftFieldLabel.numberOfLines = 0;
         _multilineDetailsLeftFieldLabel.font = kDetailsLabelFont;
         _multilineDetailsLeftFieldLabel.textColor = kDaysOFWeekColor;
         _multilineDetailsLeftFieldLabel.clipsToBounds = YES;
+        
+        NSMutableParagraphStyle *paragrahStyle = [[NSMutableParagraphStyle alloc] init];
+        [paragrahStyle setLineSpacing:kParagraphLineSpacing];
+        NSString *text = @"Status\nSection\nLocation";
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text];
+        [attributedString addAttribute:NSParagraphStyleAttributeName value:paragrahStyle range:NSMakeRange(0, [text length])];
+        _multilineDetailsLeftFieldLabel.attributedText = attributedString;
     }
     
     return _multilineDetailsLeftFieldLabel;
@@ -309,7 +341,7 @@
     [self.delegate expandStateOnCell:self changedTo:isExpanded];
 }
 
-- (UIColor *)colorForEvent:(CNEvent *)event
++ (UIColor *)colorForEvent:(CNEvent *)event
 {
     if ([event isClosed]) {
         return kStatusLEDClassClosedColor;
@@ -323,9 +355,17 @@
     return kCollapsedHeight + 20 * (event.scheduleSlots.count - 1);
 }
 
-+ (CGFloat)expandedHeightForEvent:(CNEvent *)event
++ (CGFloat)expandedHeightForEvent:(CNEvent *)event width:(CGFloat)viewWidth
 {
-    return kExpandedHeight + (20 + 66) * (event.scheduleSlots.count - 1);
+    NSAttributedString *details = [self attributedStringForEventDetails:event];
+    CGFloat width = viewWidth - kStatusDetailsXOffset - kStatusDetailsPadding;
+    CGRect boundingRect = [details boundingRectWithSize:CGSizeMake(width, kDetailsFieldMaxHeight)
+                                                options:NSStringDrawingUsesLineFragmentOrigin
+                                                context:nil];
+    
+    return  [self collapsedHeightForEvent:event] +
+            (ceilf(boundingRect.size.height)+1) +
+            kCellBottomPadding;
 }
 
 
@@ -371,29 +411,64 @@
     self.dateTimeLabel.attributedText = resultString;
 }
 
-
-- (void)updateCellDetailsForEvent:(CNEvent *)event
++ (NSAttributedString *)attributedStringForEventDetails:(CNEvent *)event
 {
     NSDictionary *statusAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                       kDetailsLabelFont, NSFontAttributeName,
                                       [self colorForEvent:event], NSForegroundColorAttributeName, nil];
     
     // stands next to @"Status
-    NSMutableAttributedString *status = [[NSMutableAttributedString alloc] initWithString:event.status
-                                                                               attributes:statusAttributes];
+    NSAttributedString *status = [[NSAttributedString alloc] initWithString:event.status
+                                                                 attributes:statusAttributes];
     
-    // stands next to "\nType"
-    NSString *nonStatusString = [NSString stringWithFormat:@"\n\n%@", event.eventType];
-    
-    NSDictionary *nonStatusAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+    // stands next to "\nSection"
+    NSDictionary *setionAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                          kDetailsLabelFont, NSFontAttributeName,
                                          DARK_GRAY_TEXT_COLOR, NSForegroundColorAttributeName, nil];
     
-    NSAttributedString *nonStatus = [[NSAttributedString alloc] initWithString:nonStatusString attributes:nonStatusAttributes];
+    // FIXME: need to get university section id from the API
+    NSString *sectionId = @"Niji Sushi Fix Me"; //temporary hack
+    NSAttributedString *section = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@\n", sectionId]
+                                                                  attributes:setionAttributes];
     
-    [status appendAttributedString:nonStatus];
-    self.multilineDetailsRightFieldLabel.attributedText = status;
-    self.multilineDetailsRightFieldLabel.numberOfLines = 0;
+    
+    NSMutableAttributedString *resultString = [[NSMutableAttributedString alloc] initWithAttributedString:status];
+    [resultString appendAttributedString:section];
+
+    
+    NSMutableAttributedString *timesAndLocation = [[NSMutableAttributedString alloc] init];
+    NSDictionary *daysTimeAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        kDetailsLabelFont, NSFontAttributeName,
+                                        DARK_GRAY_TEXT_COLOR,NSForegroundColorAttributeName, nil];
+    NSDictionary *locationAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        kDetailsLabelFont, NSFontAttributeName,
+                                        LIGHT_GRAY_TEXT_COLOR,NSForegroundColorAttributeName, nil];
+    
+    for (int i = 0; i < event.scheduleSlots.count; i++) {
+        CNScheduleSlot *slot = [event.scheduleSlots objectAtIndex:i];
+
+        NSString *daysTimeString = [NSString stringWithFormat:@"(%@ %@)", [slot daysOfWeek], [slot hours]];
+        NSString *locationString = [NSString stringWithFormat:@"%@\n", [slot location]];
+        if (i+1 < event.scheduleSlots.count) {
+            daysTimeString = [daysTimeString stringByAppendingString:@"\n"];
+        }
+        
+        NSMutableAttributedString *daysTime = [[NSMutableAttributedString alloc] initWithString:daysTimeString
+                                                                                     attributes:locationAttributes];
+        NSMutableAttributedString *location = [[NSMutableAttributedString alloc] initWithString:locationString
+                                                                                     attributes:daysTimeAttributes];
+        [timesAndLocation appendAttributedString:location];
+        [timesAndLocation appendAttributedString:daysTime];
+    }
+
+    
+    [resultString appendAttributedString:timesAndLocation];
+
+    NSMutableParagraphStyle *paragrahStyle = [[NSMutableParagraphStyle alloc] init];
+    [paragrahStyle setLineSpacing:kParagraphLineSpacing];
+    [resultString addAttribute:NSParagraphStyleAttributeName value:paragrahStyle range:NSMakeRange(0, [resultString length])];
+    
+    return resultString;
 }
 
 @end
