@@ -425,9 +425,8 @@
     NSDictionary *setionAttributes = [NSDictionary dictionaryWithObjectsAndKeys:
                                          kDetailsLabelFont, NSFontAttributeName,
                                          DARK_GRAY_TEXT_COLOR, NSForegroundColorAttributeName, nil];
-    
-    // FIXME: need to get university section id from the API
-    NSString *sectionId = @"Niji Sushi Fix Me"; //temporary hack
+
+    NSString *sectionId = [event eventSectionId];
     NSAttributedString *section = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"\n%@\n", sectionId]
                                                                   attributes:setionAttributes];
     

@@ -121,6 +121,16 @@
     return [self.status isEqual:@"Closed"];
 }
 
+- (NSString *)eventSectionId
+{
+    NSString *result = nil;
+    NSArray *typeAndSectionID = [self.eventType componentsSeparatedByString:@" "];
+    if (typeAndSectionID.count > 1) {
+        result = [typeAndSectionID objectAtIndex:1];
+    }
+    return result;
+}
+
 @end
 
 @implementation CNUser
