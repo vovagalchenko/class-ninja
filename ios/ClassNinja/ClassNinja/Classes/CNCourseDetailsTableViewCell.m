@@ -13,8 +13,8 @@
 #define kCellBackgroundColor            ([UIColor colorWithWhite:250/255.0 alpha:1])
 #define kBorderHairlineColor            ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:229/255.0 alpha:1])
 
-#define kStatusLEDWidth 5
-
+#define kStatusLEDWidth 12
+#define kStatusLEDHeight 12
 
 #define kDateTimeLabelXOffset 56.0
 #define kDateTimeLabelYOffset 0
@@ -111,7 +111,7 @@
 
 @interface CNCourseDetailsTableViewCell ()
 
-@property (nonatomic) UIView *statusLEDView;
+@property (nonatomic) UIImageView *statusLEDView;
 @property (nonatomic) UIView *separationLineView;
 @property (nonatomic) UILabel *dateTimeLabel;
 
@@ -137,7 +137,7 @@
     
     self.typeLabel.frame = CGRectMake(kLabelTypeOffsetX, kLabelTypeOffsetY, kLabelTypeWidth, kLabelTypeHeight);
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
-    self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, self.bounds.size.height);
+    self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, kStatusLEDHeight);
     
     self.targetButton.frame = CGRectMake(kStatusLEDWidth, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
     self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
@@ -178,8 +178,8 @@
 {
     if (_event != event) {
         _event = event;
-        
-        self.statusLEDView.backgroundColor = [[self class] colorForEvent:event];
+
+        self.statusLEDView.image = [[self class] ledImageForEvent:event];
         self.typeLabel.text = event.eventType;
         
         [self addSubviewforEventScheduleSlots:event.scheduleSlots];
@@ -217,7 +217,7 @@
         _separationLineView = [[UIView alloc] init];
         _separationLineView.backgroundColor = kBorderHairlineColor;
         
-        _statusLEDView = [[UIView alloc] init];
+        _statusLEDView = [[UIImageView alloc] init];
         _dateTimeLabel = [[UILabel alloc] init];
         _dateTimeLabel.numberOfLines = 0;
         _dateTimeLabel.userInteractionEnabled = NO;
@@ -339,6 +339,15 @@
     };
     [UIView animateWithDuration:ANIMATION_DURATION animations:accessoryViewFlip];
     [self.delegate expandStateOnCell:self changedTo:isExpanded];
+}
+
++ (UIImage *)ledImageForEvent:(CNEvent *)event
+{
+    if ([event isClosed]) {
+        return [UIImage imageNamed:@"tab-red"];
+    } else {
+        return [UIImage imageNamed:@"tab-green"];
+    }
 }
 
 + (UIColor *)colorForEvent:(CNEvent *)event
