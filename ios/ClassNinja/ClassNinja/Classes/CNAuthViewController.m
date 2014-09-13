@@ -10,6 +10,7 @@
 #import "AppearanceConstants.h"
 #import "CNNumberEntryTextField.h"
 #import "CNActivityIndicator.h"
+#import "CNCloseButton.h"
 
 typedef enum : NSUInteger {
     CNAuthViewControllerStatePhoneNumberEntry,
@@ -20,6 +21,7 @@ typedef enum : NSUInteger {
 @interface CNAuthViewController ()
 
 @property (nonatomic, readonly) UILabel *detailLabel;
+@property (nonatomic, readonly) CNCloseButton *cancelButton;
 @property (nonatomic, readonly) CNNumberEntryTextField *textField;
 @property (nonatomic, readonly) UIButton *confirmationButton;
 @property (nonatomic, readonly) CNActivityIndicator *activityIndicator;
@@ -63,11 +65,13 @@ typedef enum : NSUInteger {
     [self.view addSubview:self.textField];
     [self.view addSubview:self.confirmationButton];
     [self.view addSubview:self.activityIndicator];
+    [self.view addSubview:self.cancelButton];
+    
     NSArray *horizontal = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_detailLabel]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
                                                                   options:0
                                                                   metrics:nil
                                                                     views:NSDictionaryOfVariableBindings(_detailLabel)];
-    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_detailLabel]-%f-[_textField]-[_confirmationButton]", VERTICAL_MARGIN, VERTICAL_MARGIN]
+    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_detailLabel]-%f-[_textField]-[_confirmationButton]", VERTICAL_MARGIN + X_BUTTON_VERTICAL_MARGIN, VERTICAL_MARGIN]
                                                                 options:0
                                                                 metrics:nil
                                                                   views:NSDictionaryOfVariableBindings(_detailLabel, _textField, _confirmationButton)];
@@ -101,11 +105,22 @@ typedef enum : NSUInteger {
                                                                                  toItem:nil
                                                                               attribute:NSLayoutAttributeNotAnAttribute multiplier:0.0
                                                                                constant:TAPPABLE_AREA_DIMENSION];
+    NSArray *horizontalCancelConstraints = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_cancelButton]", HORIZONTAL_MARGIN]
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:NSDictionaryOfVariableBindings(_cancelButton)];
+    NSArray *verticalCancelConstraints = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_cancelButton]", X_BUTTON_VERTICAL_MARGIN]
+                                                                                 options:0
+                                                                                 metrics:nil
+                                                                                   views:NSDictionaryOfVariableBindings(_cancelButton)];
     [self.view addConstraints:horizontal];
     [self.view addConstraints:vertical];
     [self.view addConstraints:horizontalTF];
     [self.view addConstraints:horizontalButton];
     [self.view addConstraints:@[activityIndicatorHorizontal, activityIndicatorVertical, activityIndicatorWidth, activityIndicatorHeight]];
+    [self.view addConstraints:horizontalCancelConstraints];
+    [self.view addConstraints:verticalCancelConstraints];
+    
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle
@@ -125,6 +140,7 @@ typedef enum : NSUInteger {
 @synthesize textField = _textField;
 @synthesize confirmationButton = _confirmationButton;
 @synthesize activityIndicator = _activityIndicator;
+@synthesize cancelButton = _cancelButton;
 
 - (CNActivityIndicator *)activityIndicator
 {
@@ -133,6 +149,16 @@ typedef enum : NSUInteger {
         _activityIndicator.translatesAutoresizingMaskIntoConstraints = NO;
     }
     return _activityIndicator;
+}
+
+- (UIButton *)cancelButton
+{
+    if (!_cancelButton) {
+        _cancelButton = [[CNCloseButton alloc] initWithColor:[UIColor whiteColor]];
+        [_cancelButton addTarget:self action:@selector(closeButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        _cancelButton.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    return _cancelButton;
 }
 
 - (UIButton *)confirmationButton
@@ -346,6 +372,11 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
     } else {
         switchUIToNewState(newState);
     }
+}
+
+- (void)closeButtonTapped:(id)sender
+{
+    NSLog(@"CLOSE BUTTON TAPPED");
 }
 
 @end

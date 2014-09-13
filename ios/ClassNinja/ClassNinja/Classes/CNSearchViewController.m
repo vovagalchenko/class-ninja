@@ -10,6 +10,7 @@
 #import "CNAPIClient.h"
 #import "CNUserProfile.h"
 #import "CNCourseDetailsViewController.h"
+#import "CNCloseButton.h"
 
 #define kCloseButtonWidth  44
 #define kCloseButtonHeight 44
@@ -111,7 +112,7 @@
 @interface CNSearchViewController () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
 
 @property (nonatomic) UILabel *titleLabel;
-@property (nonatomic) UIButton *closeButton;
+@property (nonatomic) CNCloseButton *closeButton;
 @property (nonatomic) UITextField *searchBar;
 @property (nonatomic) UITableView *resultsView;
 
@@ -287,8 +288,7 @@
 - (UIButton *)closeButton
 {
     if (_closeButton == nil) {
-        _closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_closeButton setImage:[UIImage imageNamed:@"close-white"] forState:UIControlStateNormal];
+        _closeButton = [[CNCloseButton alloc] initWithColor:[UIColor whiteColor]];;
         [_closeButton addTarget:self action:@selector(closeButtonPressed:)
                forControlEvents:UIControlEventTouchUpInside];
     }

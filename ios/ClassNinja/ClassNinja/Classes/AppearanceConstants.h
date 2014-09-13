@@ -9,8 +9,9 @@
 #ifndef ClassNinja_AppearanceConstants_h
 #define ClassNinja_AppearanceConstants_h
 
-#define HORIZONTAL_MARGIN       20.0
-#define VERTICAL_MARGIN         50.0
+#define HORIZONTAL_MARGIN           20.0
+#define VERTICAL_MARGIN             50.0
+#define X_BUTTON_VERTICAL_MARGIN    25.0
 #define INTER_ELEMENT_VERTICAL_PADDING      10.0
 
 #define ANIMATION_DURATION      0.2
@@ -19,6 +20,7 @@
 #define WELCOME_BLUE_COLOR      [UIColor colorWithRed:27.0/255.0 green:127.0/255.0 blue:247.0/255.0 alpha:1.0]
 #define DISABLED_GRAY_COLOR     [UIColor colorWithRed:116.0/255.0 green:125.0/255.0 blue:132.0/255.0 alpha:1.0]
 #define CONFIRMATION_COLOR      [UIColor colorWithRed:47.0/255.0 green:198.0/255.0 blue:183.0/255.0 alpha:1.0]
+#define DARK_CLOSE_BUTTON_COLOR [UIColor colorWithRed:32.0/255.0 green:28.0/255.0 blue:66.0/255.0 alpha:1.0]
 
 #define DARK_GRAY_TEXT_COLOR    [UIColor colorWithRed:121/255.0 green:121/255.0 blue:121/255.0 alpha:1]
 #define LIGHT_GRAY_TEXT_COLOR   [UIColor colorWithRed:185/255.0 green:185/255.0 blue:185/255.0 alpha:1]

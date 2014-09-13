@@ -9,6 +9,8 @@
 #import "CNAPIClient.h"
 #import "CNAppDelegate.h"
 #import "CNInAppPurchaseHelper.h"
+#import "CNCloseButton.h"
+#import "AppearanceConstants.h"
 
 #define kCloseButtonWidth  44
 #define kCloseButtonHeight 44
@@ -43,7 +45,7 @@
 
 @property (nonatomic) CAGradientLayer *backgroundGradientLayer;
 
-@property (nonatomic) UIButton *closeButton;
+@property (nonatomic) CNCloseButton *closeButton;
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) UIButton *trackButton;
 
@@ -195,8 +197,7 @@
 - (UIButton *)closeButton
 {
     if (_closeButton == nil) {
-        _closeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_closeButton setImage:[UIImage imageNamed:@"close"] forState:UIControlStateNormal];
+        _closeButton = [[CNCloseButton alloc] initWithColor:DARK_CLOSE_BUTTON_COLOR];
         [_closeButton addTarget:self action:@selector(closeButtonPressed:)
                forControlEvents:UIControlEventTouchUpInside];
     }

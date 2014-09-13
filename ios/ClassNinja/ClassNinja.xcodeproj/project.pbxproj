@@ -30,6 +30,7 @@
 		70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A5F36E19B444780060EB0C /* CNSearchViewController.m */; };
 		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
 		70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */; };
+		80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 80F1000C19C4ED7500C28C32 /* CNCloseButton.m */; };
 		DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B67819883E020092EE90 /* CNAuthContext.m */; };
 		DC08B698198AB0470092EE90 /* CNWelcomeStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B697198AB0470092EE90 /* CNWelcomeStatusView.m */; };
 		DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B69E198AF3D50092EE90 /* UITableView+LayoutSubviews.m */; };
@@ -92,6 +93,8 @@
 		70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionTableViewCell.m; sourceTree = "<group>"; };
 		70E7619C19A02075003F3984 /* UIColor+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CNAdditions.h"; sourceTree = "<group>"; };
 		70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CNAdditions.m"; sourceTree = "<group>"; };
+		80F1000B19C4ED7500C28C32 /* CNCloseButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCloseButton.h; sourceTree = "<group>"; };
+		80F1000C19C4ED7500C28C32 /* CNCloseButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCloseButton.m; sourceTree = "<group>"; };
 		DC08B67719883E020092EE90 /* CNAuthContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNAuthContext.h; sourceTree = "<group>"; };
 		DC08B67819883E020092EE90 /* CNAuthContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNAuthContext.m; sourceTree = "<group>"; };
 		DC08B696198AB0470092EE90 /* CNWelcomeStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNWelcomeStatusView.h; sourceTree = "<group>"; };
@@ -250,6 +253,8 @@
 				DC08B695198AB0290092EE90 /* Welcome */,
 				70E7619C19A02075003F3984 /* UIColor+CNAdditions.h */,
 				70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */,
+				80F1000B19C4ED7500C28C32 /* CNCloseButton.h */,
+				80F1000C19C4ED7500C28C32 /* CNCloseButton.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -407,6 +412,7 @@
 				70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */,
 				70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */,
 				7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */,
+				80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */,
 				705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */,
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */,
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
