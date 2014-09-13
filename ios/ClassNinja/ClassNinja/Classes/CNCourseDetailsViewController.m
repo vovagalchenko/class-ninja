@@ -12,11 +12,11 @@
 #import "CNCloseButton.h"
 #import "AppearanceConstants.h"
 
-#define kCloseButtonWidth  44
-#define kCloseButtonHeight 44
+#define kCloseButtonWidth  11
+#define kCloseButtonHeight 11
 
-#define kCloseButtonXOffset 9
-#define kCloseButtonYOffset 6
+#define kCloseButtonXOffset 17
+#define kCloseButtonYOffset 17
 
 #define kHeaderQuestionHeight  60
 #define kHeaderQuestionOffsetX 5

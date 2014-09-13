@@ -12,23 +12,29 @@
 #import "CNCourseDetailsViewController.h"
 #import "CNCloseButton.h"
 
-#define kCloseButtonWidth  44
-#define kCloseButtonHeight 44
-
-#define kCloseButtonXOffset 9
-#define kCloseButtonYOffset 15
-
-#define kSearchBarOffsetX 20
-#define kSearchBarOffsetY 60
-#define kSearchBarHeight 30
+#define kPaddingAroundSearchBar 14
+#define kSearchBarOffsetX (kPaddingAroundSearchBar)
+#define kSearchBarOffsetY 75
+#define kSearchBarHeight 32
 #define kSearchBarTextInset 10
 
-#define kTableViewOffsetX 20
-#define kTableViewOffsetY (kSearchBarOffsetY + kSearchBarHeight + 10)
+#define kTableViewOffsetX 0
+#define kTableViewOffsetY (kSearchBarOffsetY + kSearchBarHeight + kPaddingAroundSearchBar)
+
+#define kTitleOriginY       35
+#define kTitleOriginHeight  16
 
 #define kSectionHeaderOffsetX 20
 #define kDepartmentsResultsCellHeight 44
 #define kCoursesResultsCellHeight 59
+
+#define kCloseButtonWidth  11
+#define kCloseButtonHeight 11
+#define kCloseButtonXOffset (kSearchBarOffsetX + floorf(kCloseButtonWidth / 2))
+#define kCloseButtonYOffset (kTitleOriginY +  floorf((kTitleOriginHeight - kCloseButtonHeight) / 2)+1)
+
+
+#define kCellTitleFont ([UIFont systemFontOfSize:14.0])
 
 @interface CNSearchResultsCell : UITableViewCell
 @property (nonatomic) UIView *separatorLine;
@@ -65,7 +71,7 @@
 {
     [super layoutSubviews];
     CGSize cellSize = self.frame.size;
-    self.separatorLine.frame = CGRectMake(0, cellSize.height - 2, cellSize.width, 2);
+    self.separatorLine.frame = CGRectMake(0, cellSize.height - 1, cellSize.width, 1);
 }
 
 - (void)prepareForReuse
@@ -76,7 +82,7 @@
 
 - (void)setTitle:(NSString *)title subtitle:(NSString *)subtitle searchTerms:(NSArray *)searchTerms
 {
-    NSDictionary *defaultAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0]};
+    NSDictionary *defaultAttributes = @{NSFontAttributeName : kCellTitleFont};
     NSMutableAttributedString *boldedTitle = [[NSMutableAttributedString alloc] initWithString:title
                                                                                     attributes:defaultAttributes];
     
@@ -96,7 +102,7 @@
     while(range.location != NSNotFound) {
         range = [[boldedTitle string] rangeOfString:term options:NSCaseInsensitiveSearch range:range];
         if(range.location != NSNotFound) {
-            NSDictionary *boldAttrs = @{NSFontAttributeName : [UIFont boldSystemFontOfSize:12.0]};
+            NSDictionary *boldAttrs = @{NSFontAttributeName : kCellTitleFont};
             [boldedTitle setAttributes:boldAttrs range:range];
             range = NSMakeRange(range.location + range.length, length - (range.location + range.length));
         }
@@ -244,11 +250,10 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-    self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset,
-                                        kCloseButtonWidth, kCloseButtonHeight);
-    self.titleLabel.frame = CGRectMake(2 * kCloseButtonXOffset + kCloseButtonWidth, kCloseButtonYOffset,
-                                       self.view.bounds.size.width - 2 * kCloseButtonXOffset - kCloseButtonWidth,
-                                       kCloseButtonHeight);
+    self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset, kCloseButtonWidth, kCloseButtonHeight);
+    
+    self.titleLabel.frame = CGRectMake(0, kTitleOriginY,
+                                       self.view.bounds.size.width, kTitleOriginHeight);
     
     self.searchBar.frame = CGRectMake(kSearchBarOffsetX,
                                       kSearchBarOffsetY,
@@ -267,6 +272,7 @@
 {
     if (_searchBar == nil) {
         _searchBar = [[UITextField alloc] init];
+        _searchBar.font = [UIFont systemFontOfSize:14.0];
         _searchBar.placeholder = @"Search";
 
         UIView *leftView = [[UIView alloc] init];
@@ -301,7 +307,8 @@
         _titleLabel = [[UILabel alloc] init];
         _titleLabel.text  = @"Search Classes";
         _titleLabel.textColor = [UIColor whiteColor];
-        _titleLabel.font = [UIFont systemFontOfSize:14.0];
+        _titleLabel.font = [UIFont cnSystemFontOfSize:16];
+        _titleLabel.textAlignment = NSTextAlignmentCenter;
     }
     
     return _titleLabel;
@@ -318,6 +325,7 @@
         [_resultsView setSeparatorInset:UIEdgeInsetsMake(0, 20, 0, 0)];
         _resultsView.sectionIndexBackgroundColor = [UIColor redColor];
         _resultsView.sectionIndexColor = [UIColor yellowColor];
+        _resultsView.separatorInset = UIEdgeInsetsMake(0, kSearchBarOffsetX, 0, 0);
     }
     return _resultsView;
 }
@@ -383,6 +391,11 @@
     [header.textLabel setTextColor:[UIColor opaqueWhiteWithIntensity:172]];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 32.0;
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([self isDepartmentsSection:indexPath.section]) {
@@ -397,6 +410,7 @@
     CNSearchResultsCell *cell = [tableView dequeueReusableCellWithIdentifier:@"search"];
     if (cell == nil) {
         cell = [[CNSearchResultsCell alloc] init];
+        cell.detailTextLabel.font = [UIFont systemFontOfSize:12.0];
     }
     
     NSString *title = nil;

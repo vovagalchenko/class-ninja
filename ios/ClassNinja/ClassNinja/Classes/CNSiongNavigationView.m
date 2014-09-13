@@ -15,7 +15,6 @@
 #define kButtonOriginX 9
 #define kButtonOriginY 24
 
-
 #define kSearchButtonWidth 44
 #define kSearchButtonPaddingX 9
 #define kSearchButtonPaddingY 24
@@ -136,7 +135,7 @@
     if (_headerLabel == nil) {
         _headerLabel = [[UILabel alloc] init];
         _headerLabel.textColor = [UIColor colorWithRed:32/255.0 green:48/255.0 blue:66/255.0 alpha:1.0];
-        _headerLabel.font = [UIFont cnSystemFontOfSize:14];
+        _headerLabel.font = [UIFont cnSystemFontOfSize:16];
         _headerLabel.text = @"Add class";
         _headerLabel.userInteractionEnabled = NO;
         _headerLabel.textAlignment = NSTextAlignmentCenter;
