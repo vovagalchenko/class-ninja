@@ -13,7 +13,7 @@
 @interface CNAuthContext()
 
 @property (nonatomic, readwrite) CNUser *loggedInUser;
-@property (nonatomic, copy) void (^authenticationCompletionBlock)();
+@property (nonatomic, copy) void (^authenticationCompletionBlock)(BOOL);
 
 @end
 
@@ -21,7 +21,7 @@
 
 #pragma mark Authentication
 
-- (void)authenticateWithCompletion:(void (^)())completionBlock
+- (void)authenticateWithCompletion:(void (^)(BOOL))completionBlock
 {
     UIViewController *topController = APP_DELEGATE.window.rootViewController;
     
@@ -29,13 +29,22 @@
         topController = topController.presentedViewController;
     }
     
-    self.authenticationCompletionBlock = ^{
-        [topController dismissViewControllerAnimated:YES completion:completionBlock];
+    self.authenticationCompletionBlock = ^(BOOL succeeded){
+        [topController dismissViewControllerAnimated:YES completion:^{
+            completionBlock(succeeded);
+        }];
     };
     
     CNAuthViewController *authVC = [[CNAuthViewController alloc] initWithDelegate:self];
     
     [topController presentViewController:authVC animated:YES completion:nil];
+}
+
+- (void)authViewControllerCancelledAuthentication:(CNAuthViewController *)authViewController
+{
+    if (self.authenticationCompletionBlock) {
+        self.authenticationCompletionBlock(NO);
+    }
 }
 
 - (void)authViewController:(CNAuthViewController *)authViewController
@@ -79,9 +88,11 @@
                            self.loggedInUser = user;
                            completionCallback(YES);
                            if (self.authenticationCompletionBlock)
-                               self.authenticationCompletionBlock();
+                               self.authenticationCompletionBlock(YES);
                            self.authenticationCompletionBlock = nil;
                        } else {
+                           if (self.authenticationCompletionBlock)
+                               self.authenticationCompletionBlock(NO);
                            completionCallback(NO);
                        }
                    }];

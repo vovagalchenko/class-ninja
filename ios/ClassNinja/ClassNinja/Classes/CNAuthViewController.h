@@ -25,5 +25,6 @@
   receivedConfirmationCode:(NSString *)confirmationCode
             forPhoneNumber:(NSString *)phoneNumber
     doneProcessingCallback:(void (^)(BOOL))completionCallback;
+- (void)authViewControllerCancelledAuthentication:(CNAuthViewController *)authViewController;
 
 @end

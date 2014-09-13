@@ -192,11 +192,14 @@ authenticationRequired:(BOOL)authRequired
         case CNForceAuthenticationOnAuthFailure:
         {
             authFailureHandler = ^{
-                [self.authContext authenticateWithCompletion:^{
-                    [self makeURLRequest:request
-                  authenticationRequired:YES
-                          withAuthPolicy:CNFailRequestOnAuthFailure
-                              completion:completionBlock];
+                [self.authContext authenticateWithCompletion:^(BOOL authenticationCompleted){
+                    if (authenticationCompleted)
+                        [self makeURLRequest:request
+                      authenticationRequired:YES
+                              withAuthPolicy:CNFailRequestOnAuthFailure
+                                  completion:completionBlock];
+                    else
+                        completionBlock(nil);
                 }];
             };
             break;

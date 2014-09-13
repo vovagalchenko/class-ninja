@@ -31,8 +31,8 @@
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
 {
-    CGFloat xSpill = (TAPPABLE_AREA_SIZE.width - self.bounds.size.width)/2.0;
-    CGFloat ySpill = (TAPPABLE_AREA_SIZE.height - self.bounds.size.height)/2.0;
+    CGFloat xSpill = MAX((TAPPABLE_AREA_SIZE.width - self.bounds.size.width)/2.0, 0.0);
+    CGFloat ySpill = MAX((TAPPABLE_AREA_SIZE.height - self.bounds.size.height)/2.0, 0.0);
     BOOL retVal = (point.x >= -xSpill && point.x <= self.bounds.size.width + xSpill && point.y >= -ySpill && point.y <= self.bounds.size.height + ySpill);
     return retVal;
 }

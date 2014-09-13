@@ -376,7 +376,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
 
 - (void)closeButtonTapped:(id)sender
 {
-    NSLog(@"CLOSE BUTTON TAPPED");
+    [self.delegate authViewControllerCancelledAuthentication:self];
 }
 
 @end
