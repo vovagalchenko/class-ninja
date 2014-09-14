@@ -59,25 +59,29 @@
 
 @implementation CNCourseDetailsViewController
 
+- (UITableView *)tableView
+{
+    if (_tableView == nil) {
+        _tableView = [[UITableView alloc] init];
+        _tableView.delegate = self;
+        _tableView.dataSource = self;
+        _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        _tableView.showsVerticalScrollIndicator = YES;
+        _tableView.separatorInset = UIEdgeInsetsMake(0, kHeaderQuestionOffsetX, 0, 0);
+        _tableView.backgroundColor = [UIColor clearColor];
+        _tableView.allowsMultipleSelection = YES;
+        _tableView.showsVerticalScrollIndicator = NO;
+    }
+    return _tableView;
+}
+
 - (void)viewDidLoad
 {    
     [super viewDidLoad];
-
     self.expandedIndexPaths = [NSMutableArray array];
     self.targetEvents = [NSMutableArray array];
-    
-    self.tableView = [[UITableView alloc] init];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.showsVerticalScrollIndicator = YES;
-    self.tableView.separatorInset = UIEdgeInsetsMake(0, kHeaderQuestionOffsetX, 0, 0);
-    
+
     self.view.backgroundColor = [UIColor clearColor];
-    self.tableView.backgroundColor = [UIColor clearColor];
-    self.tableView.allowsSelection = YES;
-    self.tableView.allowsMultipleSelection = YES;
-    
     self.view.autoresizingMask = UIViewAutoresizingNone;
     
     [self.view addSubview:self.tableView];
