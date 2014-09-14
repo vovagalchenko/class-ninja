@@ -18,8 +18,8 @@
 #define kCloseButtonXOffset 17
 #define kCloseButtonYOffset 17
 
-#define kHeaderQuestionHeight  60
-#define kHeaderQuestionOffsetX 5
+#define kHeaderQuestionHeight  90
+#define kHeaderQuestionOffsetX 19
 
 #define kHeaderBackgroundColor ([UIColor r:57 g:65 b:76])
 #define kHeaderClassNameTextColor  ([UIColor r:30 g:30 b:30])
@@ -29,7 +29,7 @@
 #define kClassNameLabelHeight 60
 
 #define kTableOffsetX 20
-#define kTableOffsetY (kCloseButtonYOffset + kCloseButtonHeight)
+#define kTableOffsetY (44)
 #define kTableHeaderHeight (kHeaderQuestionHeight + kClassNameLabelHeight)
 
 #define kTrackButtonHeight 40
@@ -71,9 +71,7 @@
     self.tableView.dataSource = self;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.showsVerticalScrollIndicator = YES;
-
-    CGSize size = self.view.bounds.size;
-    self.tableView.tableHeaderView = [self headerViewWithWidth:size.width height:kTableHeaderHeight];
+    self.tableView.separatorInset = UIEdgeInsetsMake(0, kHeaderQuestionOffsetX, 0, 0);
     
     self.view.backgroundColor = [UIColor clearColor];
     self.tableView.backgroundColor = [UIColor clearColor];
@@ -88,6 +86,15 @@
     [self.view.layer insertSublayer:self.backgroundGradientLayer atIndex:0];
     
     [self loadContent];    
+}
+
+
+
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    CGSize size = self.tableView.bounds.size;
+    self.tableView.tableHeaderView = [self headerViewWithWidth:size.width height:kTableHeaderHeight];
 }
 
 - (CAGradientLayer*)backgroundGradientLayer
@@ -148,6 +155,7 @@
     classLabel.numberOfLines = 2;
     classLabel.textColor = kHeaderClassNameTextColor;
     classLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    classLabel.font = [UIFont cnSystemFontOfSize:20];
     
     return classLabel;
 }
@@ -166,9 +174,9 @@
     label.text = @"Which classes do you want to track?";
     label.numberOfLines = 2;
     label.textColor = kHeaderQuestionTextColor;
-    label.font = [UIFont cnSystemFontOfSize:18];
+    label.font = [UIFont cnSystemFontOfSize:20];
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-
+    label.clipsToBounds = YES;
     [view addSubview:label];
     
     return view;
@@ -299,6 +307,11 @@
     cell.event = [self eventForIndexPath:indexPath];
 
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 32.0;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

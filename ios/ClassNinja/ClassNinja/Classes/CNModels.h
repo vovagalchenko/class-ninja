@@ -87,6 +87,7 @@
 @property (nonatomic) NSNumber *waitlistCapacity;
 
 - (NSString *)eventSectionId;
+- (NSString *)eventSectionType;
 
 - (BOOL)isClosed;
 @end

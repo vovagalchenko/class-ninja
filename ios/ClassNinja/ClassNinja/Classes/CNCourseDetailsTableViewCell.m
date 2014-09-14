@@ -8,7 +8,11 @@
 
 #import "CNCourseDetailsTableViewCell.h"
 
-#define kDisclousureWidthAndHeight 43
+#define  kDisclousureWidthAndHeight 43
+
+#define kTargetButtonWidthAndHeight 43
+#define kTargetOffsetX 7.0
+
 
 #define kCellBackgroundColor            ([UIColor colorWithWhite:250/255.0 alpha:1])
 #define kBorderHairlineColor            ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:229/255.0 alpha:1])
@@ -24,30 +28,30 @@
 #define kStatusLEDClassClosedColor      ([UIColor colorWithRed:220/255.0 green:39/255.0 blue:39/255.0 alpha:1])
 
 #define kDaysOFWeekColor                ([UIColor colorWithRed:180/255.0 green:180/255.0 blue:181/255.0 alpha:1])
-#define kDaysTimeLabelFont              ([UIFont cnBoldSystemFontOfSize:12.0])
-#define kDetailsLabelFont               ([UIFont cnSystemFontOfSize:12.0])
+#define kDaysTimeLabelFont              ([UIFont systemFontOfSize:14.0])
+#define kDetailsLabelFont               ([UIFont systemFontOfSize:14.0])
 
 #define kCollapsedHeight 44.0
 #define kExpandedHeight 214.0
 
 #define kDetailsFieldMaxHeight (1000)
-#define kDetailsFieldWidth 55
+#define kDetailsFieldWidth 70
 
-#define kLabelTypeOffsetX   56.0
+#define kLabelTypeOffsetX   (50)
 #define kLabelTypeOffsetY   0
 #define kLabelTypeHeight    44.0
 #define kLabelTypeWidth     40.0
 
-#define kStatusDetailsXOffset kSchedulSlotOffsetX
+#define kStatusDetailsXOffset (kDetailsFieldWidth + kDateTimeLabelXOffset)
 #define kStatusDetailsPadding 10
 
-#define kSchedulSlotOffsetX 110
-#define kSchedulSlotRightPadding 30
+#define kSchedulSlotOffsetX 100
+#define kSchedulSlotRightPadding 20
 #define kScheduleFirstSlotOffsetY 16
 #define kScheduleYDistanceBetweenSlots 10
 #define kSlotViewHeight 12
-#define kSlotViewDayOfWeeksWidth 30
-#define kSlotViewSpaceBetweenTimeAnDay 6
+#define kSlotViewDayOfWeeksWidth 35
+#define kSlotViewSpaceBetweenTimeAnDay 3
 
 #define kCellBottomPadding 18
 
@@ -139,7 +143,7 @@
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, kStatusLEDHeight);
     
-    self.targetButton.frame = CGRectMake(kStatusLEDWidth, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
+    self.targetButton.frame = CGRectMake(kTargetOffsetX, 1, kTargetButtonWidthAndHeight, kTargetButtonWidthAndHeight);
     self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
 
     [self layoutScheduleSlotsSubviews];
@@ -152,8 +156,9 @@
                                                      context:nil];
     self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset,
                                                            yOffset,
-                                                           ceilf(boundingRect.size.width),
+                                                           ceilf(kDetailsFieldWidth),
                                                            ceilf(boundingRect.size.height)+1);
+    [self.multilineDetailsLeftFieldLabel sizeToFit];
     
     stringToSize = self.multilineDetailsRightFieldLabel.attributedText;
     CGFloat width = self.bounds.size.width - kStatusDetailsXOffset - kStatusDetailsPadding;
@@ -180,7 +185,7 @@
         _event = event;
 
         self.statusLEDView.image = [[self class] ledImageForEvent:event];
-        self.typeLabel.text = event.eventType;
+        self.typeLabel.text = event.eventSectionType;
         
         [self addSubviewforEventScheduleSlots:event.scheduleSlots];
         self.multilineDetailsRightFieldLabel.attributedText = [[self class] attributedStringForEventDetails:self.event];
@@ -368,12 +373,14 @@
 {
     NSAttributedString *details = [self attributedStringForEventDetails:event];
     CGFloat width = viewWidth - kStatusDetailsXOffset - kStatusDetailsPadding;
-    CGRect boundingRect = [details boundingRectWithSize:CGSizeMake(width, kDetailsFieldMaxHeight)
+    CGRect rightBoundingRect = [details boundingRectWithSize:CGSizeMake(width, kDetailsFieldMaxHeight)
                                                 options:NSStringDrawingUsesLineFragmentOrigin
                                                 context:nil];
     
+    CGFloat extraHeight = rightBoundingRect.size.height;
+    
     return  [self collapsedHeightForEvent:event] +
-            (ceilf(boundingRect.size.height)+1) +
+            (ceilf(extraHeight)+1) +
             kCellBottomPadding;
 }
 
@@ -452,21 +459,30 @@
                                         kDetailsLabelFont, NSFontAttributeName,
                                         LIGHT_GRAY_TEXT_COLOR,NSForegroundColorAttributeName, nil];
     
-    for (int i = 0; i < event.scheduleSlots.count; i++) {
-        CNScheduleSlot *slot = [event.scheduleSlots objectAtIndex:i];
 
-        NSString *daysTimeString = [NSString stringWithFormat:@"(%@ %@)", [slot daysOfWeek], [slot hours]];
-        NSString *locationString = [NSString stringWithFormat:@"%@\n", [slot location]];
-        if (i+1 < event.scheduleSlots.count) {
-            daysTimeString = [daysTimeString stringByAppendingString:@"\n"];
-        }
-        
-        NSMutableAttributedString *daysTime = [[NSMutableAttributedString alloc] initWithString:daysTimeString
-                                                                                     attributes:locationAttributes];
+    if (event.scheduleSlots.count == 1){
+        CNScheduleSlot *slot = [event.scheduleSlots firstObject];
+        NSString *locationString = [NSString stringWithFormat:@"%@", [slot location]];
         NSMutableAttributedString *location = [[NSMutableAttributedString alloc] initWithString:locationString
                                                                                      attributes:daysTimeAttributes];
         [timesAndLocation appendAttributedString:location];
-        [timesAndLocation appendAttributedString:daysTime];
+    } else {
+        for (int i = 0; i < event.scheduleSlots.count; i++) {
+            CNScheduleSlot *slot = [event.scheduleSlots objectAtIndex:i];
+            
+            NSString *daysTimeString = [NSString stringWithFormat:@"%@ %@", [slot daysOfWeek], [slot hours]];
+            NSString *locationString = [NSString stringWithFormat:@"%@\n", [slot location]];
+            if (i+1 < event.scheduleSlots.count) {
+                daysTimeString = [daysTimeString stringByAppendingString:@"\n"];
+            }
+            
+            NSMutableAttributedString *daysTime = [[NSMutableAttributedString alloc] initWithString:daysTimeString
+                                                                                         attributes:locationAttributes];
+            NSMutableAttributedString *location = [[NSMutableAttributedString alloc] initWithString:locationString
+                                                                                         attributes:daysTimeAttributes];
+            [timesAndLocation appendAttributedString:location];
+            [timesAndLocation appendAttributedString:daysTime];
+        }
     }
 
     

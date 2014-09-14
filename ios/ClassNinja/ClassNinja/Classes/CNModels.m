@@ -131,6 +131,13 @@
     return result;
 }
 
+- (NSString *)eventSectionType
+{
+    NSArray *typeAndSectionID = [self.eventType componentsSeparatedByString:@" "];
+    return [typeAndSectionID firstObject];
+}
+
+
 @end
 
 @implementation CNUser
