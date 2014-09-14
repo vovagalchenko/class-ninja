@@ -191,7 +191,11 @@
         [self addSubviewforEventScheduleSlots:event.scheduleSlots];
         self.multilineDetailsRightFieldLabel.attributedText = [[self class] attributedStringForEventDetails:self.event];
         [self updateDateTimeLabelForEvent:event];
-        [self setTargetStateTo:self.event.targetId != nil];
+        if (self.event.targetId != nil) {
+            UIImage *buttonImage = [UIImage imageNamed:@"checkbox-tracked"];
+            [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
+            self.targetButton.enabled = NO;
+        }
     }
 }
 

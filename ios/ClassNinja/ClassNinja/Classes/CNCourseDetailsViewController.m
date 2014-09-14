@@ -219,22 +219,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)dealloc
-{
-    // FIXME: test code for testing deletion of the targets
-    for (CNSection *cnSection in self.listOfSections) {
-        for (CNEvent *event in cnSection.events) {
-            [[CNAPIClient sharedInstance] removeEventFromTargetting:event successBlock:^(BOOL success){
-                if (success) {
-                    NSLog(@"Removed target for event %@", event);
-                } else {
-                    NSLog(@"Failed to removed target for event %@", event);
-                }
-            }];
-        }
-    }
-}
-
 -(BOOL)prefersStatusBarHidden
 {
     return YES;
