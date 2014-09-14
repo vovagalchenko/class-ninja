@@ -123,7 +123,7 @@
 
 - (BOOL)isOpened
 {
-    return [self.status isEqual:@"Opened"];
+    return [self.status isEqual:@"Open"];
 }
 
 - (NSString *)eventSectionId
