@@ -91,6 +91,8 @@
 
 - (BOOL)isClosed;
 - (BOOL)isOpened;
+- (BOOL)isCancelled;
+- (BOOL)isWaitlisted;
 @end
 
 // Implementing NSCoding, because we'll be persisting the logged in user in the keychain

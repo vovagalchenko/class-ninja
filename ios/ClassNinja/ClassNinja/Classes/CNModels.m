@@ -126,6 +126,16 @@
     return [self.status isEqual:@"Open"];
 }
 
+- (BOOL)isCancelled
+{
+    return [self.status isEqualToString:@"Cancelled"];
+}
+
+- (BOOL)isWaitlisted
+{
+    return [self.status isEqualToString:@"W-list"];
+}
+
 - (NSString *)eventSectionId
 {
     NSString *result = nil;

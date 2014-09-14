@@ -27,6 +27,7 @@
 #define kStatusLEDClassAvailableColor   ([UIColor colorWithRed:71/255.0 green:182/255.0 blue:73/255.0 alpha:1])
 #define kStatusLEDClassClosedColor      ([UIColor colorWithRed:220/255.0 green:39/255.0 blue:39/255.0 alpha:1])
 #define kStatusLEDClassWaitlistColor    ([UIColor colorWithRed:255/255.0 green:176/255.0 blue:0/255.0 alpha:1])
+#define kStatusLEDClassCancelledColor   ([UIColor colorWithRed:120./255.0 green:120./255.0 blue:120./255.0 alpha:1])
 
 #define kDaysOFWeekColor                ([UIColor colorWithRed:180/255.0 green:180/255.0 blue:181/255.0 alpha:1])
 #define kDaysTimeLabelFont              ([UIFont systemFontOfSize:14.0])
@@ -191,11 +192,20 @@
         [self addSubviewforEventScheduleSlots:event.scheduleSlots];
         self.multilineDetailsRightFieldLabel.attributedText = [[self class] attributedStringForEventDetails:self.event];
         [self updateDateTimeLabelForEvent:event];
-        if (self.event.targetId != nil) {
-            UIImage *buttonImage = [UIImage imageNamed:@"checkbox-tracked"];
-            [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
-            self.targetButton.enabled = NO;
-        }
+        [self updateTargetButtonForEvent:event];
+    }
+}
+
+- (void)updateTargetButtonForEvent:(CNEvent *)event
+{
+    if (self.event.targetId != nil) {
+        UIImage *buttonImage = [UIImage imageNamed:@"checkbox-tracked"];
+        [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
+        self.targetButton.enabled = NO;
+    } else if ([self.event isCancelled]) {
+        UIImage *buttonImage = [UIImage imageNamed:@"checkbox-disabled"];
+        [self.targetButton setImage:buttonImage forState:UIControlStateNormal];
+        self.targetButton.enabled = NO;
     }
 }
 
@@ -355,11 +365,15 @@
 {
     if ([event isClosed]) {
         return [UIImage imageNamed:@"tab-red"];
-    } else if ([event isOpened]){
+    } else if ([event isOpened]) {
         return [UIImage imageNamed:@"tab-green"];
-    } else {
+    } else if ([event isWaitlisted]) {
         return [UIImage imageNamed:@"tab-yellow"];
+    } else if ([event isCancelled]) {
+        return [UIImage imageNamed:@"tab-grey"];
     }
+    
+    return nil;
 }
 
 + (UIColor *)colorForEvent:(CNEvent *)event
@@ -368,9 +382,13 @@
         return kStatusLEDClassClosedColor;
     } else if ([event isOpened]){
         return kStatusLEDClassAvailableColor;
-    } else {
+    } else if ([event isWaitlisted]){
         return kStatusLEDClassWaitlistColor;
+    } else if ([event isCancelled]) {
+        return kStatusLEDClassCancelledColor;
     }
+    
+    return nil;
 }
 
 + (CGFloat)collapsedHeightForEvent:(CNEvent *)event
