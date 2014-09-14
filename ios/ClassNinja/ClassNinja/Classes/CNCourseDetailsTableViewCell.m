@@ -26,6 +26,7 @@
 
 #define kStatusLEDClassAvailableColor   ([UIColor colorWithRed:71/255.0 green:182/255.0 blue:73/255.0 alpha:1])
 #define kStatusLEDClassClosedColor      ([UIColor colorWithRed:220/255.0 green:39/255.0 blue:39/255.0 alpha:1])
+#define kStatusLEDClassWaitlistColor    ([UIColor colorWithRed:255/255.0 green:176/255.0 blue:0/255.0 alpha:1])
 
 #define kDaysOFWeekColor                ([UIColor colorWithRed:180/255.0 green:180/255.0 blue:181/255.0 alpha:1])
 #define kDaysTimeLabelFont              ([UIFont systemFontOfSize:14.0])
@@ -350,8 +351,10 @@
 {
     if ([event isClosed]) {
         return [UIImage imageNamed:@"tab-red"];
-    } else {
+    } else if ([event isOpened]){
         return [UIImage imageNamed:@"tab-green"];
+    } else {
+        return [UIImage imageNamed:@"tab-yellow"];
     }
 }
 
@@ -359,8 +362,10 @@
 {
     if ([event isClosed]) {
         return kStatusLEDClassClosedColor;
-    } else {
+    } else if ([event isOpened]){
         return kStatusLEDClassAvailableColor;
+    } else {
+        return kStatusLEDClassWaitlistColor;
     }
 }
 

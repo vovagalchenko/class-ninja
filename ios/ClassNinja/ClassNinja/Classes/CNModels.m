@@ -121,6 +121,11 @@
     return [self.status isEqual:@"Closed"];
 }
 
+- (BOOL)isOpened
+{
+    return [self.status isEqual:@"Opened"];
+}
+
 - (NSString *)eventSectionId
 {
     NSString *result = nil;

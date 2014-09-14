@@ -90,6 +90,7 @@
 - (NSString *)eventSectionType;
 
 - (BOOL)isClosed;
+- (BOOL)isOpened;
 @end
 
 // Implementing NSCoding, because we'll be persisting the logged in user in the keychain
