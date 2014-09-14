@@ -239,7 +239,7 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
         CNSection *section = [CNSectionAPIResource modelWithDictionary:courseSectionDict];
         [sections addObject:section];
     }
-    target.sections = courseSectionsJson;
+    target.sections = [NSArray arrayWithArray:sections];
     return target;
 }
 

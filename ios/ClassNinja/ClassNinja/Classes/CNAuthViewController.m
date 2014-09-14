@@ -71,10 +71,6 @@ typedef enum : NSUInteger {
                                                                   options:0
                                                                   metrics:nil
                                                                     views:NSDictionaryOfVariableBindings(_detailLabel)];
-    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_detailLabel]-%f-[_textField]-[_confirmationButton]", VERTICAL_MARGIN + X_BUTTON_VERTICAL_MARGIN, VERTICAL_MARGIN]
-                                                                options:0
-                                                                metrics:nil
-                                                                  views:NSDictionaryOfVariableBindings(_detailLabel, _textField, _confirmationButton)];
     NSArray *horizontalTF = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_textField]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
                                                                     options:0
                                                                     metrics:nil
@@ -109,18 +105,25 @@ typedef enum : NSUInteger {
                                                                                    options:0
                                                                                    metrics:nil
                                                                                      views:NSDictionaryOfVariableBindings(_cancelButton)];
-    NSArray *verticalCancelConstraints = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_cancelButton]", X_BUTTON_VERTICAL_MARGIN]
-                                                                                 options:0
-                                                                                 metrics:nil
-                                                                                   views:NSDictionaryOfVariableBindings(_cancelButton)];
+    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_cancelButton(11)]-%f-[_detailLabel]-(>=8)-[_textField]-[_confirmationButton]", X_BUTTON_VERTICAL_MARGIN, X_BUTTON_VERTICAL_MARGIN*2]
+                                                                options:0
+                                                                metrics:nil
+                                                                  views:NSDictionaryOfVariableBindings(_cancelButton, _detailLabel, _textField, _confirmationButton)];
+    NSLayoutConstraint *tfCentering = [NSLayoutConstraint constraintWithItem:self.textField
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.view
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                  multiplier:0.75
+                                                                    constant:0.0];
+
     [self.view addConstraints:horizontal];
     [self.view addConstraints:vertical];
     [self.view addConstraints:horizontalTF];
     [self.view addConstraints:horizontalButton];
     [self.view addConstraints:@[activityIndicatorHorizontal, activityIndicatorVertical, activityIndicatorWidth, activityIndicatorHeight]];
     [self.view addConstraints:horizontalCancelConstraints];
-    [self.view addConstraints:verticalCancelConstraints];
-    
+    [self.view addConstraint:tfCentering];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle

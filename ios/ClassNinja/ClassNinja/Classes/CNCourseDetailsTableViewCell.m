@@ -47,8 +47,8 @@
 #define kStatusDetailsXOffset (kDetailsFieldWidth + kDateTimeLabelXOffset)
 #define kStatusDetailsPadding 10
 
-#define kSchedulSlotOffsetX 100
-#define kSchedulSlotRightPadding 20
+#define kScheduleSlotOffsetX 100
+#define kScheduleSlotRightPadding 40
 #define kScheduleFirstSlotOffsetY 16
 #define kScheduleYDistanceBetweenSlots 10
 #define kSlotViewHeight 12
@@ -59,12 +59,12 @@
 
 #define kParagraphLineSpacing 6
 
-@interface CNScheduelSlotView : UIView
+@interface CNScheduleSlotView : UIView
 @property (nonatomic) UILabel *daysOfWeekLabel;
 @property (nonatomic) UILabel *hoursLabel;
 @end
 
-@implementation CNScheduelSlotView
+@implementation CNScheduleSlotView
 - (UILabel *)daysOfWeekLabel
 {
     if (_daysOfWeekLabel == nil) {
@@ -173,27 +173,23 @@
                                                             ceilf(boundingRect.size.height)+1);
 }
 
-- (void)prepareForReuse
+- (void)setEvent:(CNEvent *)event
 {
+    // The clearing of scheduleSlotSubviews could go into prepareToReuse, however, it's nice to keep setEvent idempotent
     for (UIView *view in self.scheduleSlotSubviews) {
         [view removeFromSuperview];
     }
     self.scheduleSlotSubviews = nil;
-}
-
-- (void)setEvent:(CNEvent *)event
-{
-    if (_event != event) {
-        _event = event;
-
-        self.statusLEDView.image = [[self class] ledImageForEvent:event];
-        self.typeLabel.text = event.eventSectionType;
+    
+    _event = event;
+    
+    self.statusLEDView.image = [[self class] ledImageForEvent:event];
+    self.typeLabel.text = event.eventSectionType;
         
-        [self addSubviewforEventScheduleSlots:event.scheduleSlots];
-        self.multilineDetailsRightFieldLabel.attributedText = [[self class] attributedStringForEventDetails:self.event];
-        [self updateDateTimeLabelForEvent:event];
-        [self updateTargetButtonForEvent:event];
-    }
+    self.multilineDetailsRightFieldLabel.attributedText = [[self class] attributedStringForEventDetails:event];
+    [self updateDateTimeLabelForEvent:event];
+    [self updateTargetButtonForEvent:event];
+    [self addSubviewforEventScheduleSlots:event.scheduleSlots];
 }
 
 - (void)updateTargetButtonForEvent:(CNEvent *)event
@@ -211,10 +207,10 @@
 
 - (void)layoutScheduleSlotsSubviews
 {
-    CGFloat width = self.bounds.size.width - kSchedulSlotOffsetX - kSchedulSlotRightPadding;
+    CGFloat width = self.bounds.size.width - kScheduleSlotOffsetX - kScheduleSlotRightPadding;
     for (int i = 0; i < self.scheduleSlotSubviews.count; i++) {
         UIView *view = [self.scheduleSlotSubviews objectAtIndex:i];
-        view.frame = CGRectMake(kSchedulSlotOffsetX, kScheduleFirstSlotOffsetY + i * (kScheduleYDistanceBetweenSlots + kSlotViewHeight) , width, kSlotViewHeight);
+        view.frame = CGRectMake(kScheduleSlotOffsetX, kScheduleFirstSlotOffsetY + i * (kScheduleYDistanceBetweenSlots + kSlotViewHeight) , width, kSlotViewHeight);
     }
 }
 
@@ -222,10 +218,15 @@
 {
     self.scheduleSlotSubviews = [NSMutableArray array];
     for (CNScheduleSlot *slot in scheduleSlots) {
-        CNScheduelSlotView *slotView = [[CNScheduelSlotView alloc] initWithSlot:slot];
+        CNScheduleSlotView *slotView = [[CNScheduleSlotView alloc] initWithSlot:slot];
         [self.scheduleSlotSubviews addObject:slotView];
         [self addSubview:slotView];
     }
+}
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
+{
+    return [self initWithReuseIdentifier:reuseIdentifier usedForTargetting:NO];
 }
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting

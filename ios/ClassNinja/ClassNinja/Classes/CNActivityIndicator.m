@@ -47,8 +47,10 @@
 
 - (void)updateConstraints
 {
-    [self addConstraints:self.verticalConstraints];
-    [self addConstraints:self.horizontalConstraints];
+    if (self.constraints.count == 0) {
+        [self addConstraints:self.verticalConstraints];
+        [self addConstraints:self.horizontalConstraints];
+    }
     [super updateConstraints];
     
 }

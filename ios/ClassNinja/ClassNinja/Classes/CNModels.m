@@ -133,7 +133,7 @@
 
 - (BOOL)isWaitlisted
 {
-    return [self.status isEqualToString:@"W-list"];
+    return [self.status isEqualToString:@"W-List"];
 }
 
 - (NSString *)eventSectionId

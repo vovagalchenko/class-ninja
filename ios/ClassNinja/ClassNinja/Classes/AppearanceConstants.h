@@ -9,8 +9,8 @@
 #ifndef ClassNinja_AppearanceConstants_h
 #define ClassNinja_AppearanceConstants_h
 
-#define HORIZONTAL_MARGIN           20.0
-#define VERTICAL_MARGIN             50.0
+#define HORIZONTAL_MARGIN           15.0
+#define VERTICAL_MARGIN             10.0
 #define X_BUTTON_VERTICAL_MARGIN    25.0
 #define INTER_ELEMENT_VERTICAL_PADDING      10.0
 

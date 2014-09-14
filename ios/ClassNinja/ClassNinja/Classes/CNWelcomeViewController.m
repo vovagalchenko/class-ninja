@@ -12,12 +12,17 @@
 #import "CNAPIClient.h"
 #import "AppearanceConstants.h"
 #import "CNAppDelegate.h"
+#import "CNTargetSectionHeaderView.h"
+#import "CNCourseDetailsTableViewCell.h"
 
 @interface CNWelcomeViewController ()
 
-@property (nonatomic) UITableViewController *tableViewController;
+@property (nonatomic) UITableView *tableView;
 @property (nonatomic) CNWelcomeStatusView *statusView;
 @property (nonatomic) CNSiongNavigationViewController *siongsNavigationController;
+@property (nonatomic) NSArray *targets;
+@property (nonatomic, readonly) NSMutableArray *expandedIndexPaths;
+
 @end
 
 @implementation CNWelcomeViewController
@@ -44,8 +49,13 @@
                             authPolicy:CNFailRequestOnAuthFailure
                             completion:^(NSArray *targets) {
         if (targets.count) {
+            [self setStatus:@"Here are the classes you're tracking this semester"];
             [APP_DELEGATE registerForPushNotifications];
+        } else {
+            [self setStatus:@"You're not tracking any classes this semester :("];
         }
+        self.targets = targets;
+        [self.tableView reloadData];
     }];
 }
 
@@ -57,7 +67,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         // Let all the layout for the statusView settle and set the tableHeaderView
         // on the next iteration of the runloop.
-        [self.tableViewController.tableView setTableHeaderView:self.statusView];
+        [self.tableView setTableHeaderView:self.statusView];
     });
 }
 
@@ -75,9 +85,9 @@
             [self.statusView setNeedsLayout];
             [self.statusView layoutIfNeeded];
             
-            [self.tableViewController.tableView beginUpdates];
-            [self.tableViewController.tableView setTableHeaderView:self.statusView];
-            [self.tableViewController.tableView endUpdates];
+            [self.tableView beginUpdates];
+            [self.tableView setTableHeaderView:self.statusView];
+            [self.tableView endUpdates];
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:ANIMATION_DURATION animations:^{
                 self.statusView.statusLabel.alpha = 1;
@@ -94,85 +104,88 @@
     
     self.view.backgroundColor = WELCOME_BLUE_COLOR;
     
-    self.tableViewController = [[UITableViewController alloc] init];
-    [self addChildViewController:self.tableViewController];
-    [self.view addSubview:self.tableViewController.tableView];
-    [self.tableViewController didMoveToParentViewController:self];
-    self.tableViewController.tableView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.tableViewController.tableView.backgroundColor = [UIColor clearColor];
-    NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:_tableViewController.tableView
-                                                           attribute:NSLayoutAttributeTop
-                                                           relatedBy:NSLayoutRelationEqual
-                                                              toItem:self.view
-                                                           attribute:NSLayoutAttributeTop
-                                                          multiplier:1.0
-                                                            constant:0.0];
-    NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:_tableViewController.tableView
-                                                              attribute:NSLayoutAttributeBottom
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:self.view
-                                                              attribute:NSLayoutAttributeBottom
-                                                             multiplier:1.0
-                                                               constant:0.0];
-    NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:_tableViewController.tableView
-                                                            attribute:NSLayoutAttributeLeft
-                                                            relatedBy:NSLayoutRelationEqual
-                                                               toItem:self.view
-                                                            attribute:NSLayoutAttributeLeft
-                                                           multiplier:1.0
-                                                             constant:0.0];
-    NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:_tableViewController.tableView
-                                                             attribute:NSLayoutAttributeRight
-                                                             relatedBy:NSLayoutRelationEqual
-                                                                toItem:self.view
-                                                             attribute:NSLayoutAttributeRight
-                                                            multiplier:1.0
-                                                              constant:0.0];
-    [self.view addConstraints:@[top, bottom, left, right]];
-    
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    self.tableView.clipsToBounds = YES;
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    self.tableView.allowsMultipleSelection = YES;
+    self.tableView.showsVerticalScrollIndicator = NO;
+    self.tableView.separatorStyle = UITableViewCellSelectionStyleNone;
+    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:sectionCellId];
+    [self.tableView registerClass:[CNCourseDetailsTableViewCell class] forCellReuseIdentifier:eventCellId];
+    [self.view addSubview:self.tableView];
+    self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.tableView.backgroundColor = [UIColor clearColor];
     
     self.statusView = [[CNWelcomeStatusView alloc] initWithDelegate:self];
-    [self.tableViewController.tableView setTableHeaderView:self.statusView];
-    top = [NSLayoutConstraint constraintWithItem:self.statusView
-                                 attribute:NSLayoutAttributeTop
-                                 relatedBy:NSLayoutRelationEqual
-                                    toItem:self.tableViewController.tableView
-                                 attribute:NSLayoutAttributeTop
-                                multiplier:1.0
-                                  constant:0.0];
-    left = [NSLayoutConstraint constraintWithItem:self.statusView
-                                       attribute:NSLayoutAttributeLeft
-                                       relatedBy:NSLayoutRelationEqual
-                                          toItem:self.tableViewController.tableView
-                                       attribute:NSLayoutAttributeLeft
-                                      multiplier:1.0
-                                        constant:0.0];
-    right = [NSLayoutConstraint constraintWithItem:self.statusView
-                                       attribute:NSLayoutAttributeRight
-                                       relatedBy:NSLayoutRelationEqual
-                                          toItem:self.tableViewController.tableView
-                                       attribute:NSLayoutAttributeRight
-                                      multiplier:1.0
-                                        constant:0.0];
-    NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:self.statusView
-                                         attribute:NSLayoutAttributeWidth
-                                         relatedBy:NSLayoutRelationEqual
-                                            toItem:self.tableViewController.tableView
-                                         attribute:NSLayoutAttributeWidth
-                                        multiplier:1.0
-                                          constant:0.0];
-    [self.view addConstraints:@[top, left, right, width]];
-    
-    [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(testAnimation) userInfo:nil repeats:YES];
+    [self.tableView setTableHeaderView:self.statusView];
 }
 
-- (void)testAnimation
+- (void)updateViewConstraints
 {
-    NSArray *statuses = @[@"This is a short string.",
-                          @"Holy tits, look at this awesome animation. It's super smooth with multiple lines and shit.",
-                          @"The long string instrument is an instrument where the string is of such a length that the fundamental transverse wave is below what we can hear as a tone (±20 Hz). If the tension and the length result in sounds with such a frequency the tone becomes a beating frequency ranging from a short reverb (approx 5–10 meters) to longer echo sounds (longer than 10 meter). Besides the beating frequency, the string also gives higher pitched natural overtones. Since the length is that long this has an effect on the attack tone.",
-                          @"Orientation flipping also works."];
-    [self setStatus:[statuses objectAtIndex:rand()%statuses.count]];
+    if (self.view.constraints.count == 0) {
+        NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:self.tableView
+                                                               attribute:NSLayoutAttributeTop
+                                                               relatedBy:NSLayoutRelationEqual
+                                                                  toItem:self.view
+                                                               attribute:NSLayoutAttributeTop
+                                                              multiplier:1.0
+                                                                constant:self.topLayoutGuide.length];
+        NSLayoutConstraint *bottom = [NSLayoutConstraint constraintWithItem:self.tableView
+                                                                  attribute:NSLayoutAttributeBottom
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.view
+                                                                  attribute:NSLayoutAttributeBottom
+                                                                 multiplier:1.0
+                                                                   constant:0.0];
+        NSLayoutConstraint *left = [NSLayoutConstraint constraintWithItem:self.tableView
+                                                                attribute:NSLayoutAttributeLeft
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.view
+                                                                attribute:NSLayoutAttributeLeft
+                                                               multiplier:1.0
+                                                                 constant:HORIZONTAL_MARGIN];
+        NSLayoutConstraint *right = [NSLayoutConstraint constraintWithItem:self.tableView
+                                                                 attribute:NSLayoutAttributeRight
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.view
+                                                                 attribute:NSLayoutAttributeRight
+                                                                multiplier:1.0
+                                                                  constant:-HORIZONTAL_MARGIN];
+        [self.view addConstraints:@[top, bottom, left, right]];
+        
+        
+        top = [NSLayoutConstraint constraintWithItem:self.statusView
+                                           attribute:NSLayoutAttributeTop
+                                           relatedBy:NSLayoutRelationEqual
+                                              toItem:self.tableView
+                                           attribute:NSLayoutAttributeTop
+                                          multiplier:1.0
+                                            constant:0.0];
+        left = [NSLayoutConstraint constraintWithItem:self.statusView
+                                            attribute:NSLayoutAttributeLeft
+                                            relatedBy:NSLayoutRelationEqual
+                                               toItem:self.tableView
+                                            attribute:NSLayoutAttributeLeft
+                                           multiplier:1.0
+                                             constant:0.0];
+        right = [NSLayoutConstraint constraintWithItem:self.statusView
+                                             attribute:NSLayoutAttributeRight
+                                             relatedBy:NSLayoutRelationEqual
+                                                toItem:self.tableView
+                                             attribute:NSLayoutAttributeRight
+                                            multiplier:1.0
+                                              constant:0.0];
+        NSLayoutConstraint *width = [NSLayoutConstraint constraintWithItem:self.statusView
+                                                                 attribute:NSLayoutAttributeWidth
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.tableView
+                                                                 attribute:NSLayoutAttributeWidth
+                                                                multiplier:1.0
+                                                                  constant:0.0];
+        [self.view addConstraints:@[top, left, right, width]];
+    }
+    [super updateViewConstraints];
 }
 
 - (void)addClassesButtonPressed:(id)sender
@@ -194,7 +207,183 @@
         schoolVC = (CNSchoolViewController *)[self.siongsNavigationController rootVC];
     }
     [schoolVC handleSearchResult:models];
+}
 
+#pragma mark - UITableViewController stuff
+
+static void getSectionAndEventIndicesForCourse(CNCourse *course, NSUInteger rowIndex, NSInteger *sectionIndex, NSInteger *eventIndex)
+{
+    *sectionIndex = 0;
+    while (rowIndex >= [[[course.sections objectAtIndex:*sectionIndex] events] count] + 1) {
+        (*sectionIndex)++;
+        rowIndex -= [[[course.sections objectAtIndex:*sectionIndex] events] count] + 1;
+    }
+    *eventIndex = rowIndex - 1;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return self.targets.count;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    NSArray *sections = [[self.targets objectAtIndex:section] sections];
+    NSUInteger numSections = 0;
+    for (CNSection *section in sections) {
+        numSections++; // Increment once for the section header cell
+        numSections += section.events.count;
+    }
+    return numSections; // + 1 because for the section cell at the top
+}
+
+static NSString *sectionCellId = @"Section_Cell";
+static NSString *eventCellId = @"Event_Cell";
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CNCourse *course = [self.targets objectAtIndex:indexPath.section];
+    NSInteger sectionIndex, eventIndex;
+    getSectionAndEventIndicesForCourse(course, indexPath.row, &sectionIndex, &eventIndex);
+    
+    NSString *cellId = nil;
+    UITableViewCell *cell = nil;
+    CNSection *section = [course.sections objectAtIndex:sectionIndex];
+    if (eventIndex < 0) {
+        cellId = sectionCellId;
+        cell = [tableView dequeueReusableCellWithIdentifier:cellId forIndexPath:indexPath];
+        cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", section.name, section.staffName];
+        cell.textLabel.font = [UIFont boldSystemFontOfSize:12];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.backgroundColor = [UIColor colorWithRed:.92 green:.92 blue:.92 alpha:1.0];
+    } else {
+        cellId = eventCellId;
+        cell = (CNCourseDetailsTableViewCell *)[tableView dequeueReusableCellWithIdentifier:cellId forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        ((CNCourseDetailsTableViewCell *)cell).event = [[section events] objectAtIndex:eventIndex];
+        if ([self.expandedIndexPaths containsObject:indexPath])
+            [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+    }
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) return; // There's no selecting of the section headers
+    
+    [self.expandedIndexPaths addObject:indexPath];
+    
+    [tableView beginUpdates];
+        [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [tableView endUpdates];
+}
+
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) return; // There's no deselecting of the section headers
+    
+    [self.expandedIndexPaths removeObject:indexPath];
+    [tableView beginUpdates];
+        [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [tableView endUpdates];
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    CNTargetSectionHeaderView *headerView = [[CNTargetSectionHeaderView alloc] init];
+    [headerView setText:[[self.targets objectAtIndex:section] name]];
+    [headerView removeConstraints:headerView.constraints];
+    [headerView addConstraints:@[
+                                 [NSLayoutConstraint constraintWithItem:headerView
+                                                              attribute:NSLayoutAttributeHeight
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:nil
+                                                              attribute:NSLayoutAttributeNotAnAttribute
+                                                             multiplier:0.0
+                                                               constant:70.0],
+                                 [NSLayoutConstraint constraintWithItem:headerView
+                                                              attribute:NSLayoutAttributeWidth
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:nil
+                                                              attribute:NSLayoutAttributeNotAnAttribute
+                                                             multiplier:0.0
+                                                               constant:tableView.bounds.size.width]
+                                 ]];
+    return headerView;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 70.0;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    CNCourse *course = [self.targets objectAtIndex:indexPath.section];
+    NSInteger sectionIndex, eventIndex;
+    getSectionAndEventIndicesForCourse(course, indexPath.row, &sectionIndex, &eventIndex);
+    
+    CNSection *section = [course.sections objectAtIndex:sectionIndex];
+    CGFloat retVal = 0;
+    if (eventIndex < 0)
+    {
+        retVal = 20;
+    } else {
+        if ([self.expandedIndexPaths containsObject:indexPath])
+            retVal = [CNCourseDetailsTableViewCell expandedHeightForEvent:[section.events objectAtIndex:eventIndex] width:tableView.bounds.size.width];
+        else
+            retVal = [CNCourseDetailsTableViewCell collapsedHeightForEvent:[section.events objectAtIndex:eventIndex]];
+    }
+    return retVal;
+}
+
+// The footer is for separation between sections
+- (void)tableView:(UITableView *)tableView willDisplayFooterView:(UIView *)view forSection:(NSInteger)section
+{
+    NSLog(@"%@", view);
+    view.opaque = NO;
+    view.alpha = 0;
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    UIView *footerView = [[UIView alloc] init];
+    footerView.alpha = 0;
+    [footerView addConstraints:@[
+                                 [NSLayoutConstraint constraintWithItem:footerView
+                                                              attribute:NSLayoutAttributeHeight
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:nil
+                                                              attribute:NSLayoutAttributeNotAnAttribute
+                                                             multiplier:0.0
+                                                               constant:20.0],
+                                 [NSLayoutConstraint constraintWithItem:footerView
+                                                              attribute:NSLayoutAttributeWidth
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:nil
+                                                              attribute:NSLayoutAttributeNotAnAttribute
+                                                             multiplier:0.0
+                                                               constant:tableView.bounds.size.width]
+                                 ]];
+    return footerView;
+    
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 20.0;
+}
+
+#pragma mark - Properties
+
+@synthesize expandedIndexPaths = _expandedIndexPaths;
+
+- (NSMutableArray *)expandedIndexPaths
+{
+    if (!_expandedIndexPaths) {
+        _expandedIndexPaths = [NSMutableArray array];
+    }
+    return _expandedIndexPaths;
 }
 
 @end
