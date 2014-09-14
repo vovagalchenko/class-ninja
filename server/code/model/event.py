@@ -2,6 +2,9 @@ from base import Base, Ninja_Model_Mixin
 from sqlalchemy import Column, String, Enum, ForeignKey, Integer, TEXT
 from sqlalchemy.orm import backref, relationship
 import json
+import copy
+
+uclaDaysLookup = {"M" : "MON", "T" : "TUE", "W" : "WED", "R" : "THU", "F" : "FRI"}
 
 class Event(Base, Ninja_Model_Mixin):
     __tablename__ = 'events'
@@ -17,8 +20,17 @@ class Event(Base, Ninja_Model_Mixin):
     section_id = Column('section_id', String(254), ForeignKey("sections.section_id"), nullable = False)
     school_id = Column('school_id', Integer, ForeignKey("schools.school_id"),  nullable = False)   
 
+
     def for_api(self):
         base_dict = super(Event, self).for_api()
         times_and_locations_dict_array = json.loads(self.times_and_locations)
-        base_dict["times_and_locations"] = times_and_locations_dict_array
+        resultArray = []
+        for dict in times_and_locations_dict_array:
+            daysString = dict["weekdays"]
+            for dayChar in daysString:
+                oneDayDict = copy.deepcopy(dict)
+                oneDayDict["weekdays"] = uclaDaysLookup[dayChar]
+                resultArray.append(oneDayDict)
+        
+        base_dict["times_and_locations"] = resultArray
         return base_dict
