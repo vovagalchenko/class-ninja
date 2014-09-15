@@ -11,6 +11,7 @@
 #import "CNInAppPurchaseHelper.h"
 #import "CNCloseButton.h"
 #import "AppearanceConstants.h"
+#import "CNPaywallViewController.h"
 
 #define kCloseButtonWidth  11
 #define kCloseButtonHeight 11
@@ -359,14 +360,9 @@
         if (success) {
             [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
         } else {
-            [[CNInAppPurchaseHelper sharedInstance] testIAP];
-            [[[UIAlertView alloc] initWithTitle:@"Error"
-                                        message:@"Unable to set the target"
-                                       delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil] show];
-            
-
+            CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
+            paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
+            [self presentViewController:paywallVC animated:YES completion:nil];
         }
     }];
 }
