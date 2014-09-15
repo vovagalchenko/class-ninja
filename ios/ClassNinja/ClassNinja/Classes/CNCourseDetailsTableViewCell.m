@@ -47,7 +47,7 @@
 #define kStatusDetailsXOffset (kDetailsFieldWidth + kDateTimeLabelXOffset)
 #define kStatusDetailsPadding 10
 
-#define kScheduleSlotOffsetX 100
+#define kScheduleSlotOffsetX 90
 #define kScheduleSlotRightPadding 40
 #define kScheduleFirstSlotOffsetY 16
 #define kScheduleYDistanceBetweenSlots 10
@@ -97,8 +97,13 @@
         [self addSubview:self.hoursLabel];
         [self addSubview:self.daysOfWeekLabel];
         
-        self.hoursLabel.text = slot.hours;
-        self.daysOfWeekLabel.text = slot.daysOfWeek;
+        if ([slot.daysOfWeek isEqualToString:@"UNSCHED"] ) {
+            self.hoursLabel.text = @"UNSCHED";
+        } else {
+            self.hoursLabel.text = slot.hours;
+            self.daysOfWeekLabel.text = slot.daysOfWeek;
+        }
+        
     }
     return self;
 }
