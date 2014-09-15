@@ -4,7 +4,9 @@ from sqlalchemy.orm import backref, relationship
 import json
 import copy
 
-uclaDaysLookup = {"M" : "MON", "T" : "TUE", "W" : "WED", "R" : "THU", "F" : "FRI"}
+uclaDaysLookup = {"M" : "MON", "T" : "TUE", "W" : "WED", "R" : "THU", "F" : "FRI", "S" : "SAT"}
+uclaWeekdaysExceptions = ["TBA", "VAR", "UNSCHED"]
+
 
 class Event(Base, Ninja_Model_Mixin):
     __tablename__ = 'events'
@@ -27,7 +29,7 @@ class Event(Base, Ninja_Model_Mixin):
         resultArray = []
         for dict in times_and_locations_dict_array:
             daysString = dict["weekdays"]
-            if len(daysString) > 0:
+            if len(daysString) > 0  and (daysString not in uclaWeekdaysExceptions): 
                 for dayChar in daysString:
                     oneDayDict = copy.deepcopy(dict)
                     oneDayDict["weekdays"] = uclaDaysLookup[dayChar]
