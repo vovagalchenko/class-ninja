@@ -27,10 +27,12 @@ class Event(Base, Ninja_Model_Mixin):
         resultArray = []
         for dict in times_and_locations_dict_array:
             daysString = dict["weekdays"]
-            for dayChar in daysString:
-                oneDayDict = copy.deepcopy(dict)
-                oneDayDict["weekdays"] = uclaDaysLookup[dayChar]
-                resultArray.append(oneDayDict)
-        
+            if len(daysString) > 0:
+                for dayChar in daysString:
+                    oneDayDict = copy.deepcopy(dict)
+                    oneDayDict["weekdays"] = uclaDaysLookup[dayChar]
+                    resultArray.append(oneDayDict)
+            else:
+               resultArray = times_and_locations_dict_array
         base_dict["times_and_locations"] = resultArray
         return base_dict
