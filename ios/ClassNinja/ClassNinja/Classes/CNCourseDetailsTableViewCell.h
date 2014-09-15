@@ -14,6 +14,10 @@
 @protocol CourseDetailsTableViewCellProtocol
 - (void)targetingStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isTargeted;
 - (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isExpanded;
+
+@optional
+- (void)removeFromTargetsPressedIn:(CNCourseDetailsTableViewCell *)cell;
+
 @end
 
 @interface CNCourseDetailsTableViewCell : UITableViewCell
@@ -23,6 +27,6 @@
 
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting;
 + (CGFloat)collapsedHeightForEvent:(CNEvent *)event;
-+ (CGFloat)expandedHeightForEvent:(CNEvent *)event width:(CGFloat)viewWidth;
++ (CGFloat)expandedHeightForEvent:(CNEvent *)event width:(CGFloat)viewWidth usedForTargeting:(BOOL)usedForTargeting;
 
 @end

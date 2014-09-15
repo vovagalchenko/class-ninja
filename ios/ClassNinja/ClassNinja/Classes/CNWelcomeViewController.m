@@ -325,14 +325,16 @@ static NSString *eventCellId = @"Event_Cell";
     
     CNSection *section = [course.sections objectAtIndex:sectionIndex];
     CGFloat retVal = 0;
-    if (eventIndex < 0)
-    {
+    if (eventIndex < 0) {
         retVal = 20;
     } else {
-        if ([self.expandedIndexPaths containsObject:indexPath])
-            retVal = [CNCourseDetailsTableViewCell expandedHeightForEvent:[section.events objectAtIndex:eventIndex] width:tableView.bounds.size.width];
-        else
+        if ([self.expandedIndexPaths containsObject:indexPath]) {
+            retVal = [CNCourseDetailsTableViewCell expandedHeightForEvent:[section.events objectAtIndex:eventIndex]
+                                                                    width:tableView.bounds.size.width
+                                                         usedForTargeting:NO];
+        } else {
             retVal = [CNCourseDetailsTableViewCell collapsedHeightForEvent:[section.events objectAtIndex:eventIndex]];
+        }
     }
     return retVal;
 }

@@ -59,6 +59,7 @@
 #define kCellBottomPadding 18
 
 #define kParagraphLineSpacing 6
+#define kRemoveFromTargetButtonHeight 44
 
 @interface CNScheduleSlotView : UIView
 @property (nonatomic) UILabel *daysOfWeekLabel;
@@ -130,11 +131,10 @@
 @property (nonatomic) BOOL usedForTargetting;
 
 @property (nonatomic) UIButton *targetButton;
+@property (nonatomic) UIButton *removeFromTargetsButton;
 @property (nonatomic) UIView *expandAccessoryView;
-
 @property (nonatomic) UILabel *multilineDetailsLeftFieldLabel;
 @property (nonatomic) UILabel *multilineDetailsRightFieldLabel;
-
 @property (nonatomic) UILabel *typeLabel;
 
 @property (nonatomic) NSMutableArray *scheduleSlotSubviews;
@@ -156,7 +156,16 @@
     if (self.usedForTargetting == NO) {
         leftShift = kLeftShiftForMainScreen;
         self.targetButton.hidden = YES;
+        CGFloat expandedHeight = [[self class] expandedHeightForEvent:self.event
+                                                                width:self.bounds.size.width
+                                                     usedForTargeting:self.usedForTargetting];
+        
+        self.removeFromTargetsButton.frame = CGRectMake(0,
+                                                        expandedHeight - kRemoveFromTargetButtonHeight,
+                                                        self.bounds.size.width,
+                                                        kRemoveFromTargetButtonHeight);
     } else {
+        self.removeFromTargetsButton.hidden = YES;
         self.targetButton.frame = CGRectMake(kTargetOffsetX, 1, kTargetButtonWidthAndHeight, kTargetButtonWidthAndHeight);
     }
 
@@ -266,14 +275,13 @@
         [self addSubview:_separationLineView];
         [self addSubview:_statusLEDView];
         [self addSubview:_dateTimeLabel];
+        [self addSubview:self.removeFromTargetsButton];
         [self addSubview:self.expandAccessoryView];
         [self addSubview:self.targetButton];
         [self addSubview:self.multilineDetailsLeftFieldLabel];
         [self addSubview:self.multilineDetailsRightFieldLabel];
-
-
         [self addSubview:self.typeLabel];
-        
+
         self.clipsToBounds = YES;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
     }
@@ -342,10 +350,30 @@
     return _targetButton;
 }
 
+
 - (void)targetButtonPressed:(id)sender
 {
     BOOL isTargetedByUser = !self.targetButton.isSelected;
     [self setTargetStateTo:isTargetedByUser];
+}
+
+
+- (UIButton *)removeFromTargetsButton
+{
+    if (_removeFromTargetsButton == nil) {
+        _removeFromTargetsButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_removeFromTargetsButton setTitle:@"Remove from targets" forState:UIControlStateNormal];
+        _removeFromTargetsButton.backgroundColor = [UIColor clearColor];
+        _removeFromTargetsButton.titleLabel.font = [UIFont cnSystemFontOfSize:16.0];
+        [_removeFromTargetsButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
+        [_removeFromTargetsButton addTarget:self action:@selector(removeFromTargetsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _removeFromTargetsButton;
+}
+
+- (void)removeFromTargetsButtonPressed:(id)sender
+{
+    [self.delegate removeFromTargetsPressedIn:self];
 }
 
 - (void)setTargetStateTo:(BOOL)isTargetted
@@ -421,7 +449,7 @@
     }
 }
 
-+ (CGFloat)expandedHeightForEvent:(CNEvent *)event width:(CGFloat)viewWidth
++ (CGFloat)expandedHeightForEvent:(CNEvent *)event width:(CGFloat)viewWidth usedForTargeting:(BOOL)usedForTargeting
 {
     NSAttributedString *details = [self attributedStringForEventDetails:event];
     CGFloat width = viewWidth - kStatusDetailsXOffset - kStatusDetailsPadding;
@@ -430,7 +458,9 @@
                                                 context:nil];
     
     CGFloat extraHeight = rightBoundingRect.size.height;
-    
+    if (usedForTargeting == NO) {
+        extraHeight += (kRemoveFromTargetButtonHeight - kCellBottomPadding);
+    }
     return  [self collapsedHeightForEvent:event] +
             (ceilf(extraHeight)+1) +
             kCellBottomPadding;

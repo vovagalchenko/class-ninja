@@ -307,7 +307,8 @@
 {
     if ([self.expandedIndexPaths containsObject:indexPath]) {
         return [CNCourseDetailsTableViewCell expandedHeightForEvent:[self eventForIndexPath:indexPath]
-                                                              width:self.tableView.bounds.size.width];
+                                                              width:self.tableView.bounds.size.width
+                                                   usedForTargeting:YES];
     } else {
         return [CNCourseDetailsTableViewCell collapsedHeightForEvent:[self eventForIndexPath:indexPath]];
     }
