@@ -394,7 +394,11 @@
 
 + (CGFloat)collapsedHeightForEvent:(CNEvent *)event
 {
-    return kCollapsedHeight + 20 * (event.scheduleSlots.count - 1);
+    if (event.scheduleSlots.count > 0) {
+        return kCollapsedHeight + 20 * (event.scheduleSlots.count - 1);
+    } else {
+        return kCollapsedHeight;
+    }
 }
 
 + (CGFloat)expandedHeightForEvent:(CNEvent *)event width:(CGFloat)viewWidth

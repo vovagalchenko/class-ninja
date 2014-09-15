@@ -13,6 +13,6 @@
 
 + (instancetype)sharedInstance;
 
-- (void)validateProductIdentifiers:(NSArray *)productIdentifiers;
-- (void)testIAP;
+- (void)purchase:(NSString *)productId withCompletionBlock:(dispatch_block_t)completionBlock;
+
 @end

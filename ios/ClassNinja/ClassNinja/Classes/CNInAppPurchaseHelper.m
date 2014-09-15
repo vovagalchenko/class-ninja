@@ -10,8 +10,9 @@
 #import "CNAPIClient.h"
 
 @interface CNInAppPurchaseHelper ()
-@property (nonatomic, strong) SKProductsRequest *productsRequest;
+@property (nonatomic) SKProductsRequest *productsRequest;
 @property (nonatomic) SKReceiptRefreshRequest *refresh;
+@property (nonatomic, strong) dispatch_block_t completion;
 @end
 
 @implementation CNInAppPurchaseHelper
@@ -40,19 +41,20 @@
     [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
 }
 
-// Custom test method
-- (void)testIAP
+- (void)purchase:(NSString *)productId withCompletionBlock:(dispatch_block_t)completionBlock
 {
-    NSString *productId = @"UQ_9_99";
-    [self validateProductIdentifiers:@[productId]];
-}
-
-- (void)validateProductIdentifiers:(NSArray *)productIdentifiers
-{
-    self.productsRequest = [[SKProductsRequest alloc]
-                                          initWithProductIdentifiers:[NSSet setWithArray:productIdentifiers]];
+    if (productId == nil) {
+        if (completionBlock) {
+            completionBlock();
+        }
+        return;
+    }
+    self.completion = completionBlock;
+    NSArray *productIdentifiers = [[NSArray alloc] initWithObjects:productId, nil];
+    self.productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithArray:productIdentifiers]];
     self.productsRequest.delegate = self;
     [self.productsRequest start];
+
 }
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
@@ -66,73 +68,32 @@
         [[SKPaymentQueue defaultQueue] addPayment:payment];
     }
 }
-
-- (void)requestDidFinish:(SKRequest *)request
-{
-    
-}
-
-- (void)request:(SKRequest *)request didFailWithError:(NSError *)error
-{
-    
-}
-
-
-
 // Sent when the transaction array has changed (additions or state changes).  Client should check state of transactions and finish as appropriate
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
-    for (SKPaymentTransaction *transaction in transactions) {
+    SKPaymentTransaction *transaction = [transactions firstObject];
+    if (transaction) {
         SKPaymentTransactionState transactionState = transaction.transactionState;
         if (transactionState == SKPaymentTransactionStatePurchased) {
             NSData *receipt = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] appStoreReceiptURL]];
-            
             [[CNAPIClient sharedInstance] verify:receipt successBlock:^(BOOL success){
                 if (success) {
-                    NSLog(@"Receipt verification succeeded! Woohoo!");
                     [queue finishTransaction:transaction];
-                } else {
-                    
-                    NSLog(@"Receipt validation failed");
                 }
             }];
-            
-            NSLog(@"Make post to our server to verify receipt with %@", receipt);
-            
-        } else if (transactionState == SKPaymentTransactionStateFailed) {
-            NSLog(@"State failed");
+        } else if (transactionState == SKPaymentTransactionStateFailed || transactionState == SKPaymentTransactionStateRestored){
             [queue finishTransaction:transaction];
-        } else if (transactionState == SKPaymentTransactionStateRestored) {
-            NSLog(@"State restored");
         }
     }
-    
 }
 
 // Sent when transactions are removed from the queue (via finishTransaction:).
 - (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions
 {
-    
+    if (self.completion) {
+        self.completion();
+    }
 }
-
-// Sent when an error is encountered while adding transactions from the user's purchase history back to the queue.
-- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
-{
-    
-}
-
-// Sent when all transactions from the user's purchase history have successfully been added back to the queue.
-- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue
-{
-    
-}
-
-// Sent when the download state has changed.
-- (void)paymentQueue:(SKPaymentQueue *)queue updatedDownloads:(NSArray *)downloads
-{
-    
-}
-
 
 
 @end
