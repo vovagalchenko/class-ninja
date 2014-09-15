@@ -13,6 +13,7 @@
 #define kTargetButtonWidthAndHeight 43
 #define kTargetOffsetX 7.0
 
+#define kLeftShiftForMainScreen 31
 
 #define kCellBackgroundColor            ([UIColor colorWithWhite:250/255.0 alpha:1])
 #define kBorderHairlineColor            ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:229/255.0 alpha:1])
@@ -146,14 +147,22 @@
 {
     self.backgroundColor = kCellBackgroundColor;
     
-    self.typeLabel.frame = CGRectMake(kLabelTypeOffsetX, kLabelTypeOffsetY, kLabelTypeWidth, kLabelTypeHeight);
+
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, kStatusLEDHeight);
-    
-    self.targetButton.frame = CGRectMake(kTargetOffsetX, 1, kTargetButtonWidthAndHeight, kTargetButtonWidthAndHeight);
-    self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
 
-    [self layoutScheduleSlotsSubviews];
+    CGFloat leftShift = 0;
+    
+    if (self.usedForTargetting == NO) {
+        leftShift = kLeftShiftForMainScreen;
+        self.targetButton.hidden = YES;
+    } else {
+        self.targetButton.frame = CGRectMake(kTargetOffsetX, 1, kTargetButtonWidthAndHeight, kTargetButtonWidthAndHeight);
+    }
+
+    self.typeLabel.frame = CGRectMake(kLabelTypeOffsetX - leftShift, kLabelTypeOffsetY, kLabelTypeWidth, kLabelTypeHeight);
+
+    [self layoutScheduleSlotsSubviewsWithLeftShift:leftShift];
     
     CGFloat yOffset = [[self class] collapsedHeightForEvent:self.event];
     
@@ -161,21 +170,24 @@
     CGRect boundingRect = [stringToSize boundingRectWithSize:CGSizeMake(kDetailsFieldWidth, kDetailsFieldMaxHeight)
                                                      options:NSStringDrawingUsesLineFragmentOrigin
                                                      context:nil];
-    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset,
+    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset - leftShift,
                                                            yOffset,
                                                            ceilf(kDetailsFieldWidth),
                                                            ceilf(boundingRect.size.height)+1);
     [self.multilineDetailsLeftFieldLabel sizeToFit];
     
     stringToSize = self.multilineDetailsRightFieldLabel.attributedText;
-    CGFloat width = self.bounds.size.width - kStatusDetailsXOffset - kStatusDetailsPadding;
+    CGFloat width = self.bounds.size.width - (kStatusDetailsXOffset - leftShift) - kStatusDetailsPadding;
     boundingRect = [stringToSize boundingRectWithSize:CGSizeMake(width, kDetailsFieldMaxHeight)
                                               options:NSStringDrawingUsesLineFragmentOrigin
                                               context:nil];
-    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
+    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset - leftShift,
                                                             yOffset,
                                                             ceilf(boundingRect.size.width),
                                                             ceilf(boundingRect.size.height)+1);
+
+    self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
+
 }
 
 - (void)setEvent:(CNEvent *)event
@@ -210,12 +222,15 @@
     }
 }
 
-- (void)layoutScheduleSlotsSubviews
+- (void)layoutScheduleSlotsSubviewsWithLeftShift:(CGFloat)leftShift
 {
-    CGFloat width = self.bounds.size.width - kScheduleSlotOffsetX - kScheduleSlotRightPadding;
+    CGFloat width = self.bounds.size.width - (kScheduleSlotOffsetX - leftShift) - kScheduleSlotRightPadding;
+    
     for (int i = 0; i < self.scheduleSlotSubviews.count; i++) {
         UIView *view = [self.scheduleSlotSubviews objectAtIndex:i];
-        view.frame = CGRectMake(kScheduleSlotOffsetX, kScheduleFirstSlotOffsetY + i * (kScheduleYDistanceBetweenSlots + kSlotViewHeight) , width, kSlotViewHeight);
+        view.frame = CGRectMake(kScheduleSlotOffsetX - leftShift,
+                                kScheduleFirstSlotOffsetY + i * (kScheduleYDistanceBetweenSlots + kSlotViewHeight),
+                                width, kSlotViewHeight);
     }
 }
 
