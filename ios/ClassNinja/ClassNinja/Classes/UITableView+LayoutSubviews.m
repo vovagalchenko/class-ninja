@@ -14,10 +14,13 @@
 
 + (void)load
 {
-    Method existing = class_getInstanceMethod(self, @selector(layoutSubviews));
-    Method new = class_getInstanceMethod(self, @selector(_autolayout_replacementLayoutSubviews));
-    
-    method_exchangeImplementations(existing, new);
+    // The layoutSubviews bug is fixed in iOS 8
+    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_7_1) {
+        Method existing = class_getInstanceMethod(self, @selector(layoutSubviews));
+        Method new = class_getInstanceMethod(self, @selector(_autolayout_replacementLayoutSubviews));
+        
+        method_exchangeImplementations(existing, new);
+    }
 }
 
 - (void)_autolayout_replacementLayoutSubviews

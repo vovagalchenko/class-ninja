@@ -44,6 +44,7 @@
 {
     if (self.authenticationCompletionBlock) {
         self.authenticationCompletionBlock(NO);
+        self.authenticationCompletionBlock = nil;
     }
 }
 

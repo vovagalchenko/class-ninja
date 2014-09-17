@@ -13,7 +13,6 @@
 @interface CNTargetSectionHeaderView()
 
 @property (nonatomic) UILabel *label;
-@property (nonatomic, assign) BOOL constraintsApplied;
 
 @end
 
@@ -23,62 +22,35 @@
 {
     self = [super initWithFrame:CGRectZero];
     if (self) {
-        self.translatesAutoresizingMaskIntoConstraints = NO;
         self.backgroundColor = [UIColor whiteColor];
         self.opaque = NO;
         
         self.label = [[UILabel alloc] init];
         self.label.clipsToBounds = YES;
-        self.label.translatesAutoresizingMaskIntoConstraints = NO;
-        self.label.backgroundColor = [UIColor whiteColor];
         self.label.font = [UIFont cnSystemFontOfSize:17.0];
         self.label.textColor = [UIColor blackColor];
-        self.label.numberOfLines = -1;
-        [self.label setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
-        [self.label setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
-        [self.label setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
-        [self.label setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+        self.label.lineBreakMode = NSLineBreakByWordWrapping;
+        self.label.numberOfLines = 0;
         [self addSubview:self.label];
-        
-        self.constraintsApplied = NO;
-        
     }
     return self;
 }
 
-- (void)updateConstraints
+- (void)layoutSubviews
 {
-    if (!self.constraintsApplied) {
-        self.constraintsApplied = YES;
-        [self addConstraints:@[
-                               [NSLayoutConstraint constraintWithItem:self.label
-                                                            attribute:NSLayoutAttributeBottom
-                                                            relatedBy:NSLayoutRelationEqual
-                                                               toItem:self
-                                                            attribute:NSLayoutAttributeBottom
-                                                           multiplier:1.0
-                                                             constant:0.0],
-                               [NSLayoutConstraint constraintWithItem:self.label
-                                                            attribute:NSLayoutAttributeHeight
-                                                            relatedBy:NSLayoutRelationEqual
-                                                               toItem:self
-                                                            attribute:NSLayoutAttributeHeight
-                                                           multiplier:1.0
-                                                             constant:0.0]
-                               
-                               ]];
-        
-        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_label]|", HORIZONTAL_MARGIN]
-                                                                     options:0
-                                                                     metrics:0
-                                                                       views:NSDictionaryOfVariableBindings(_label)]];
-    }
-    [super updateConstraints];
+    CGFloat labelX = HORIZONTAL_MARGIN - self.frame.origin.x;
+    CGRect labelRect = [self.label.attributedText boundingRectWithSize:CGSizeMake(self.bounds.size.width - 2*labelX, self.bounds.size.height)
+                                                               options:NSStringDrawingUsesLineFragmentOrigin
+                                                               context:nil];
+    self.label.frame = CGRectMake(labelX, (self.bounds.size.height - labelRect.size.height)/2,
+                                  labelRect.size.width, labelRect.size.height);
+    [super layoutSubviews];
 }
 
 - (void)setText:(NSString *)text
 {
-   self.label.text = text;
+    self.label.text = text;
+    [self setNeedsLayout];
 }
 
 @end

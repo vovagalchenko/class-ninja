@@ -22,6 +22,7 @@
 @property (nonatomic) CNSiongNavigationViewController *siongsNavigationController;
 @property (nonatomic) NSArray *targets;
 @property (nonatomic, readonly) NSMutableArray *expandedIndexPaths;
+@property (nonatomic, assign) BOOL targetLoadInProgress;
 
 @end
 
@@ -45,18 +46,22 @@
 {
     [super viewDidAppear:animated];
     [self setNeedsStatusBarAppearanceUpdate];
-    [[CNAPIClient sharedInstance] list:[CNTargetedCourse class]
-                            authPolicy:CNFailRequestOnAuthFailure
-                            completion:^(NSArray *targets) {
-        if (targets.count) {
-            [self setStatus:@"Here are the classes you're tracking this semester"];
-            [APP_DELEGATE registerForPushNotifications];
-        } else {
-            [self setStatus:@"You're not tracking any classes this semester :("];
-        }
-        self.targets = targets;
-        [self.tableView reloadData];
-    }];
+    if (!self.targetLoadInProgress) {
+        self.targetLoadInProgress = YES;
+        [[CNAPIClient sharedInstance] list:[CNTargetedCourse class]
+                                authPolicy:CNFailRequestOnAuthFailure
+                                completion:^(NSArray *targets) {
+            if (targets.count) {
+                [self setStatus:@"Here are the classes you're tracking this semester"];
+                [APP_DELEGATE registerForPushNotifications];
+            } else {
+                [self setStatus:@"You're not tracking any classes this semester :("];
+            }
+            self.targets = targets;
+            [self.tableView reloadData];
+            self.targetLoadInProgress = NO;
+        }];
+    }
 }
 
 - (void)viewDidLayoutSubviews
@@ -104,7 +109,12 @@
     
     self.view.backgroundColor = WELCOME_BLUE_COLOR;
     
-    self.tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    // UITableViewStylePlain is the nicer style for us, however, on iOS 7, there's a bug that causes
+    // crashes during cell animations if there are footers involved and the table style is UITableViewStylePlain:
+    // http://stackoverflow.com/questions/11664766/cell-animation-stop-fraction-must-be-greater-than-start-fraction
+    self.tableView = [[UITableView alloc] initWithFrame:CGRectZero
+                                                  style:(floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_7_1)?
+                                                            UITableViewStylePlain : UITableViewStyleGrouped];
     self.tableView.clipsToBounds = YES;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
@@ -214,11 +224,12 @@
 static void getSectionAndEventIndicesForCourse(CNCourse *course, NSUInteger rowIndex, NSInteger *sectionIndex, NSInteger *eventIndex)
 {
     *sectionIndex = 0;
-    while (rowIndex >= [[[course.sections objectAtIndex:*sectionIndex] events] count] + 1) {
+    NSInteger currRowIndex = rowIndex;
+    while (currRowIndex >= (NSInteger)[[[course.sections objectAtIndex:*sectionIndex] events] count] + 1) {
         (*sectionIndex)++;
-        rowIndex -= [[[course.sections objectAtIndex:*sectionIndex] events] count] + 1;
+        currRowIndex -= [[[course.sections objectAtIndex:*sectionIndex] events] count] + 1;
     }
-    *eventIndex = rowIndex - 1;
+    *eventIndex = currRowIndex - 1;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -263,6 +274,9 @@ static NSString *eventCellId = @"Event_Cell";
         ((CNCourseDetailsTableViewCell *)cell).event = [[section events] objectAtIndex:eventIndex];
         if ([self.expandedIndexPaths containsObject:indexPath])
             [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+        else
+            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+        
     }
     return cell;
 }
@@ -271,20 +285,19 @@ static NSString *eventCellId = @"Event_Cell";
 {
     if (indexPath.row == 0) return; // There's no selecting of the section headers
     
-    [self.expandedIndexPaths addObject:indexPath];
-    
     [tableView beginUpdates];
-        [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.expandedIndexPaths addObject:indexPath];
     [tableView endUpdates];
+ 
+    [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.row == 0) return; // There's no deselecting of the section headers
     
-    [self.expandedIndexPaths removeObject:indexPath];
     [tableView beginUpdates];
-        [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.expandedIndexPaths removeObject:indexPath];
     [tableView endUpdates];
 }
 
@@ -292,23 +305,6 @@ static NSString *eventCellId = @"Event_Cell";
 {
     CNTargetSectionHeaderView *headerView = [[CNTargetSectionHeaderView alloc] init];
     [headerView setText:[[self.targets objectAtIndex:section] name]];
-    [headerView removeConstraints:headerView.constraints];
-    [headerView addConstraints:@[
-                                 [NSLayoutConstraint constraintWithItem:headerView
-                                                              attribute:NSLayoutAttributeHeight
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:nil
-                                                              attribute:NSLayoutAttributeNotAnAttribute
-                                                             multiplier:0.0
-                                                               constant:70.0],
-                                 [NSLayoutConstraint constraintWithItem:headerView
-                                                              attribute:NSLayoutAttributeWidth
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:nil
-                                                              attribute:NSLayoutAttributeNotAnAttribute
-                                                             multiplier:0.0
-                                                               constant:tableView.bounds.size.width]
-                                 ]];
     return headerView;
 }
 
@@ -342,7 +338,6 @@ static NSString *eventCellId = @"Event_Cell";
 // The footer is for separation between sections
 - (void)tableView:(UITableView *)tableView willDisplayFooterView:(UIView *)view forSection:(NSInteger)section
 {
-    NSLog(@"%@", view);
     view.opaque = NO;
     view.alpha = 0;
 }
@@ -351,22 +346,6 @@ static NSString *eventCellId = @"Event_Cell";
 {
     UIView *footerView = [[UIView alloc] init];
     footerView.alpha = 0;
-    [footerView addConstraints:@[
-                                 [NSLayoutConstraint constraintWithItem:footerView
-                                                              attribute:NSLayoutAttributeHeight
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:nil
-                                                              attribute:NSLayoutAttributeNotAnAttribute
-                                                             multiplier:0.0
-                                                               constant:20.0],
-                                 [NSLayoutConstraint constraintWithItem:footerView
-                                                              attribute:NSLayoutAttributeWidth
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:nil
-                                                              attribute:NSLayoutAttributeNotAnAttribute
-                                                             multiplier:0.0
-                                                               constant:tableView.bounds.size.width]
-                                 ]];
     return footerView;
     
 }

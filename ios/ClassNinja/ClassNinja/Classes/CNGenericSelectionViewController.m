@@ -133,7 +133,7 @@
     }
     
     if (VCs.count < searchModels.count) {
-        for (int i = VCs.count; i < searchModels.count; i++) {
+        for (NSUInteger i = VCs.count; i < searchModels.count; i++) {
             cursorVC = [[[cursorVC nextVCClass] alloc] init];
             cursorVC.selectedModel = [searchModels objectAtIndex:i];;
             [self.siongNavigationController pushViewController:cursorVC animated:NO];

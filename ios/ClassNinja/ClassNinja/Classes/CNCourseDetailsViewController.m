@@ -13,9 +13,6 @@
 #import "AppearanceConstants.h"
 #import "CNPaywallViewController.h"
 
-#define kCloseButtonWidth  11
-#define kCloseButtonHeight 11
-
 #define kCloseButtonXOffset 17
 #define kCloseButtonYOffset 17
 
@@ -244,7 +241,7 @@
     [super viewWillLayoutSubviews];
 
     self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset,
-                                        kCloseButtonWidth, kCloseButtonHeight);
+                                        CLOSE_BUTTON_DIMENSION, CLOSE_BUTTON_DIMENSION);
     CGSize size = self.view.bounds.size;
     self.tableView.frame = CGRectMake(kTableOffsetX, kTableOffsetY, size.width - 2 * kTableOffsetX, size.height - kTableOffsetY - kTrackButtonHeight);
     self.tableView.tableHeaderView.frame = CGRectMake(0, 0, size.width - 2 * kTableOffsetX,  kTableHeaderHeight);

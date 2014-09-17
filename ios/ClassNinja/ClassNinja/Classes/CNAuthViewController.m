@@ -54,7 +54,6 @@ typedef enum : NSUInteger {
 - (void)viewWillAppear:(BOOL)animated
 {
     [self changeState:self.currentState animated:NO];
-    [self.textField becomeFirstResponder];
     [super viewWillAppear:animated];
 }
 
@@ -105,10 +104,17 @@ typedef enum : NSUInteger {
                                                                                    options:0
                                                                                    metrics:nil
                                                                                      views:NSDictionaryOfVariableBindings(_cancelButton)];
-    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_cancelButton(11)]-%f-[_detailLabel]-(>=8)-[_textField]-[_confirmationButton]", X_BUTTON_VERTICAL_MARGIN, X_BUTTON_VERTICAL_MARGIN*2]
+    NSArray *vertical = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_cancelButton(%f)]-(>=8)-[_detailLabel]-(>=8)-[_textField]-[_confirmationButton]", X_BUTTON_VERTICAL_MARGIN, CLOSE_BUTTON_DIMENSION]
                                                                 options:0
                                                                 metrics:nil
                                                                   views:NSDictionaryOfVariableBindings(_cancelButton, _detailLabel, _textField, _confirmationButton)];
+    NSLayoutConstraint *detailLabelCenter = [NSLayoutConstraint constraintWithItem:self.detailLabel
+                                                                         attribute:NSLayoutAttributeCenterY
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:self.view
+                                                                         attribute:NSLayoutAttributeBottom
+                                                                        multiplier:0.20
+                                                                          constant:0.0];
     NSLayoutConstraint *tfCentering = [NSLayoutConstraint constraintWithItem:self.textField
                                                                    attribute:NSLayoutAttributeCenterY
                                                                    relatedBy:NSLayoutRelationEqual
@@ -123,7 +129,7 @@ typedef enum : NSUInteger {
     [self.view addConstraints:horizontalButton];
     [self.view addConstraints:@[activityIndicatorHorizontal, activityIndicatorVertical, activityIndicatorWidth, activityIndicatorHeight]];
     [self.view addConstraints:horizontalCancelConstraints];
-    [self.view addConstraint:tfCentering];
+    [self.view addConstraints:@[tfCentering, detailLabelCenter]];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle

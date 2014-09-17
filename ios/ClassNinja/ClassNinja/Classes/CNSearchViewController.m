@@ -28,10 +28,8 @@
 #define kDepartmentsResultsCellHeight 44
 #define kCoursesResultsCellHeight 59
 
-#define kCloseButtonWidth  11
-#define kCloseButtonHeight 11
-#define kCloseButtonXOffset (kSearchBarOffsetX + floorf(kCloseButtonWidth / 2))
-#define kCloseButtonYOffset (kTitleOriginY +  floorf((kTitleOriginHeight - kCloseButtonHeight) / 2)+1)
+#define kCloseButtonXOffset (kSearchBarOffsetX + floorf(CLOSE_BUTTON_DIMENSION / 2))
+#define kCloseButtonYOffset (kTitleOriginY +  floorf((kTitleOriginHeight - CLOSE_BUTTON_DIMENSION) / 2)+1)
 
 
 #define kCellTitleFont ([UIFont systemFontOfSize:14.0])
@@ -250,7 +248,7 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-    self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset, kCloseButtonWidth, kCloseButtonHeight);
+    self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset, CLOSE_BUTTON_DIMENSION, CLOSE_BUTTON_DIMENSION);
     
     self.titleLabel.frame = CGRectMake(0, kTitleOriginY,
                                        self.view.bounds.size.width, kTitleOriginHeight);

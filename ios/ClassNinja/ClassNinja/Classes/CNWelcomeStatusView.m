@@ -41,23 +41,20 @@
                                                  metrics:nil
                                                  views:NSDictionaryOfVariableBindings(_welcomeLabel)];
         NSArray *statusHorizontalConstraints = [NSLayoutConstraint
-                                                 constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_statusLabel]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
-                                                 options:0
-                                                 metrics:nil
-                                                 views:NSDictionaryOfVariableBindings(_statusLabel)];
-        NSArray *addClassesHorizontalConstraints = [NSLayoutConstraint
-                                                constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_addClassesButton]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
+                                                constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_statusLabel]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
                                                 options:0
                                                 metrics:nil
-                                                views:NSDictionaryOfVariableBindings(_addClassesButton)];
-
+                                                views:NSDictionaryOfVariableBindings(_statusLabel)];
+        NSArray *addClassesHorizontalConstraints = [NSLayoutConstraint
+                                                    constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_addClassesButton]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
+                                                    options:0
+                                                    metrics:nil
+                                                    views:NSDictionaryOfVariableBindings(_addClassesButton)];
+        
         [self addConstraints:verticalConstraints];
         [self addConstraints:welcomeHorizontalConstraints];
         [self addConstraints:statusHorizontalConstraints];
         [self addConstraints:addClassesHorizontalConstraints];
-        
-        [self setNeedsLayout];
-        [self layoutIfNeeded];
     }
     return self;
 }

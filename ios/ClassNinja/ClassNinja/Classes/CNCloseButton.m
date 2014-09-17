@@ -39,7 +39,7 @@
 
 - (CGSize)intrinsicContentSize
 {
-    return CGSizeMake(11.0, 11.0);
+    return CGSizeMake(CLOSE_BUTTON_DIMENSION, CLOSE_BUTTON_DIMENSION);
 }
 
 - (void)drawRect:(CGRect)rect
