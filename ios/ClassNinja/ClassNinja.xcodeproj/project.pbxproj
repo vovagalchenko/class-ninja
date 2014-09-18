@@ -31,6 +31,7 @@
 		70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A5F36E19B444780060EB0C /* CNSearchViewController.m */; };
 		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
 		70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */; };
+		80A05E5E19CAD34100B4A1CD /* CNTargetsDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 80A05E5D19CAD34100B4A1CD /* CNTargetsDiff.m */; };
 		80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 80F1000C19C4ED7500C28C32 /* CNCloseButton.m */; };
 		80F1001019C50E4300C28C32 /* CNTargetSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 80F1000F19C50E4300C28C32 /* CNTargetSectionHeaderView.m */; };
 		DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B67819883E020092EE90 /* CNAuthContext.m */; };
@@ -97,6 +98,8 @@
 		70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionTableViewCell.m; sourceTree = "<group>"; };
 		70E7619C19A02075003F3984 /* UIColor+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CNAdditions.h"; sourceTree = "<group>"; };
 		70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CNAdditions.m"; sourceTree = "<group>"; };
+		80A05E5C19CAD34100B4A1CD /* CNTargetsDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNTargetsDiff.h; sourceTree = "<group>"; };
+		80A05E5D19CAD34100B4A1CD /* CNTargetsDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNTargetsDiff.m; sourceTree = "<group>"; };
 		80F1000B19C4ED7500C28C32 /* CNCloseButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCloseButton.h; sourceTree = "<group>"; };
 		80F1000C19C4ED7500C28C32 /* CNCloseButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCloseButton.m; sourceTree = "<group>"; };
 		80F1000E19C50E4300C28C32 /* CNTargetSectionHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNTargetSectionHeaderView.h; sourceTree = "<group>"; };
@@ -296,6 +299,8 @@
 		DCCAA3981985FABA00BC4E7D /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				80A05E5C19CAD34100B4A1CD /* CNTargetsDiff.h */,
+				80A05E5D19CAD34100B4A1CD /* CNTargetsDiff.m */,
 				707F989619689D8700D6E552 /* CNModels.h */,
 				707F989719689D8700D6E552 /* CNModels.m */,
 				DCCAA3971985FA8A00BC4E7D /* API */,
@@ -438,6 +443,7 @@
 				708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */,
 				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
 				DC42205A1996D96100739068 /* CNActivityIndicator.m in Sources */,
+				80A05E5E19CAD34100B4A1CD /* CNTargetsDiff.m in Sources */,
 				DCCAA3921985ECB200BC4E7D /* CNAPIClient.m in Sources */,
 				707F9851196899BC00D6E552 /* CNAppDelegate.m in Sources */,
 				7032013D1997F8C40032F16B /* CNCourseDetailsTableViewCell.m in Sources */,

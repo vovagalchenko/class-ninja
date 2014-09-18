@@ -57,7 +57,8 @@
         CNCourse *rightCourse = (CNCourse *)object;
         return  [self.courseId isEqualToString:rightCourse.courseId] &&
                 [self.departmentSpecificCourseId isEqualToString:rightCourse.departmentSpecificCourseId] &&
-                [self.departmentId isEqualToString:rightCourse.departmentId];
+                [self.departmentId isEqualToString:rightCourse.departmentId] &&
+                [self.name isEqualToString:rightCourse.name];
     }
     return NO;
 }
@@ -76,6 +77,18 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"Section %@, id = %@, staff name = %@, course id = %@\n\nlist of events = %@", self.name, self.sectionid, self.staffName, self.courseId, self.events];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    BOOL retVal = NO;
+    if ([object isKindOfClass:[self class]]) {
+        CNSection *properSection = (CNSection *)object;
+        retVal = [self.sectionid isEqualToString:properSection.sectionid] &&
+                 [self.staffName isEqualToString:properSection.staffName] &&
+                 [self.name isEqualToString:properSection.name];
+    }
+    return retVal;
 }
 
 @end
@@ -150,6 +163,16 @@
 {
     NSArray *typeAndSectionID = [self.eventType componentsSeparatedByString:@" "];
     return [typeAndSectionID firstObject];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    BOOL retVal = NO;
+    if ([object isKindOfClass:[self class]]) {
+        CNEvent *properEvent = (CNEvent *)object;
+        retVal = [self.name isEqualToString:properEvent.name];
+    }
+    return retVal;
 }
 
 

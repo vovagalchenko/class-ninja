@@ -14,8 +14,9 @@
 #import "CNAppDelegate.h"
 #import "CNTargetSectionHeaderView.h"
 #import "CNCourseDetailsTableViewCell.h"
+#import "CNTargetsDiff.h"
 
-@interface CNWelcomeViewController ()
+@interface CNWelcomeViewController () <CourseDetailsTableViewCellProtocol>
 
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) CNWelcomeStatusView *statusView;
@@ -23,6 +24,7 @@
 @property (nonatomic) NSArray *targets;
 @property (nonatomic, readonly) NSMutableArray *expandedIndexPaths;
 @property (nonatomic, assign) BOOL targetLoadInProgress;
+@property (nonatomic) NSArray *highlightedTargetRows;
 
 @end
 
@@ -46,20 +48,99 @@
 {
     [super viewDidAppear:animated];
     [self setNeedsStatusBarAppearanceUpdate];
+    [self refreshTargets];
+}
+
+- (void)refreshTargets
+{
     if (!self.targetLoadInProgress) {
         self.targetLoadInProgress = YES;
         [[CNAPIClient sharedInstance] list:[CNTargetedCourse class]
                                 authPolicy:CNFailRequestOnAuthFailure
-                                completion:^(NSArray *targets) {
+                                completion:^(NSArray *targets)
+        {
             if (targets.count) {
                 [self setStatus:@"Here are the classes you're tracking this semester"];
                 [APP_DELEGATE registerForPushNotifications];
             } else {
                 [self setStatus:@"You're not tracking any classes this semester :("];
             }
-            self.targets = targets;
-            [self.tableView reloadData];
+            
             self.targetLoadInProgress = NO;
+            if (!targets) return;
+            
+            // Now we'll animate the change from the old list of targets to the new
+            NSArray *oldTargets = self.targets;
+            CNTargetsDiff *diff = [CNTargetsDiff diffWithOldTargets:oldTargets newTargets:targets];
+            
+            self.targets = targets;
+            // Deselect everything for starters
+            for (UITableViewCell *cell in self.tableView.visibleCells) {
+                [cell setSelected:NO animated:YES];
+            }
+            // Take the first
+            NSUInteger singleAddition = [diff singleAddition];
+            if (singleAddition != NSNotFound) {
+                [self.expandedIndexPaths removeAllObjects];
+                // In case only additions to a single targeted course were performed
+                // we're going to want to highlight this change to the user by scrolling
+                // the tableview to the newly added cells and highlighting them for a second.
+                NSArray *indexPathsToScrollTo = @[];
+                
+                // The single addition change could be performed two ways:
+                //  1. Addition of a new targeted course with one or more targeted events.
+                //  2. Addition of one or more targeted events to an existing targeted course.
+                // Below, we calculate the indexPaths to highlight for each of those cases.
+                if (diff.sectionsAdditions.count) {
+                    [self.tableView insertSections:diff.sectionsAdditions withRowAnimation:UITableViewRowAnimationTop];
+                    NSMutableArray *sectionsIndexPaths = [NSMutableArray array];
+                    NSUInteger numRowsInSection = [self tableView:self.tableView numberOfRowsInSection:singleAddition];
+                    for (NSUInteger i = 0; i < numRowsInSection; i++) {
+                        [sectionsIndexPaths addObject:[NSIndexPath indexPathForRow:i
+                                                                         inSection:singleAddition]];
+                    }
+                    indexPathsToScrollTo = [NSArray arrayWithArray:sectionsIndexPaths];
+                } else if (diff.rowsAdditions.count) {
+                    [self.tableView insertRowsAtIndexPaths:diff.rowsAdditions withRowAnimation:UITableViewRowAnimationAutomatic];
+                    indexPathsToScrollTo = diff.rowsAdditions;
+                }
+                // Finally, change the model for the highlightedTargetRows and reload the corresponding rows in the UI.
+                self.highlightedTargetRows = [NSArray arrayWithArray:indexPathsToScrollTo];
+                [self.tableView reloadRowsAtIndexPaths:indexPathsToScrollTo
+                                      withRowAnimation:UITableViewRowAnimationFade];
+                
+                // Scroll to make sure the first and the last indexPaths of the indexPathsToScrollTo are visible.
+                [self.tableView scrollToRowAtIndexPath:indexPathsToScrollTo.firstObject
+                                      atScrollPosition:UITableViewScrollPositionNone
+                                              animated:YES];
+                [self.tableView scrollToRowAtIndexPath:indexPathsToScrollTo.lastObject
+                                      atScrollPosition:UITableViewScrollPositionNone
+                                              animated:YES];
+                // Dismiss the highlighting after 1 second.
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    self.highlightedTargetRows = nil;
+                    [self.tableView reloadRowsAtIndexPaths:indexPathsToScrollTo withRowAnimation:UITableViewRowAnimationFade];
+                });
+            } else {
+                // The diff between the old and new targets isn't a change to a single targeted course.
+                // We don't have anything to highlight – we're just going to apply the diff to the tableview.
+                // TODO: apply updates.
+                [self.tableView beginUpdates];
+                [self.expandedIndexPaths removeAllObjects];
+                if (diff.sectionsAdditions.count) {
+                    [self.tableView insertSections:diff.sectionsAdditions withRowAnimation:UITableViewRowAnimationBottom];
+                }
+                if (diff.rowsAdditions.count) {
+                    [self.tableView insertRowsAtIndexPaths:diff.rowsAdditions withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+                if (diff.sectionsDeletions.count) {
+                    [self.tableView deleteSections:diff.sectionsDeletions withRowAnimation:UITableViewRowAnimationBottom];
+                }
+                if (diff.rowsDeletions.count) {
+                    [self.tableView deleteRowsAtIndexPaths:diff.rowsDeletions withRowAnimation:UITableViewRowAnimationAutomatic];
+                }
+                [self.tableView endUpdates];
+            }
         }];
     }
 }
@@ -221,13 +302,13 @@
 
 #pragma mark - UITableViewController stuff
 
-static void getSectionAndEventIndicesForCourse(CNCourse *course, NSUInteger rowIndex, NSInteger *sectionIndex, NSInteger *eventIndex)
+static void getSectionAndEventIndicesForCourse(CNTargetedCourse *course, NSUInteger rowIndex, NSInteger *sectionIndex, NSInteger *eventIndex)
 {
     *sectionIndex = 0;
     NSInteger currRowIndex = rowIndex;
     while (currRowIndex >= (NSInteger)[[[course.sections objectAtIndex:*sectionIndex] events] count] + 1) {
+        currRowIndex -= ([[[course.sections objectAtIndex:*sectionIndex] events] count] + 1);
         (*sectionIndex)++;
-        currRowIndex -= [[[course.sections objectAtIndex:*sectionIndex] events] count] + 1;
     }
     *eventIndex = currRowIndex - 1;
 }
@@ -253,7 +334,7 @@ static NSString *eventCellId = @"Event_Cell";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    CNCourse *course = [self.targets objectAtIndex:indexPath.section];
+    CNTargetedCourse *course = [self.targets objectAtIndex:indexPath.section];
     NSInteger sectionIndex, eventIndex;
     getSectionAndEventIndicesForCourse(course, indexPath.row, &sectionIndex, &eventIndex);
     
@@ -270,6 +351,7 @@ static NSString *eventCellId = @"Event_Cell";
     } else {
         cellId = eventCellId;
         cell = (CNCourseDetailsTableViewCell *)[tableView dequeueReusableCellWithIdentifier:cellId forIndexPath:indexPath];
+        ((CNCourseDetailsTableViewCell *)cell).delegate = self;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         ((CNCourseDetailsTableViewCell *)cell).event = [[section events] objectAtIndex:eventIndex];
         if ([self.expandedIndexPaths containsObject:indexPath])
@@ -305,6 +387,9 @@ static NSString *eventCellId = @"Event_Cell";
 {
     CNTargetSectionHeaderView *headerView = [[CNTargetSectionHeaderView alloc] init];
     [headerView setText:[[self.targets objectAtIndex:section] name]];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [headerView setNeedsLayout];
+    });
     return headerView;
 }
 
@@ -315,7 +400,7 @@ static NSString *eventCellId = @"Event_Cell";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    CNCourse *course = [self.targets objectAtIndex:indexPath.section];
+    CNTargetedCourse *course = [self.targets objectAtIndex:indexPath.section];
     NSInteger sectionIndex, eventIndex;
     getSectionAndEventIndicesForCourse(course, indexPath.row, &sectionIndex, &eventIndex);
     
@@ -353,6 +438,37 @@ static NSString *eventCellId = @"Event_Cell";
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
     return 20.0;
+}
+
+- (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isExpanded
+{
+    // TODO: it's not clear why we should ever need these callbacks at all
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([self.highlightedTargetRows containsObject:indexPath]) {
+        [cell setHighlighted:YES animated:NO];
+    } else {
+        [cell setHighlighted:NO animated:NO];
+    }
+}
+
+- (void)removeFromTargetsPressedIn:(CNCourseDetailsTableViewCell *)cell
+{
+    NSIndexPath *cellIndexPath = [self.tableView indexPathForCell:cell];
+    CNTargetedCourse *targetedCourse = [self.targets objectAtIndex:cellIndexPath.section];
+    NSLog(@"REMOVIN: %@", cellIndexPath);
+    NSInteger sectionIndex, eventIndex;
+    getSectionAndEventIndicesForCourse(targetedCourse, cellIndexPath.row, &sectionIndex, &eventIndex);
+    
+    CNAPIClient *client = [CNAPIClient sharedInstance];
+    CNSection *relevantSection = [targetedCourse.sections objectAtIndex:sectionIndex];
+    CNEvent *relevantEvent = [relevantSection.events objectAtIndex:eventIndex];
+    [client removeEventFromTargetting:relevantEvent
+                         successBlock:^(BOOL success) {
+        [self refreshTargets];
+    }];
 }
 
 #pragma mark - Properties

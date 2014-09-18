@@ -139,6 +139,8 @@
 
 @property (nonatomic) NSMutableArray *scheduleSlotSubviews;
 
+@property (nonatomic) UIView *highlightBackgroundView;
+
 @end
 
 @implementation CNCourseDetailsTableViewCell
@@ -147,7 +149,8 @@
 {
     self.backgroundColor = kCellBackgroundColor;
     
-
+    self.highlightBackgroundView.frame = self.bounds;
+    
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, kStatusLEDHeight);
 
@@ -272,6 +275,10 @@
         _dateTimeLabel.numberOfLines = 0;
         _dateTimeLabel.userInteractionEnabled = NO;
         
+        _highlightBackgroundView = [[UIView alloc] init];
+        _highlightBackgroundView.backgroundColor = [UIColor colorWithRed:.9 green:.9 blue:.9 alpha:1.0];
+        
+        [self addSubview:_highlightBackgroundView];
         [self addSubview:_separationLineView];
         [self addSubview:_statusLEDView];
         [self addSubview:_dateTimeLabel];
@@ -286,6 +293,18 @@
         self.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     return self;
+}
+
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
+{
+    void (^highlight)() = ^{
+        self.highlightBackgroundView.alpha = highlighted;
+    };
+    if (animated) {
+        [UIView animateWithDuration:ANIMATION_DURATION animations:highlight];
+    } else {
+        highlight();
+    }
 }
 
 - (UILabel *)typeLabel
