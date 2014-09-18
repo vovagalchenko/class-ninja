@@ -13,8 +13,8 @@ class create_notification_interface(HTTP_Response_Builder):
         if self.user is None:
             raise Authorization_Exception("You must be logged in to create a notification interface.")
 
-        if self.kind != 'iOS':
-            raise Unprocessable_Entity_Exception("Only 'iOS' kind of notification interfaces are currently supported")
+        if self.kind != 'iOS' and self.kind != 'iOS-sandbox':
+            raise Unprocessable_Entity_Exception("Only 'iOS' kind of notification interfaces are currently supported. Provided: " + str(self.kind))
 
         db_session = DB_Session_Factory.get_db_session() 
         notification_interface = db_session.query(Notification_Interface).filter(Notification_Interface.user_phone_number == self.user.phonenumber, Notification_Interface.kind == self.kind, Notification_Interface.notification_interface_key == self.notification_interface_key).first()
