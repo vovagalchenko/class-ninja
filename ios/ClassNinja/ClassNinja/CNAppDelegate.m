@@ -34,10 +34,29 @@
 
 - (void)registerForPushNotifications
 {
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound];
+    UIApplication *app = [UIApplication sharedApplication];
+    if ([app respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        UIUserNotificationSettings *notificationSettings = [UIUserNotificationSettings settingsForTypes:UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound
+                                                                                             categories:nil];
+        [app registerUserNotificationSettings:notificationSettings];
+    } else {
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound];
+    }
 }
 
 #define PUSH_NOTIFICATION_KNOWN_TOKENS_USER_DEFAULTS_KEY    @"known_tokens"
+
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
+{
+    if (notificationSettings.types != UIRemoteNotificationTypeNone)
+        [application registerForRemoteNotifications];
+    else
+        [[[UIAlertView alloc] initWithTitle:@"Warning"
+                                    message:@"The app has limited utility if you don't let us notify you of when classes become available. If you change your mind, make the appropriate change in your settings."
+                                   delegate:nil
+                          cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
+
+}
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {

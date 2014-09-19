@@ -74,7 +74,6 @@
         if (!targets) {
             NSArray *pathsToRefresh = [NSArray arrayWithArray:self.processingRows];
             [self.processingRows removeAllObjects];
-            NSLog(@"FAILED");
             [self.tableView reloadRowsAtIndexPaths:pathsToRefresh withRowAnimation:UITableViewRowAnimationNone];
             return;
         }
@@ -180,6 +179,9 @@
 {
     if ([self.statusView.statusLabel.text isEqualToString:newStatus]) return;
     
+    if ([self.statusView.statusLabel.layer animationKeys].count) {
+        [self.statusView.statusLabel.layer removeAllAnimations];
+    }
     [UIView animateWithDuration:ANIMATION_DURATION/2 animations:^{
         self.statusView.statusLabel.alpha = 0;
     } completion:^(BOOL finished) {
