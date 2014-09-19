@@ -7,6 +7,7 @@
 //
 
 #import "CNCourseDetailsTableViewCell.h"
+#import "CNCloseButton.h"
 
 #define  kDisclousureWidthAndHeight 43
 
@@ -131,7 +132,7 @@
 @property (nonatomic) BOOL usedForTargetting;
 
 @property (nonatomic) UIButton *targetButton;
-@property (nonatomic) UIButton *removeFromTargetsButton;
+@property (nonatomic) CNCloseButton *removeFromTargetsButton;
 @property (nonatomic) UIView *expandAccessoryView;
 @property (nonatomic) UILabel *multilineDetailsLeftFieldLabel;
 @property (nonatomic) UILabel *multilineDetailsRightFieldLabel;
@@ -139,6 +140,7 @@
 
 @property (nonatomic) NSMutableArray *scheduleSlotSubviews;
 
+@property (nonatomic) UIView *myContentView;
 @property (nonatomic) UIView *highlightBackgroundView;
 
 @end
@@ -148,8 +150,12 @@
 - (void)layoutSubviews
 {
     self.backgroundColor = kCellBackgroundColor;
-    
     self.highlightBackgroundView.frame = self.bounds;
+    self.myContentView.frame =  CGRectMake(0, 0, self.bounds.size.width,
+                                         self.isSelected? [[self class] expandedHeightForEvent:self.event
+                                                                                         width:self.bounds.size.width
+                                                                              usedForTargeting:self.usedForTargetting] :
+                                                          [[self class] collapsedHeightForEvent:self.event]);
     
     self.separationLineView.frame = CGRectMake(0, 0, self.bounds.size.width, 1);
     self.statusLEDView.frame = CGRectMake(0, 0, kStatusLEDWidth, kStatusLEDHeight);
@@ -278,18 +284,25 @@
         _highlightBackgroundView = [[UIView alloc] init];
         _highlightBackgroundView.backgroundColor = [UIColor colorWithRed:.9 green:.9 blue:.9 alpha:1.0];
         
-        [self addSubview:_highlightBackgroundView];
-        [self addSubview:_separationLineView];
-        [self addSubview:_statusLEDView];
-        [self addSubview:_dateTimeLabel];
-        [self addSubview:self.removeFromTargetsButton];
-        [self addSubview:self.expandAccessoryView];
-        [self addSubview:self.targetButton];
-        [self addSubview:self.multilineDetailsLeftFieldLabel];
-        [self addSubview:self.multilineDetailsRightFieldLabel];
-        [self addSubview:self.typeLabel];
+        
+        _myContentView = [[UIView alloc] init];
+        _myContentView.opaque = YES;
+        _myContentView.backgroundColor = [UIColor whiteColor];
+        _myContentView.clipsToBounds = YES;
+        [self addSubview:_myContentView];
+        
+        [_myContentView addSubview:_highlightBackgroundView];
+        [_myContentView addSubview:_separationLineView];
+        [_myContentView addSubview:_statusLEDView];
+        [_myContentView addSubview:_dateTimeLabel];
+        [_myContentView addSubview:self.removeFromTargetsButton];
+        [_myContentView addSubview:self.expandAccessoryView];
+        [_myContentView addSubview:self.targetButton];
+        [_myContentView addSubview:self.multilineDetailsLeftFieldLabel];
+        [_myContentView addSubview:self.multilineDetailsRightFieldLabel];
+        [_myContentView addSubview:self.typeLabel];
 
-        self.clipsToBounds = YES;
+        _myContentView.clipsToBounds = YES;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     return self;
@@ -380,11 +393,10 @@
 - (UIButton *)removeFromTargetsButton
 {
     if (_removeFromTargetsButton == nil) {
-        _removeFromTargetsButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _removeFromTargetsButton = [[CNCloseButton alloc] initWithColor:[UIColor redColor]];
         [_removeFromTargetsButton setTitle:@"Remove from targets" forState:UIControlStateNormal];
         _removeFromTargetsButton.backgroundColor = [UIColor clearColor];
         _removeFromTargetsButton.titleLabel.font = [UIFont cnSystemFontOfSize:16.0];
-        [_removeFromTargetsButton setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         [_removeFromTargetsButton addTarget:self action:@selector(removeFromTargetsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     }
     return _removeFromTargetsButton;

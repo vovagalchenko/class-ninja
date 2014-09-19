@@ -11,6 +11,7 @@
 @interface CNCloseButton()
 
 @property (nonatomic) UIColor *color;
+@property (nonatomic) UIColor *highlightedColor;
 
 @end
 
@@ -23,6 +24,9 @@
         self.backgroundColor = [UIColor clearColor];
         self.clearsContextBeforeDrawing = YES;
         self.color = color;
+        self.highlightedColor = [color colorWithAlphaComponent:.75];
+        [self setTitleColor:color forState:UIControlStateNormal];
+        [self setTitleColor:self.highlightedColor forState:UIControlStateHighlighted];
     }
     return self;
 }
@@ -42,17 +46,31 @@
     return CGSizeMake(CLOSE_BUTTON_DIMENSION, CLOSE_BUTTON_DIMENSION);
 }
 
+- (void)setHighlighted:(BOOL)highlighted
+{
+    [super setHighlighted:highlighted];
+    [self setNeedsDisplay];
+}
+
+#define MAX_X_MARGIN        25.0
+
 - (void)drawRect:(CGRect)rect
 {
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     
-    CGContextMoveToPoint(ctx, 0, 0);
-    CGContextAddLineToPoint(ctx, self.bounds.size.width, self.bounds.size.height);
-    CGContextMoveToPoint(ctx, self.bounds.size.width, 0);
-    CGContextAddLineToPoint(ctx, 0, self.bounds.size.height);
+    CGFloat xDrawingDimension = MIN(CLOSE_BUTTON_DIMENSION, MIN(self.bounds.size.width, self.bounds.size.height));
+    CGFloat yMargin = (self.bounds.size.height - xDrawingDimension)/2;
+    CGFloat xMargin = MIN(self.bounds.size.width - xDrawingDimension, MAX_X_MARGIN);
+    CGContextMoveToPoint(ctx, xMargin, yMargin);
+    CGContextAddLineToPoint(ctx, xDrawingDimension + xMargin, self.bounds.size.height - yMargin);
+    CGContextMoveToPoint(ctx, xDrawingDimension + xMargin, yMargin);
+    CGContextAddLineToPoint(ctx, xMargin, self.bounds.size.height - yMargin);
     
-    [self.color setStroke];
-    CGContextSetLineWidth(ctx, self.bounds.size.width/10.0);
+    UIColor *xColor = self.color;
+    if (self.highlighted)
+        xColor = self.highlightedColor;
+    [xColor setStroke];
+    CGContextSetLineWidth(ctx, 2.0);
     CGContextDrawPath(ctx, kCGPathStroke);
 }
 

@@ -454,21 +454,49 @@ static NSString *eventCellId = @"Event_Cell";
     }
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    // Return YES if you want the specified item to be editable.
+    return ![self.expandedIndexPaths containsObject:indexPath];
+}
+
 - (void)removeFromTargetsPressedIn:(CNCourseDetailsTableViewCell *)cell
 {
     NSIndexPath *cellIndexPath = [self.tableView indexPathForCell:cell];
-    CNTargetedCourse *targetedCourse = [self.targets objectAtIndex:cellIndexPath.section];
-    NSLog(@"REMOVIN: %@", cellIndexPath);
+    [self removeTargetForIndexPath:cellIndexPath];
+}
+
+- (void)removeTargetForIndexPath:(NSIndexPath *)indexPath
+{
+    CNTargetedCourse *targetedCourse = [self.targets objectAtIndex:indexPath.section];
     NSInteger sectionIndex, eventIndex;
-    getSectionAndEventIndicesForCourse(targetedCourse, cellIndexPath.row, &sectionIndex, &eventIndex);
+    getSectionAndEventIndicesForCourse(targetedCourse, indexPath.row, &sectionIndex, &eventIndex);
     
     CNAPIClient *client = [CNAPIClient sharedInstance];
     CNSection *relevantSection = [targetedCourse.sections objectAtIndex:sectionIndex];
     CNEvent *relevantEvent = [relevantSection.events objectAtIndex:eventIndex];
+    if ([self.expandedIndexPaths containsObject:indexPath]) {
+        [self.expandedIndexPaths removeObject:indexPath];
+        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+    } else {
+        [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    }
     [client removeEventFromTargetting:relevantEvent
-                         successBlock:^(BOOL success) {
+                         successBlock:^(BOOL success)
+    {
         [self refreshTargets];
     }];
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [self removeTargetForIndexPath:indexPath];
+    }
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return @"Stop Tracking";
 }
 
 #pragma mark - Properties
