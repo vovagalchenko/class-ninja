@@ -28,5 +28,6 @@
 - (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier usedForTargetting:(BOOL)usedForTargetting;
 + (CGFloat)collapsedHeightForEvent:(CNEvent *)event;
 + (CGFloat)expandedHeightForEvent:(CNEvent *)event width:(CGFloat)viewWidth usedForTargeting:(BOOL)usedForTargeting;
+- (void)setProcessing:(BOOL)processing;
 
 @end

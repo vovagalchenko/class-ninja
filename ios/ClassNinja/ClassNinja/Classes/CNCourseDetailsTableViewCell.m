@@ -8,8 +8,9 @@
 
 #import "CNCourseDetailsTableViewCell.h"
 #import "CNCloseButton.h"
+#import "CNActivityIndicator.h"
 
-#define  kDisclousureWidthAndHeight 43
+#define  kDisclousureWidthAndHeight 22
 
 #define kTargetButtonWidthAndHeight 43
 #define kTargetOffsetX 7.0
@@ -24,7 +25,7 @@
 
 #define kDateTimeLabelXOffset 56.0
 #define kDateTimeLabelYOffset 0
-#define kDateTimeLabelXRightMargin (kDisclousureWidthAndHeight + 3)
+#define kDateTimeLabelXRightMargin (kTargetButtonWidthAndHeight + 3)
 
 #define kStatusLEDClassAvailableColor   ([UIColor colorWithRed:71/255.0 green:182/255.0 blue:73/255.0 alpha:1])
 #define kStatusLEDClassClosedColor      ([UIColor colorWithRed:220/255.0 green:39/255.0 blue:39/255.0 alpha:1])
@@ -134,6 +135,7 @@
 @property (nonatomic) UIButton *targetButton;
 @property (nonatomic) CNCloseButton *removeFromTargetsButton;
 @property (nonatomic) UIView *expandAccessoryView;
+@property (nonatomic) CNActivityIndicator *activityIndicatorAccessoryView;
 @property (nonatomic) UILabel *multilineDetailsLeftFieldLabel;
 @property (nonatomic) UILabel *multilineDetailsRightFieldLabel;
 @property (nonatomic) UILabel *typeLabel;
@@ -204,8 +206,8 @@
                                                             ceilf(boundingRect.size.width),
                                                             ceilf(boundingRect.size.height)+1);
 
-    self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight, 1, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
-
+    self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight*2, 11, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
+    self.activityIndicatorAccessoryView.frame = self.expandAccessoryView.frame;
 }
 
 - (void)setEvent:(CNEvent *)event
@@ -284,6 +286,8 @@
         _highlightBackgroundView = [[UIView alloc] init];
         _highlightBackgroundView.backgroundColor = [UIColor colorWithRed:.9 green:.9 blue:.9 alpha:1.0];
         
+        _activityIndicatorAccessoryView = [[CNActivityIndicator alloc] initWithFrame:CGRectZero presentedOnLightBackground:YES];
+        _activityIndicatorAccessoryView.alpha = 0;
         
         _myContentView = [[UIView alloc] init];
         _myContentView.opaque = YES;
@@ -297,6 +301,7 @@
         [_myContentView addSubview:_dateTimeLabel];
         [_myContentView addSubview:self.removeFromTargetsButton];
         [_myContentView addSubview:self.expandAccessoryView];
+        [_myContentView addSubview:_activityIndicatorAccessoryView];
         [_myContentView addSubview:self.targetButton];
         [_myContentView addSubview:self.multilineDetailsLeftFieldLabel];
         [_myContentView addSubview:self.multilineDetailsRightFieldLabel];
@@ -503,6 +508,15 @@
 {
     [super setSelected:selected animated:animated];
     [self setExpandedStateTo:selected];
+}
+
+- (void)setProcessing:(BOOL)processing
+{
+    [UIView animateWithDuration:ANIMATION_DURATION animations:^
+     {
+         self.activityIndicatorAccessoryView.alpha = processing;
+         self.expandAccessoryView.alpha = !processing;
+     }];
 }
 
 - (void)updateDateTimeLabelForEvent:(CNEvent *)event

@@ -80,7 +80,7 @@
 
 - (void)setAlpha:(CGFloat)alpha
 {
-    if (self.alpha == 0 && alpha != 0) {
+    if (alpha == 1.0 && self.gradientImageView.layer.animationKeys.count == 0) {
         [self spin];
     } else if (alpha == 0 && self.alpha != 0) {
         [self.gradientImageView.layer removeAllAnimations];
