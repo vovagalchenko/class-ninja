@@ -9,6 +9,12 @@
 #import "CNAPIClient.h"
 #import "CNAPIResource.h"
 
+@interface CNAPIClient()
+
+@property (nonatomic, assign) NSUInteger numOngoingRequests;
+
+@end
+
 @implementation CNAPIClient
 
 #pragma mark Misc. Helpers
@@ -222,10 +228,12 @@ authenticationRequired:(BOOL)authRequired
     
     UIApplication* app = [UIApplication sharedApplication];
     app.networkActivityIndicatorVisible = YES;
+    self.numOngoingRequests++;
     [NSURLConnection sendAsynchronousRequest:request
                                        queue:[NSOperationQueue mainQueue] // Callbacks executed on the main thread
                            completionHandler:^(NSURLResponse* response, NSData* data, NSError* connectionError) {
-        app.networkActivityIndicatorVisible = NO;
+        self.numOngoingRequests--;
+        app.networkActivityIndicatorVisible = self.numOngoingRequests > 0;
         if (connectionError || [(NSHTTPURLResponse *)response statusCode] >= 400) {
             NSLog(@"Error attempting to execute: %@\n%@\n%@", response, connectionError, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
             completionBlock(nil);
