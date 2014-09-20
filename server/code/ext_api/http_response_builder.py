@@ -5,6 +5,7 @@ from urlparse import parse_qsl
 from re import subn
 from model.db_session import DB_Session_Factory
 from model.user_model import User
+from model.user_profile import UserProfile
 from model.base import Ninja_Model_Mixin
 from datetime import datetime, date
 from lib.time_utils import dt_to_timestamp
@@ -15,6 +16,8 @@ class HTTP_Response_Builder(object):
     resource_id = None
     request_headers = {}
     user = None
+    user_profile = None
+
     def __init__(self, env, resource_id):
         query_string = env.get('QUERY_STRING', '')
         body_stream = env.get('wsgi.input', None)
@@ -60,15 +63,18 @@ class HTTP_Response_Builder(object):
         auth_header = self.request_headers.get('AUTHORIZATION', None)
         if auth_header is not None:
             db_session = DB_Session_Factory.get_db_session() 
-            results = db_session.query(User).filter(User.access_token == auth_header).all()
+            results = db_session.query(User, UserProfile).filter(User.phonenumber == UserProfile.phonenumber).filter(User.access_token == auth_header).all()
             if len(results) > 1:
                 raise API_Exception("500 Server Error", "This access token is being used by multiple users.")
             elif len(results) == 1:
-                self.user = results[0]
+                self.user = results[0][0]
+                self.user_profile = results[0][1]
 
     def finalize_http_response(self, http_response):
         if self.warnings:
             http_response.add_to_body('warnings', self.warnings)
+        if self.user_profile is not None:
+            http_response.add_to_body('credits', self.user_profile.credits)
         return http_response
 
     def do_controller_specific_work(self):
