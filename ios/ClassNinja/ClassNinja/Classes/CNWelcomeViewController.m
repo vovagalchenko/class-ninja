@@ -15,6 +15,7 @@
 #import "CNTargetSectionHeaderView.h"
 #import "CNCourseDetailsTableViewCell.h"
 #import "CNTargetsDiff.h"
+#import "CNPaywallViewController.h"
 
 @interface CNWelcomeViewController () <CourseDetailsTableViewCellProtocol>
 
@@ -52,115 +53,6 @@
     [self refreshTargets];
 }
 
-- (void)refreshTargets
-{
-    [self setStatus:@"Fetching targets..."];
-    self.numOngoingTargetFetches++;
-    [[CNAPIClient sharedInstance] list:[CNTargetedCourse class]
-                            authPolicy:CNFailRequestOnAuthFailure
-                            completion:^(NSArray *targets)
-    {
-        self.numOngoingTargetFetches--;
-        if (self.numOngoingTargetFetches == 0)
-        {
-            if (targets.count) {
-                [self setStatus:@"Here are the classes you're tracking this semester"];
-                [APP_DELEGATE registerForPushNotifications];
-            } else {
-                [self setStatus:@"You're not tracking any classes this semester :("];
-            }
-        }
-        
-        if (!targets) {
-            NSArray *pathsToRefresh = [NSArray arrayWithArray:self.processingRows];
-            [self.processingRows removeAllObjects];
-            [self.tableView reloadRowsAtIndexPaths:pathsToRefresh withRowAnimation:UITableViewRowAnimationNone];
-            return;
-        }
-        
-        // Now we'll animate the change from the old list of targets to the new
-        NSArray *oldTargets = self.targets;
-        CNTargetsDiff *diff = [CNTargetsDiff diffWithOldTargets:oldTargets newTargets:targets];
-        
-        self.targets = targets;
-        // Deselect everything for starters
-        for (UITableViewCell *cell in self.tableView.visibleCells) {
-            [cell setSelected:NO animated:YES];
-        }
-        // Take the first
-        NSUInteger singleAddition = [diff singleAddition];
-        if (singleAddition != NSNotFound) {
-            [self.expandedIndexPaths removeAllObjects];
-            [self.processingRows removeAllObjects];
-            // In case only additions to a single targeted course were performed
-            // we're going to want to highlight this change to the user by scrolling
-            // the tableview to the newly added cells and highlighting them for a second.
-            NSArray *indexPathsToScrollTo = @[];
-            
-            // The single addition change could be performed two ways:
-            //  1. Addition of a new targeted course with one or more targeted events.
-            //  2. Addition of one or more targeted events to an existing targeted course.
-            // Below, we calculate the indexPaths to highlight for each of those cases.
-            if (diff.sectionsAdditions.count) {
-                [self.tableView insertSections:diff.sectionsAdditions withRowAnimation:UITableViewRowAnimationTop];
-                NSMutableArray *sectionsIndexPaths = [NSMutableArray array];
-                NSUInteger numRowsInSection = [self tableView:self.tableView numberOfRowsInSection:singleAddition];
-                for (NSUInteger i = 0; i < numRowsInSection; i++) {
-                    [sectionsIndexPaths addObject:[NSIndexPath indexPathForRow:i
-                                                                     inSection:singleAddition]];
-                }
-                indexPathsToScrollTo = [NSArray arrayWithArray:sectionsIndexPaths];
-            } else if (diff.rowsAdditions.count) {
-                [self.tableView insertRowsAtIndexPaths:diff.rowsAdditions withRowAnimation:UITableViewRowAnimationAutomatic];
-                indexPathsToScrollTo = diff.rowsAdditions;
-            }
-            // Finally, change the model for the highlightedTargetRows and reload the corresponding rows in the UI.
-            self.highlightedTargetRows = [NSArray arrayWithArray:indexPathsToScrollTo];
-            [self.tableView reloadRowsAtIndexPaths:indexPathsToScrollTo
-                                  withRowAnimation:UITableViewRowAnimationFade];
-            
-            // Scroll to make sure the first and the last indexPaths of the indexPathsToScrollTo are visible.
-            [self.tableView scrollToRowAtIndexPath:indexPathsToScrollTo.firstObject
-                                  atScrollPosition:UITableViewScrollPositionNone
-                                          animated:YES];
-            [self.tableView scrollToRowAtIndexPath:indexPathsToScrollTo.lastObject
-                                  atScrollPosition:UITableViewScrollPositionNone
-                                          animated:YES];
-            // Dismiss the highlighting after 1 second.
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                self.highlightedTargetRows = nil;
-                NSMutableArray *indexPathsToReload = [NSMutableArray array];
-                for (NSIndexPath *candidate in indexPathsToScrollTo) {
-                    if ([self.tableView numberOfSections] > candidate.section
-                        && [self.tableView numberOfRowsInSection:candidate.section] > candidate.row)
-                        [indexPathsToReload addObject:candidate];
-                }
-                [self.tableView reloadRowsAtIndexPaths:indexPathsToReload withRowAnimation:UITableViewRowAnimationFade];
-            });
-        } else {
-            // The diff between the old and new targets isn't a change to a single targeted course.
-            // We don't have anything to highlight – we're just going to apply the diff to the tableview.
-            // TODO: apply updates.
-            [self.tableView beginUpdates];
-            [self.expandedIndexPaths removeAllObjects];
-            [self.processingRows removeAllObjects];
-            if (diff.sectionsAdditions.count) {
-                [self.tableView insertSections:diff.sectionsAdditions withRowAnimation:UITableViewRowAnimationBottom];
-            }
-            if (diff.rowsAdditions.count) {
-                [self.tableView insertRowsAtIndexPaths:diff.rowsAdditions withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
-            if (diff.sectionsDeletions.count) {
-                [self.tableView deleteSections:diff.sectionsDeletions withRowAnimation:UITableViewRowAnimationBottom];
-            }
-            if (diff.rowsDeletions.count) {
-                [self.tableView deleteRowsAtIndexPaths:diff.rowsDeletions withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
-            [self.tableView endUpdates];
-        }
-    }];
-}
-
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
@@ -177,27 +69,167 @@
 
 - (void)setStatus:(NSString *)newStatus
 {
-    if ([self.statusView.statusLabel.text isEqualToString:newStatus]) return;
-    
+    [self setStatus:newStatus actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeNone completion:nil];
+}
+
+- (void)setStatus:(NSString *)newStatus actionButtonType:(CNWelcomeStatusViewActionStatusButtonType)actionButtonType completion:(void (^)())completion
+{
     if ([self.statusView.statusLabel.layer animationKeys].count) {
         [self.statusView.statusLabel.layer removeAllAnimations];
+        [self.statusView.actionButton.layer removeAllAnimations];
+        [self.statusView.separatorLine.layer removeAllAnimations];
     }
     [UIView animateWithDuration:ANIMATION_DURATION/2 animations:^{
         self.statusView.statusLabel.alpha = 0;
+        self.statusView.separatorLine.alpha = 0;
+        self.statusView.actionButton.alpha = 0;
     } completion:^(BOOL finished) {
-        [UIView animateWithDuration:ANIMATION_DURATION/2 animations:^{
-            self.statusView.statusLabel.text = newStatus;
-            [self.statusView setNeedsLayout];
-            [self.statusView layoutIfNeeded];
-            
-            [self.tableView beginUpdates];
-            [self.tableView setTableHeaderView:self.statusView];
-            [self.tableView endUpdates];
-        } completion:^(BOOL finished) {
+        if (finished) {
             [UIView animateWithDuration:ANIMATION_DURATION/2 animations:^{
-                self.statusView.statusLabel.alpha = 1;
+                self.statusView.statusLabel.text = newStatus;
+                [self.statusView setActionButtonType:actionButtonType];
+                [self.statusView setNeedsLayout];
+                [self.statusView layoutIfNeeded];
+                
+                [self.tableView beginUpdates];
+                [self.tableView setTableHeaderView:self.statusView];
+                [self.tableView endUpdates];
+            } completion:^(BOOL finished) {
+                if (finished) {
+                    [UIView animateWithDuration:ANIMATION_DURATION/2 animations:^{
+                        self.statusView.statusLabel.alpha = 1;
+                        self.statusView.separatorLine.alpha = 1;
+                        self.statusView.actionButton.alpha = 1;
+                        if (completion) completion();
+                    }];
+                }
             }];
-        }];
+        }
+    }];
+}
+
+- (void)refreshTargets
+{
+    [self setStatus:@"Fetching targets..."];
+    self.numOngoingTargetFetches++;
+    CNAPIClient *apiClient = [CNAPIClient sharedInstance];
+    [apiClient list:[CNTargetedCourse class]
+         authPolicy:CNFailRequestOnAuthFailure
+         completion:^(NSArray *targets)
+     {
+         self.numOngoingTargetFetches--;
+         if (self.numOngoingTargetFetches == 0)
+         {
+             void (^refreshTargetsTable)() = ^{
+                 if (!targets) {
+                     NSArray *pathsToRefresh = [NSArray arrayWithArray:self.processingRows];
+                     [self.processingRows removeAllObjects];
+                     [self.tableView reloadRowsAtIndexPaths:pathsToRefresh withRowAnimation:UITableViewRowAnimationNone];
+                     return;
+                 }
+                 
+                 // Now we'll animate the change from the old list of targets to the new
+                 NSArray *oldTargets = self.targets;
+                 CNTargetsDiff *diff = [CNTargetsDiff diffWithOldTargets:oldTargets newTargets:targets];
+                 
+                 self.targets = targets;
+                 // Deselect everything for starters
+                 for (UITableViewCell *cell in self.tableView.visibleCells) {
+                     [cell setSelected:NO animated:YES];
+                 }
+                 // Take the first
+                 NSUInteger singleAddition = [diff singleAddition];
+                 if (singleAddition != NSNotFound) {
+                     [self.expandedIndexPaths removeAllObjects];
+                     [self.processingRows removeAllObjects];
+                     // In case only additions to a single targeted course were performed
+                     // we're going to want to highlight this change to the user by scrolling
+                     // the tableview to the newly added cells and highlighting them for a second.
+                     NSArray *indexPathsToScrollTo = @[];
+                     
+                     // The single addition change could be performed two ways:
+                     //  1. Addition of a new targeted course with one or more targeted events.
+                     //  2. Addition of one or more targeted events to an existing targeted course.
+                     // Below, we calculate the indexPaths to highlight for each of those cases.
+                     if (diff.sectionsAdditions.count) {
+                         [self.tableView insertSections:diff.sectionsAdditions withRowAnimation:UITableViewRowAnimationTop];
+                         NSMutableArray *sectionsIndexPaths = [NSMutableArray array];
+                         NSUInteger numRowsInSection = [self tableView:self.tableView numberOfRowsInSection:singleAddition];
+                         for (NSUInteger i = 0; i < numRowsInSection; i++) {
+                             [sectionsIndexPaths addObject:[NSIndexPath indexPathForRow:i
+                                                                              inSection:singleAddition]];
+                         }
+                         indexPathsToScrollTo = [NSArray arrayWithArray:sectionsIndexPaths];
+                     } else if (diff.rowsAdditions.count) {
+                         [self.tableView insertRowsAtIndexPaths:diff.rowsAdditions withRowAnimation:UITableViewRowAnimationAutomatic];
+                         indexPathsToScrollTo = diff.rowsAdditions;
+                     }
+                     // Finally, change the model for the highlightedTargetRows and reload the corresponding rows in the UI.
+                     self.highlightedTargetRows = [NSArray arrayWithArray:indexPathsToScrollTo];
+                     [self.tableView reloadRowsAtIndexPaths:indexPathsToScrollTo
+                                           withRowAnimation:UITableViewRowAnimationFade];
+                     
+                     // Scroll to make sure the first and the last indexPaths of the indexPathsToScrollTo are visible.
+                     [self.tableView scrollToRowAtIndexPath:indexPathsToScrollTo.firstObject
+                                           atScrollPosition:UITableViewScrollPositionNone
+                                                   animated:YES];
+                     [self.tableView scrollToRowAtIndexPath:indexPathsToScrollTo.lastObject
+                                           atScrollPosition:UITableViewScrollPositionNone
+                                                   animated:YES];
+                     // Dismiss the highlighting after 1 second.
+                     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                         self.highlightedTargetRows = nil;
+                         NSMutableArray *indexPathsToReload = [NSMutableArray array];
+                         for (NSIndexPath *candidate in indexPathsToScrollTo) {
+                             if ([self.tableView numberOfSections] > candidate.section
+                                 && [self.tableView numberOfRowsInSection:candidate.section] > candidate.row)
+                                 [indexPathsToReload addObject:candidate];
+                         }
+                         [self.tableView reloadRowsAtIndexPaths:indexPathsToReload withRowAnimation:UITableViewRowAnimationFade];
+                     });
+                 } else {
+                     // The diff between the old and new targets isn't a change to a single targeted course.
+                     // We don't have anything to highlight – we're just going to apply the diff to the tableview.
+                     // TODO: apply updates.
+                     [self.tableView beginUpdates];
+                     [self.expandedIndexPaths removeAllObjects];
+                     [self.processingRows removeAllObjects];
+                     if (diff.sectionsAdditions.count) {
+                         [self.tableView insertSections:diff.sectionsAdditions withRowAnimation:UITableViewRowAnimationBottom];
+                     }
+                     if (diff.rowsAdditions.count) {
+                         [self.tableView insertRowsAtIndexPaths:diff.rowsAdditions withRowAnimation:UITableViewRowAnimationAutomatic];
+                     }
+                     if (diff.sectionsDeletions.count) {
+                         [self.tableView deleteSections:diff.sectionsDeletions withRowAnimation:UITableViewRowAnimationBottom];
+                     }
+                     if (diff.rowsDeletions.count) {
+                         [self.tableView deleteRowsAtIndexPaths:diff.rowsDeletions withRowAnimation:UITableViewRowAnimationAutomatic];
+                     }
+                     [self.tableView endUpdates];
+                 }
+             };
+             if (targets == nil && apiClient.authContext.loggedInUser != nil) {
+                 [self setStatus:@"Unable to fetch targets."
+                actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeRefreshTargets
+                      completion:refreshTargetsTable];
+             } else if (apiClient.authContext.loggedInUser.credits <= 5 && apiClient.authContext.loggedInUser.credits > 0) {
+                 NSString *classesString = (apiClient.authContext.loggedInUser.credits > 1)? @"classes" : @"class";
+                 [self setStatus:[NSString stringWithFormat:@"You can track %d more %@ this term for free", apiClient.authContext.loggedInUser.credits, classesString]
+                actionButtonType:CNWelcomeStatusViewActionStatusButtonTypePay
+                      completion:refreshTargetsTable];
+             } else if (targets.count) {
+                 [self setStatus:@"Here are the classes you're tracking this term"
+                actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeNone
+                      completion:refreshTargetsTable];
+                 [APP_DELEGATE registerForPushNotifications];
+             } else {
+                 [self setStatus:@"You're not tracking any classes this term :("
+                actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeNone
+                      completion:refreshTargetsTable];
+             }
+         }
+         
     }];
 }
 
@@ -296,14 +328,6 @@
         [self.view addConstraints:@[top, left, right, width]];
     }
     [super updateViewConstraints];
-}
-
-- (void)addClassesButtonPressed:(id)sender
-{
-    CNSchoolViewController *schoolVC = [[CNSchoolViewController alloc] init];
-    self.siongsNavigationController = [[CNSiongNavigationViewController alloc] initWithRootViewController:schoolVC];
-    self.siongsNavigationController.searchDelegate = self;
-    [self presentViewController:self.siongsNavigationController animated:YES completion:nil];
 }
 
 - (void)buildUIForSearchResults:(NSArray *)models
@@ -518,6 +542,28 @@ static NSString *eventCellId = @"Event_Cell";
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return @"Stop Tracking";
+}
+
+#pragma mark - CNWelcomeStatusViewDelegate
+
+- (void)addClassesButtonPressed:(id)sender
+{
+    CNSchoolViewController *schoolVC = [[CNSchoolViewController alloc] init];
+    self.siongsNavigationController = [[CNSiongNavigationViewController alloc] initWithRootViewController:schoolVC];
+    self.siongsNavigationController.searchDelegate = self;
+    [self presentViewController:self.siongsNavigationController animated:YES completion:nil];
+}
+
+- (void)refreshTargetsButtonPressed:(id)sender
+{
+    [self refreshTargets];
+}
+
+- (void)payToTrackMoreButtonPressed:(id)sender
+{
+    CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
+    paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:paywallVC animated:YES completion:nil];
 }
 
 #pragma mark - Properties

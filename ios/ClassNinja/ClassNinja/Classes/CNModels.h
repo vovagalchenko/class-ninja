@@ -102,5 +102,6 @@
 // Phone numbers have to go through some sanitization/standardization layer.
 @property (nonatomic) NSString *phoneNumber;
 @property (nonatomic) NSString *accessToken;
+@property (nonatomic, assign) NSUInteger credits;
 
 @end

@@ -239,7 +239,7 @@
 
 - (NSString *)siongNavBarTitle
 {
-    return @"Add class";
+    return @"Track a class";
 }
 
 - (void)tryNavigatingToDefaultSchool

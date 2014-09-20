@@ -109,6 +109,7 @@
     NSAssert([NSThread isMainThread], @"loggedInUser is assumed to be called on the main thread.");
     if (!_loggedInUser) {
         _loggedInUser = [self retrieveLoggedInUserFromKeychain];
+        [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
     }
     return _loggedInUser;
 }
@@ -119,6 +120,14 @@
     NSAssert([NSThread isMainThread], @"setLoggedInUser is assumed to be called on the main thread.");
     _loggedInUser = loggedInUser;
     [self writeLoggedInUserToKeychain:loggedInUser];
+    [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (object == self.loggedInUser) {
+        [self writeLoggedInUserToKeychain:object];
+    }
 }
 
 static inline NSMutableDictionary *keychainSearchDictionaryForLoggedInUser()
@@ -151,6 +160,11 @@ static inline NSMutableDictionary *keychainSearchDictionaryForLoggedInUser()
                                (__bridge CFDictionaryRef)[NSDictionary dictionaryWithObject:data forKey:(__bridge_transfer id)kSecValueData]);
     }
     NSAssert(status == errSecSuccess, @"Error writing to keychain.");
+}
+
+- (void)dealloc
+{
+    [_loggedInUser removeObserver:self forKeyPath:@"credits"];
 }
 
 @end

@@ -185,6 +185,7 @@
     if (self = [super init]) {
         _phoneNumber = [aDecoder decodeObjectForKey:@"phoneNumber"];
         _accessToken = [aDecoder decodeObjectForKey:@"accessToken"];
+        _credits = [[aDecoder decodeObjectForKey:@"credits"] unsignedIntegerValue];
     }
     return self;
 }
@@ -193,11 +194,12 @@
 {
     [aCoder encodeObject:self.phoneNumber forKey:@"phoneNumber"];
     [aCoder encodeObject:self.accessToken forKey:@"accessToken"];
+    [aCoder encodeObject:@(self.credits) forKey:@"credits"];
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"User phoneNumber %@, accessToken = %@", self.phoneNumber, self.accessToken];
+    return [NSString stringWithFormat:@"User phoneNumber %@, accessToken = %@, credits = %lu", self.phoneNumber, self.accessToken, (unsigned long)self.credits];
 }
 
 - (NSString *)name

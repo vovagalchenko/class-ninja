@@ -245,6 +245,10 @@ authenticationRequired:(BOOL)authRequired
                       jsonDict, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], serializationError);
                 completionBlock(nil);
             } else {
+                NSNumber *credits = [jsonDict objectForKey:@"credits"];
+                if (credits && self.authContext.loggedInUser) {
+                    self.authContext.loggedInUser.credits = [credits unsignedIntegerValue];
+                }
                 completionBlock(jsonDict);
             }
         }
