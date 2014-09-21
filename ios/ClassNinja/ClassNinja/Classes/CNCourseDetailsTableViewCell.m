@@ -442,6 +442,7 @@
         // The 0.999 is a hack to make sure the accessory view rotates counter clockwise
         self.expandAccessoryView.transform = CGAffineTransformMakeRotation(isExpanded? 0.999*M_PI : 0);
     };
+    if (self.expandAccessoryView.layer.animationKeys.count > 0) [self.expandAccessoryView.layer removeAllAnimations];
     [UIView animateWithDuration:ANIMATION_DURATION animations:accessoryViewFlip];
     [self.delegate expandStateOnCell:self changedTo:isExpanded];
 }
