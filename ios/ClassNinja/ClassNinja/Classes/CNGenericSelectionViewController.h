@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "CNSiongNavigationViewController.h"
 #import "CNModels.h"
+#import "CNLoggingViewController.h"
 
-@interface CNGenericSelectionViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, SiongNavigationProtocol>
+@interface CNGenericSelectionViewController : CNLoggingViewController <UITableViewDataSource, UITableViewDelegate, SiongNavigationProtocol>
 @property (nonatomic, weak) CNSiongNavigationViewController *siongNavigationController;
 
 - (void)handleSearchResult:(NSArray *)searchModels;

@@ -16,4 +16,5 @@
     #import "UIFont+CNAdditions.h"
     #import "UIColor+CNAdditions.h"
     #import "AppearanceConstants.h"
+    #import <VGAnalytics/Analytics.h>
 #endif

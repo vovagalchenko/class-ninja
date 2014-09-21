@@ -42,7 +42,7 @@
 
 @implementation CNGenericSelectionViewController
 
-- (NSString *)siongNavBarTitle
+- (NSString *)title
 {
     return self.rootModel.name;
 }
@@ -237,7 +237,7 @@
 
 @implementation CNSchoolViewController
 
-- (NSString *)siongNavBarTitle
+- (NSString *)title
 {
     return @"Track a class";
 }

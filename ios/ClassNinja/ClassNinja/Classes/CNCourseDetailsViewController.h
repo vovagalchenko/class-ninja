@@ -7,7 +7,8 @@
 
 #import <UIKit/UIKit.h>
 #import "CNModels.h"
+#import "CNLoggingViewController.h"
 
-@interface CNCourseDetailsViewController : UIViewController
+@interface CNCourseDetailsViewController : CNLoggingViewController
 @property (nonatomic) CNCourse *course;
 @end

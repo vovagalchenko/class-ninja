@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CNLoggingViewController.h"
 
 @protocol CNSearchViewControllerDelegateProtocol <NSObject>
 - (void)buildUIForSearchResults:(NSArray *)models;
 @end
 
-@interface CNSearchViewController : UIViewController
+@interface CNSearchViewController : CNLoggingViewController
 @property (nonatomic, weak) id <CNSearchViewControllerDelegateProtocol> searchDelegate;
 @end

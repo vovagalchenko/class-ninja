@@ -39,5 +39,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>IANSettings</key>
+	<dict>
+		<key>PostURL</key>
+		<string>http://vova.class-ninja.com/api/analytics</string>
+	</dict>
 </dict>
 </plist>

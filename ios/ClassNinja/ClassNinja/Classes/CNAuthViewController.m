@@ -28,6 +28,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, readwrite) CNAuthViewControllerState currentState;
 @property (nonatomic, weak) id<CNAuthViewControllerDelegate>delegate;
 @property (nonatomic, readwrite) NSString *phoneNumber;
+@property (nonatomic, readonly) NSMutableArray *statesChain;
 
 @end
 
@@ -143,13 +144,14 @@ typedef enum : NSUInteger {
     [self setNeedsStatusBarAppearanceUpdate];
 }
 
-#pragma mark - Subviews
+#pragma mark - Read-Only Properties
 
 @synthesize detailLabel = _detailLabel;
 @synthesize textField = _textField;
 @synthesize confirmationButton = _confirmationButton;
 @synthesize activityIndicator = _activityIndicator;
 @synthesize cancelButton = _cancelButton;
+@synthesize statesChain = _statesChain;
 
 - (CNActivityIndicator *)activityIndicator
 {
@@ -213,6 +215,14 @@ typedef enum : NSUInteger {
         _textField.bounds = CGRectMake(0, 0, 0, FOCAL_LABEL_TEXT_SIZE);
     }
     return _textField;
+}
+
+- (NSMutableArray *)statesChain
+{
+    if (!_statesChain) {
+        _statesChain = [NSMutableArray array];
+    }
+    return _statesChain;
 }
 
 static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
@@ -336,6 +346,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
             self.textField.groupArray = groups;
         }
         self.textField.text = @"";
+        NSString *stateNameForAnalytics = @"unknown";
         
         switch (state) {
             case CNAuthViewControllerStatePhoneNumberEntry:
@@ -344,6 +355,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
                 self.activityIndicator.alpha = 0.0;
                 self.view.backgroundColor = AUTH_BLUE_COLOR;
                 [self.textField becomeFirstResponder];
+                stateNameForAnalytics = @"phone_number_entry";
                 break;
             case CNAuthViewControllerStateVerificationCodeEntry:
                 self.detailLabel.alpha = 1.0;
@@ -351,18 +363,23 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
                 self.activityIndicator.alpha = 0.0;
                 self.view.backgroundColor = CONFIRMATION_COLOR;
                 [self.textField becomeFirstResponder];
+                stateNameForAnalytics = @"verification_code_entry";
                 break;
             case CNAuthViewControllerStateWait:
                 self.detailLabel.alpha = 0.0;
                 self.textField.alpha = 0.0;
                 self.activityIndicator.alpha = 1.0;
                 [self.textField resignFirstResponder];
+                stateNameForAnalytics = @"wait";
                 break;
             default:
                 NSAssert(NO, @"Unknown state: %d", (int)state);
                 break;
         }
         self.currentState = state;
+        
+        logUserAction(@"auth_view_state_switch", @{ @"state" : stateNameForAnalytics });
+        [self.statesChain addObject:stateNameForAnalytics];
     };
     
     if (animated) {
@@ -385,6 +402,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
 
 - (void)closeButtonTapped:(id)sender
 {
+    logUserAction(@"auth_view_cancel", @{ @"state_chain" : self.statesChain });
     [self.delegate authViewControllerCancelledAuthentication:self];
 }
 

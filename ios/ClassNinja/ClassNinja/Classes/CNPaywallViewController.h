@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CNLoggingViewController.h"
 
-@interface CNPaywallViewController : UIViewController
+@interface CNPaywallViewController : CNLoggingViewController
 
 @end

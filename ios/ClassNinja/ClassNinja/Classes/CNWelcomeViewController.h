@@ -9,7 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "CNWelcomeStatusView.h"
 #import "CNSearchViewController.h"
+#import "CNLoggingViewController.h"
 
-@interface CNWelcomeViewController : UIViewController <CNWelcomeStatusViewDelegate, CNSearchViewControllerDelegateProtocol, UITableViewDataSource, UITableViewDelegate>
+@interface CNWelcomeViewController : CNLoggingViewController <CNWelcomeStatusViewDelegate, CNSearchViewControllerDelegateProtocol, UITableViewDataSource, UITableViewDelegate>
 
 @end

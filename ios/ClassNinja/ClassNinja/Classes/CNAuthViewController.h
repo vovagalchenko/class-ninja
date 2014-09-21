@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "CNNumberEntryTextField.h"
+#import "CNLoggingViewController.h"
 
 @protocol CNAuthViewControllerDelegate;
-@interface CNAuthViewController : UIViewController <CNNumberEntryTextFieldDelegate>
+@interface CNAuthViewController : CNLoggingViewController <CNNumberEntryTextFieldDelegate>
 
 - (instancetype)initWithDelegate:(id<CNAuthViewControllerDelegate>)delegate;
 

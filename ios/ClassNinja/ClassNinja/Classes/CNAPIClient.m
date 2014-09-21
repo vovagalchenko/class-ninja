@@ -8,6 +8,7 @@
 
 #import "CNAPIClient.h"
 #import "CNAPIResource.h"
+#import "NSData+CNAdditions.h"
 
 @interface CNAPIClient()
 
@@ -229,9 +230,31 @@ authenticationRequired:(BOOL)authRequired
     UIApplication* app = [UIApplication sharedApplication];
     app.networkActivityIndicatorVisible = YES;
     self.numOngoingRequests++;
+    
+    logNetworkEvent(@"request_send",
+  @{
+    @"http_method" : request.HTTPMethod,
+    @"request_url" : [request.URL path],
+    @"request_headers" : [request allHTTPHeaderFields],
+    @"request_http_body_length" : @([[request HTTPBody] length]),
+    });
+    NSDate *beforeSendDate = [NSDate date];
     [NSURLConnection sendAsynchronousRequest:request
                                        queue:[NSOperationQueue mainQueue] // Callbacks executed on the main thread
-                           completionHandler:^(NSURLResponse* response, NSData* data, NSError* connectionError) {
+                           completionHandler:^(NSURLResponse* response, NSData* data, NSError* connectionError)
+    {
+        NSTimeInterval elapsedTime = [[NSDate date] timeIntervalSinceDate:beforeSendDate];
+        logNetworkEvent(@"response_receipt",
+        @{
+          @"http_method" : request.HTTPMethod,
+          @"request_url" : [request.URL path],
+          @"request_headers" : [request allHTTPHeaderFields],
+          @"request_http_body_length" : @([[request HTTPBody] length]),
+          @"response_code" : @([(NSHTTPURLResponse *)response statusCode]),
+          @"response_http_body_length" : @([data length]),
+          @"connection_error" : connectionError.debugDescription ?: [NSNull null],
+          @"elapsed_time" : @(elapsedTime)
+        });
         self.numOngoingRequests--;
         app.networkActivityIndicatorVisible = self.numOngoingRequests > 0;
         if (connectionError || [(NSHTTPURLResponse *)response statusCode] >= 400) {
@@ -243,6 +266,18 @@ authenticationRequired:(BOOL)authRequired
             if (serializationError) {
                 NSLog(@"Error attempting to deserialize response to: %@\nResponse: %@\nError: %@",
                       jsonDict, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], serializationError);
+                logWarning(@"malformed_http_response",
+                                @{
+                                  @"http_method" : request.HTTPMethod,
+                                  @"request_url" : [request.URL path],
+                                  @"request_headers" : [request allHTTPHeaderFields],
+                                  @"request_http_body_length" : @([[request HTTPBody] length]),
+                                  @"response_code" : @([(NSHTTPURLResponse *)response statusCode]),
+                                  @"response_http_body_length" : @([data length]),
+                                  @"response_http_body_except" : [[[NSString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding] substringToIndex:100],
+                                  @"serialization_error" : serializationError.debugDescription,
+                                  
+                                  });
                 completionBlock(nil);
             } else {
                 NSNumber *credits = [jsonDict objectForKey:@"credits"];
@@ -341,11 +376,6 @@ authenticationRequired:(BOOL)authRequired
 
 - (void)registerDeviceForPushNotifications:(NSData *)token completion:(void (^)(BOOL success))completion
 {
-    NSMutableString *tokenString = [NSMutableString stringWithCapacity:token.length*2];
-    const unsigned char *bytes = token.bytes;
-    for (int i = 0; i < token.length; i++) {
-        [tokenString appendFormat:@"%02x", bytes[i]];
-    }
     NSMutableURLRequest *req = [self mutableURLRequestForAPIEndpoint:@"notification_interface"
                                                           HTTPMethod:@"POST"
                                                   HTTPBodyParameters:@{
@@ -355,7 +385,7 @@ authenticationRequired:(BOOL)authRequired
 #else
                                                                            @"iOS",
 #endif
-                                                                       @"notification_interface_key" : tokenString,
+                                                                       @"notification_interface_key" : [token hexString],
                                                                        @"notification_interface_name" : [[UIDevice currentDevice] name],
                                                                        }];
     [self makeURLRequest:req

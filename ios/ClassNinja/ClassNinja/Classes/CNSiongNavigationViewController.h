@@ -12,9 +12,7 @@
 @class CNSiongNavigationViewController;
 
 @protocol SiongNavigationProtocol <NSObject>
-- (NSString *)siongNavBarTitle;
 @property (nonatomic, weak) CNSiongNavigationViewController *siongNavigationController;
-
 - (void)nextViewControllerWillPop;
 @end
 

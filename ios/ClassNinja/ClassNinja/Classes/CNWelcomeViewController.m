@@ -228,11 +228,14 @@
                  [self setStatus:@"Here are the classes you're tracking this term"
                 actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeNone
                       completion:refreshTargetsTable];
-                 [APP_DELEGATE registerForPushNotifications];
              } else {
                  [self setStatus:@"You're not tracking any classes this term :("
                 actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeNone
                       completion:refreshTargetsTable];
+             }
+             
+             if (targets.count > 0) {
+                 [APP_DELEGATE registerForPushNotifications];
              }
          }
          

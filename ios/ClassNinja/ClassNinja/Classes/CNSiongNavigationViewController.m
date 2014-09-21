@@ -61,7 +61,7 @@
 - (NSString *)navbarTitleForIndex:(NSInteger)index
 {
     if (index <= self.viewControllers.count) {
-        return [[self.viewControllers objectAtIndex:index] siongNavBarTitle];
+        return [[self.viewControllers objectAtIndex:index] title];
     } else {
         return nil;
     }
