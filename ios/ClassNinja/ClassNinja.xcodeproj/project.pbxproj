@@ -28,6 +28,8 @@
 		707F985B196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
 		707F985C196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
 		708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 708D688A19B6D6A600BE9156 /* CNUserProfile.m */; };
+		7092DF5D19CFCE72008CB366 /* libFlurry_5.3.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7092DF5C19CFCE72008CB366 /* libFlurry_5.3.0.a */; };
+		7092DF5F19CFCED5008CB366 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7092DF5E19CFCED5008CB366 /* SystemConfiguration.framework */; };
 		70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A5F36E19B444780060EB0C /* CNSearchViewController.m */; };
 		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
 		70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */; };
@@ -92,6 +94,9 @@
 		707F989719689D8700D6E552 /* CNModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNModels.m; sourceTree = "<group>"; };
 		708D688919B6D6A600BE9156 /* CNUserProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNUserProfile.h; sourceTree = "<group>"; };
 		708D688A19B6D6A600BE9156 /* CNUserProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNUserProfile.m; sourceTree = "<group>"; };
+		7092DF5B19CFCE72008CB366 /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flurry.h; sourceTree = "<group>"; };
+		7092DF5C19CFCE72008CB366 /* libFlurry_5.3.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry_5.3.0.a; sourceTree = "<group>"; };
+		7092DF5E19CFCED5008CB366 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		70A5F36D19B444780060EB0C /* CNSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSearchViewController.h; sourceTree = "<group>"; };
 		70A5F36E19B444780060EB0C /* CNSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSearchViewController.m; sourceTree = "<group>"; };
 		70DB470C198D967000F81F43 /* CNGenericSelectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGenericSelectionTableViewCell.h; sourceTree = "<group>"; };
@@ -128,8 +133,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7092DF5F19CFCED5008CB366 /* SystemConfiguration.framework in Frameworks */,
 				70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */,
 				707F9843196899BC00D6E552 /* CoreGraphics.framework in Frameworks */,
+				7092DF5D19CFCE72008CB366 /* libFlurry_5.3.0.a in Frameworks */,
 				707F9845196899BC00D6E552 /* UIKit.framework in Frameworks */,
 				707F9841196899BC00D6E552 /* Foundation.framework in Frameworks */,
 			);
@@ -165,7 +172,7 @@
 				707F9846196899BC00D6E552 /* ClassNinja */,
 				707F983F196899BC00D6E552 /* Frameworks */,
 				707F983E196899BC00D6E552 /* Products */,
-				707F989A19689D9500D6E552 /* Libraries */,
+				7092DE2519CFCDE3008CB366 /* Libraries */,
 			);
 			sourceTree = "<group>";
 		};
@@ -181,6 +188,7 @@
 		707F983F196899BC00D6E552 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7092DF5E19CFCED5008CB366 /* SystemConfiguration.framework */,
 				70557114197B1ED7008F66F1 /* StoreKit.framework */,
 				707F9840196899BC00D6E552 /* Foundation.framework */,
 				707F9842196899BC00D6E552 /* CoreGraphics.framework */,
@@ -228,12 +236,21 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		707F989A19689D9500D6E552 /* Libraries */ = {
+		7092DE2519CFCDE3008CB366 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				7092DF5A19CFCE72008CB366 /* Flurry */,
 			);
-			name = Libraries;
-			path = ClassNinja;
+			path = Libraries;
+			sourceTree = "<group>";
+		};
+		7092DF5A19CFCE72008CB366 /* Flurry */ = {
+			isa = PBXGroup;
+			children = (
+				7092DF5B19CFCE72008CB366 /* Flurry.h */,
+				7092DF5C19CFCE72008CB366 /* libFlurry_5.3.0.a */,
+			);
+			path = Flurry;
 			sourceTree = "<group>";
 		};
 		DC08B695198AB0290092EE90 /* Welcome */ = {
@@ -567,6 +584,12 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Libraries/Flurry/Flurry-iOS-5.3.0/Flurry",
+					"$(PROJECT_DIR)/Libraries/Flurry/Flurry-iOS-5.3.0/FlurryAds",
+					"$(PROJECT_DIR)/Libraries/Flurry",
+				);
 				PRODUCT_NAME = classalert;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -583,6 +606,12 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Libraries/Flurry/Flurry-iOS-5.3.0/Flurry",
+					"$(PROJECT_DIR)/Libraries/Flurry/Flurry-iOS-5.3.0/FlurryAds",
+					"$(PROJECT_DIR)/Libraries/Flurry",
+				);
 				PRODUCT_NAME = classalert;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

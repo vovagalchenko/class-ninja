@@ -10,6 +10,7 @@
 #import "CNAPIClient.h"
 #import "CNInAppPurchaseHelper.h"
 #import "CNWelcomeViewController.h"
+#import "Flurry.h"
 
 @interface CNAppDelegate ()
 @property (nonatomic)CNInAppPurchaseHelper *iap;
@@ -29,6 +30,8 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
+    [Flurry setCrashReportingEnabled:NO];
+    [Flurry startSession:@"FPK36XPRRWRSPKCHZTSW"];
     return YES;
 }
 
