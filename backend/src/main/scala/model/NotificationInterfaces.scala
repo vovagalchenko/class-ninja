@@ -1,5 +1,6 @@
 package model
 
+import scala.slick.ast.ColumnOption.DBType
 import scala.slick.driver.MySQLDriver.simple._
 
 case class NotificationInterface(
@@ -15,7 +16,7 @@ class NotificationInterfaces(tag: Tag) extends Table[NotificationInterface](tag,
   def userPhoneNumber = column[String]("user_phone_number")
   def kind = column[String]("kind")
   def notificationInterfaceKey = column[String]("notification_interface_key")
-  def notificationInterfaceName = column[String]("notification_interface_name")
+  def notificationInterfaceName = column[String]("notification_interface_name", DBType("varchar(254) CHARACTER SET utf8"))
 
   def user = foreignKey("notification_interface_user_fk", userPhoneNumber, TableQuery[Users])(_.phoneNumber)
   def kindUserPhoneNumberIndex = index("kind_user_phone_number_idx", (kind, userPhoneNumber))
