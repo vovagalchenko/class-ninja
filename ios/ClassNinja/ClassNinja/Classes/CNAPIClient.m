@@ -234,7 +234,7 @@ authenticationRequired:(BOOL)authRequired
     logNetworkEvent(@"request_send",
   @{
     @"http_method" : request.HTTPMethod,
-    @"request_url" : [request.URL path],
+    @"request_url" : [request.URL absoluteString],
     @"request_headers" : [request allHTTPHeaderFields],
     @"request_http_body_length" : @([[request HTTPBody] length]),
     });
