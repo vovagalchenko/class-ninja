@@ -363,6 +363,8 @@ static void getSectionAndEventIndicesForCourse(CNTargetedCourse *course, NSUInte
         (*sectionIndex)++;
     }
     *eventIndex = currRowIndex - 1;
+    CNAssert(course.sections.count > *sectionIndex && ((NSInteger)[course.sections[*sectionIndex] events].count) > *eventIndex,
+             @"getSectionAndEventIndicesForCourse_integrity", @"getSectionAndEventIndicesForCourse returned impossible results.");
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -426,6 +428,8 @@ static NSString *eventCellId = @"Event_Cell";
     [tableView endUpdates];
  
     [tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+    
+    [self logCellAction:@"cell_expand" forCellAtIndexPath:indexPath];
 }
 
 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -435,6 +439,20 @@ static NSString *eventCellId = @"Event_Cell";
     [tableView beginUpdates];
     [self.expandedIndexPaths removeObject:indexPath];
     [tableView endUpdates];
+    
+    [self logCellAction:@"cell_collapse" forCellAtIndexPath:indexPath];
+}
+
+- (void)logCellAction:(NSString *)cellAction forCellAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSInteger sectionIndex, eventIndex;
+    CNTargetedCourse *target = self.targets[indexPath.section];
+    getSectionAndEventIndicesForCourse(target, indexPath.row, &sectionIndex, &eventIndex);
+    logUserAction(cellAction,
+                  @{
+                    @"event_id" : ((CNEvent *)((CNSection *)target.sections[sectionIndex]).events[eventIndex]).eventId,
+                    @"table_type" : @"targets"
+                    });
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section

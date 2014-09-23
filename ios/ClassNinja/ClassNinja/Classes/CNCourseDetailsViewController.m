@@ -47,8 +47,6 @@
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) UIButton *trackButton;
 
-@property (nonatomic) NSArray *courseDetails;
-
 @property (nonatomic) NSArray *listOfSections;
 
 @property (nonatomic) NSMutableArray *expandedIndexPaths;
@@ -319,6 +317,10 @@
         [self.targetEvents removeObject:cell.event];
     }
     [self updateTrackButtonState];
+    
+    NSString *analyticsCellAction = isTargeted? @"cell_target" : @"cell_untarget";
+    [self logCellAction:analyticsCellAction
+     forCellAtIndexPath:[self.tableView indexPathForCell:cell]];
 }
 
 - (void)expandStateOnCell:(CNCourseDetailsTableViewCell *)cell changedTo:(BOOL)isExpanded
@@ -348,6 +350,20 @@
             [self.tableView scrollToRowAtIndexPath:cellIndexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         }
     }
+    
+    NSString *analyticsCellAction = isExpanded? @"cell_expand" : @"cell_collapse";
+    [self logCellAction:analyticsCellAction
+     forCellAtIndexPath:cellIndexPath];
+    
+}
+
+- (void)logCellAction:(NSString *)cellAction forCellAtIndexPath:(NSIndexPath *)indexPath
+{
+    logUserAction(cellAction,
+    @{
+      @"event_id" : [[self eventForIndexPath:indexPath] eventId],
+      @"table_type" : @"course_details"
+    });
 }
 
 // code for testing deletion of the target
