@@ -521,6 +521,11 @@ static NSString *eventCellId = @"Event_Cell";
     CNAPIClient *client = [CNAPIClient sharedInstance];
     CNSection *relevantSection = [targetedCourse.sections objectAtIndex:sectionIndex];
     CNEvent *relevantEvent = [relevantSection.events objectAtIndex:eventIndex];
+    logUserAction(@"target_remove", @{
+        @"targeted_course" : targetedCourse.name,
+        @"targeted_event" : relevantEvent.eventId,
+        @"target_id" : relevantEvent.targetId
+    });
     [self.processingRows addObject:indexPath];
     if ([self.expandedIndexPaths containsObject:indexPath]) {
         [self.expandedIndexPaths removeObject:indexPath];
