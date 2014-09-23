@@ -19,6 +19,19 @@
 
 @implementation CNAuthContext
 
+- (instancetype)init
+{
+    if (self = [super init]) {
+        // Clear the logged in user out of the keychain in case of a reinstall
+        if (![[NSUserDefaults standardUserDefaults] objectForKey:@"FirstRun"]) {
+            self.loggedInUser = nil;
+            [[NSUserDefaults standardUserDefaults] setValue:@"1strun" forKey:@"FirstRun"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+    }
+    return self;
+}
+
 #pragma mark Authentication
 
 - (void)authenticateWithCompletion:(void (^)(BOOL))completionBlock
