@@ -221,7 +221,7 @@
                       completion:refreshTargetsTable];
              } else if (apiClient.authContext.loggedInUser.credits <= 5 && apiClient.authContext.loggedInUser.credits > 0) {
                  NSString *classesString = (apiClient.authContext.loggedInUser.credits > 1)? @"classes" : @"class";
-                 [self setStatus:[NSString stringWithFormat:@"You can track %d more %@ this term for free", apiClient.authContext.loggedInUser.credits, classesString]
+                 [self setStatus:[NSString stringWithFormat:@"You can track %lu more %@ this term for free", (unsigned long)apiClient.authContext.loggedInUser.credits, classesString]
                 actionButtonType:CNWelcomeStatusViewActionStatusButtonTypePay
                       completion:refreshTargetsTable];
              } else if (targets.count) {
