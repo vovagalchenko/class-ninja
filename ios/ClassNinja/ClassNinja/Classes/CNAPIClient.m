@@ -247,7 +247,7 @@ authenticationRequired:(BOOL)authRequired
         logNetworkEvent(@"response_receipt",
         @{
           @"http_method" : request.HTTPMethod,
-          @"request_url" : [request.URL path],
+          @"request_url" : [request.URL absoluteString],
           @"request_headers" : [request allHTTPHeaderFields],
           @"request_http_body_length" : @([[request HTTPBody] length]),
           @"response_code" : @([(NSHTTPURLResponse *)response statusCode]),
@@ -269,7 +269,7 @@ authenticationRequired:(BOOL)authRequired
                 logWarning(@"malformed_http_response",
                                 @{
                                   @"http_method" : request.HTTPMethod,
-                                  @"request_url" : [request.URL path],
+                                  @"request_url" : [request.URL absoluteString],
                                   @"request_headers" : [request allHTTPHeaderFields],
                                   @"request_http_body_length" : @([[request HTTPBody] length]),
                                   @"response_code" : @([(NSHTTPURLResponse *)response statusCode]),
