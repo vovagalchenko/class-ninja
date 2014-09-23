@@ -103,7 +103,7 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
                                          [parentAPIResource resourceTypeName], [childAPIResourceInstance resourceTypeName]];
                       }
                       NSArray *children = [jsonResult objectForKey:childrenKey];
-                      NSAssert(children != nil, @"Unable to find the childrenKey <%@> in JSON result:\n%@", childrenKey, jsonResult);
+                      CNAssert(children != nil, @"api_children", @"Unable to find the childrenKey <%@> in JSON result:\n%@", childrenKey, jsonResult);
                       NSMutableArray *childObjects = [NSMutableArray arrayWithCapacity:children.count];
                       for (NSDictionary *childDict in children) {
                           [childObjects addObject:[[parentAPIResource childResourceClass] modelWithDictionary:childDict]];
@@ -181,7 +181,7 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
     if (httpBodyParams.count) {
         NSError *err = nil;
         NSData *httpBody = [NSJSONSerialization dataWithJSONObject:httpBodyParams options:0 error:&err];
-        NSAssert(err == nil, @"Unable to JSON serialize your http body parameters: %@", httpBodyParams);
+        CNAssert(err == nil, @"request_body_serialization", @"Unable to JSON serialize your http body parameters: %@", httpBodyParams);
         [urlRequest setHTTPBody:httpBody];
     }
     return urlRequest;
@@ -192,7 +192,7 @@ authenticationRequired:(BOOL)authRequired
         withAuthPolicy:(CNAuthenticationPolicy)authPolicy
             completion:(void (^)(id))completionBlock
 {
-    NSAssert(completionBlock != nil, @"Must pass in a completion block");
+    CNAssert(completionBlock != nil, @"api_call_completion", @"Must pass in a completion block");
     
     void (^authFailureHandler)() = nil;
     switch (authPolicy) {

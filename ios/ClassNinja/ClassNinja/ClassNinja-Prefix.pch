@@ -18,3 +18,34 @@
     #import "AppearanceConstants.h"
     #import <VGAnalytics/Analytics.h>
 #endif
+
+// There's no need to ever invoke this directly. Just use CNAssert and CSNssertFail.
+static inline void CNAssert_v(BOOL assertion, NSString *assertName, NSString *descriptionFormat, va_list args)
+{
+    NSString *description = nil;
+    if (!assertion)
+    {
+        description = [[NSString alloc] initWithFormat:descriptionFormat arguments:args];
+        logIssue(@"assert_fail", @{
+                                   @"assert_name" : assertName,
+                                   @"assert_msg" : description,
+                                   });
+    }
+    NSCAssert(assertion, description);
+}
+
+static inline void CNAssert(BOOL assertion, NSString *assertName, NSString *descriptionFormat, ...)
+{
+    va_list args;
+    va_start(args, descriptionFormat);
+    CNAssert_v(assertion, assertName, descriptionFormat, args);
+    va_end(args);
+}
+
+static inline void CNAssertFail(NSString *assertName, NSString *descriptionFormat, ...)
+{
+    va_list args;
+    va_start(args, descriptionFormat);
+    CNAssert_v(NO, assertName, descriptionFormat, args);
+    va_end(args);
+}

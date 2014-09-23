@@ -29,7 +29,7 @@
 #define FOCAL_LABEL_TEXT_SIZE   30
 #define INSTRUCTION_LABEL_FONT  [UIFont cnSystemFontOfSize:18.0]
 
-#define ASSERT_MAIN_THREAD()        NSAssert([[NSThread currentThread] isMainThread], @"<%@:%d> This must be executed on the main thread.",\
+#define ASSERT_MAIN_THREAD()        CNAssert([[NSThread currentThread] isMainThread], @"main_thread", @"<%@:%d> This must be executed on the main thread.",\
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__)
 #define SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:230/255.0 alpha:1.0])
 #define QUESTION_TITLE_BACKGROUND_COLOR [UIColor colorWithRed:16/255.0 green:77/255.0 blue:147/255.0 alpha:1.0]

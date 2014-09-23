@@ -119,7 +119,7 @@
 - (CNUser *)loggedInUser
 {
     // Assert main thread so we don't have to worry about synchronizing this.
-    NSAssert([NSThread isMainThread], @"loggedInUser is assumed to be called on the main thread.");
+    ASSERT_MAIN_THREAD();
     if (!_loggedInUser) {
         _loggedInUser = [self retrieveLoggedInUserFromKeychain];
         [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
@@ -130,7 +130,7 @@
 - (void)setLoggedInUser:(CNUser *)loggedInUser
 {
     // Assert main thread so we don't have to worry about synchronizing this.
-    NSAssert([NSThread isMainThread], @"setLoggedInUser is assumed to be called on the main thread.");
+    ASSERT_MAIN_THREAD();
     _loggedInUser = loggedInUser;
     [self writeLoggedInUserToKeychain:loggedInUser];
     [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
@@ -172,7 +172,7 @@ static inline NSMutableDictionary *keychainSearchDictionaryForLoggedInUser()
         status = SecItemUpdate((__bridge CFDictionaryRef)keychainSearchDict,
                                (__bridge CFDictionaryRef)[NSDictionary dictionaryWithObject:data forKey:(__bridge_transfer id)kSecValueData]);
     }
-    NSAssert(status == errSecSuccess, @"Error writing to keychain.");
+    CNAssert(status == errSecSuccess, @"keychain_write", @"Error writing to keychain: %d", status);
 }
 
 - (void)dealloc

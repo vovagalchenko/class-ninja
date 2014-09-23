@@ -327,7 +327,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
         }
         default:
         {
-            NSAssert(NO, @"Confirmation button pressed in unexpected state: %d", (int)self.currentState);
+            CNAssertFail(@"auth_view_conf_button_state", @"Confirmation button pressed in unexpected state: %d", (int)self.currentState);
             break;
         }
     }
@@ -373,7 +373,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
                 stateNameForAnalytics = @"wait";
                 break;
             default:
-                NSAssert(NO, @"Unknown state: %d", (int)state);
+                CNAssertFail(@"auth_view_switch_to_state", @"Unknown state: %d", (int)state);
                 break;
         }
         self.currentState = state;

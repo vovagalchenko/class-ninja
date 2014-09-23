@@ -200,7 +200,7 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
 
 - (Class<CNAPIResource>)childResourceClass
 {
-    NSAssert(NO, @"CNSectionAPIResource doesn't have child API resources.");
+    CNAssertFail(@"CNSectionAPIResource_child_resource", @"CNSectionAPIResource doesn't have child API resources.");
     return nil;
 }
 
@@ -211,7 +211,7 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
 
 - (NSString *)resourceIdentifier
 {
-    NSAssert(NO, @"CNSectionAPIResource doesn't have child API resources.");
+    CNAssertFail(@"CNSectionAPIResource_resource_id", @"CNSectionAPIResource doesn't have child API resources.");
     return [(CNSection *)self.model sectionid];
 }
 
@@ -245,7 +245,7 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
 
 - (Class<CNAPIResource>)childResourceClass
 {
-    NSAssert(NO, @"CNTargetAPIResource doesn't have child API resources.");
+    CNAssertFail(@"CNTargetAPIResource_child_resource", @"CNTargetAPIResource doesn't have child API resources.");
     return nil;
 }
 
@@ -256,7 +256,7 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
 
 - (NSString *)resourceIdentifier
 {
-    NSAssert(NO, @"CNTargetAPIResource doesn't have child API resources.");
+    CNAssertFail(@"CNTargetAPIResource_resource_id", @"CNTargetAPIResource doesn't have a resource id.");
     return [(CNEvent *)self.model eventId];
 }
 
@@ -286,7 +286,7 @@ static inline CNEvent *createEventFromAPIDictionary(NSDictionary *eventDict)
 
 + (id<CNModel>)modelWithDictionary:(NSDictionary *)dictionary
 {
-    NSAssert(NO, @"There is no model for CNRootAPIResource");
+    CNAssertFail(@"CNRootAPIResource_model", @"There is no model for CNRootAPIResource");
     return nil;
 }
 
