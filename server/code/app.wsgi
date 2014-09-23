@@ -4,8 +4,7 @@ import re
 import traceback
 from urlparse import urlparse
 
-def application(environ, start_response):
-
+def basic_application(environ, start_response):
     document_root = environ.get('CONTEXT_DOCUMENT_ROOT', '')
     if document_root not in sys.path:
         sys.path.insert(0, document_root)
@@ -99,3 +98,35 @@ def get_controller(env):
     else:
         raise ext_api.exceptions.Invalid_API_Call_Exception(http_method, endpoint, "Please specify what API call you would like to make.")
     return controller
+
+
+
+from StringIO import StringIO
+import zlib
+
+class UnzipRequestMiddleware(object):
+    """A middleware that unzips POSTed data.
+ 
+    For this middleware to kick in, the client must provide a value
+    for the ``Content-Encoding`` header. The only accepted value is
+    ``gzip``. Any other value is ignored.
+    """
+ 
+    def __init__(self, app):
+        self.app = app
+ 
+    def __call__(self, environ, start_response):
+        encoding = environ.get('HTTP_CONTENT_ENCODING')
+        if encoding == 'gzip':
+            data = environ['wsgi.input'].read(int(environ.get('CONTENT_LENGTH', '0')))
+            try:
+                uncompressed = zlib.decompress(data, zlib.MAX_WBITS|16)
+                environ['wsgi.input'] = StringIO(uncompressed)
+                environ['CONTENT_LENGTH'] = len(uncompressed)
+            except zlib.error as e:
+                print >> environ['wsgi.errors'], "Could not decompress request data."
+                print >> environ['wsgi.errors'], str(e)
+                environ['wsgi.input'] = StringIO(data)
+        return self.app(environ, start_response)
+
+application = UnzipRequestMiddleware(basic_application)

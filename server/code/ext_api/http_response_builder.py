@@ -17,11 +17,16 @@ class HTTP_Response_Builder(object):
     request_headers = {}
     user = None
     user_profile = None
+    handles_http_body_processing = False
+    body_stream = None
+    content_length = None
+    http_user_agent = None
 
     def __init__(self, env, resource_id):
         query_string = env.get('QUERY_STRING', '')
-        body_stream = env.get('wsgi.input', None)
-        content_length = int(env.get('CONTENT_LENGTH', 0))
+        self.http_user_agent = env.get('HTTP_USER_AGENT', None)
+        self.body_stream = env.get('wsgi.input', None)
+        self.content_length = int(env.get('CONTENT_LENGTH', 0))
         self.request_headers = {}
         for key in env:
             (header_name, num_subs) = subn(r'^HTTP_', '', key)
@@ -31,8 +36,8 @@ class HTTP_Response_Builder(object):
         self.warnings = []
         self.resource_id = resource_id
         passed_in_param_dict= {}
-        if content_length > 0:
-            body_str = body_stream.read(content_length)
+        if self.content_length > 0 and not self.handles_http_body_processing:
+            body_str = self.body_stream.read(self.content_length)
             try:
                 passed_in_param_dict = loads(body_str)
                 if not isinstance(passed_in_param_dict, dict):
