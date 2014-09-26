@@ -156,22 +156,24 @@
         [_trackButton addTarget:self action:@selector(trackButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
         [_trackButton addTarget:self action:@selector(trackButtonGotHighlighted:) forControlEvents:UIControlEventTouchDragInside|UIControlEventTouchDown];
         [_trackButton addTarget:self action:@selector(trackButtonGotUnhighlighted:) forControlEvents:UIControlEventTouchDragOutside|UIControlEventTouchUpInside];
-        _trackButton.backgroundColor = kTrackButtonBackgroundColorDisabled;
         [_trackButton setTitle:@"Track" forState:UIControlStateNormal];
         [_trackButton setTitleColor:kTrackButtonTextColorEnabled forState:UIControlStateNormal];
         [_trackButton setTitleColor:kTrackButtonTextColorDisabled forState:UIControlStateDisabled];
+        [_trackButton addObserver:self forKeyPath:@"enabled" options:NSKeyValueObservingOptionNew context:nil];
     }
     return _trackButton;
 }
 
 - (void)trackButtonGotHighlighted:(UIButton *)trackButton
 {
-    [trackButton setBackgroundColor:[kTrackButtonBackgroundColorEnabled colorWithAlphaComponent:.75]];
+    if (trackButton.enabled)
+        [trackButton setBackgroundColor:[kTrackButtonBackgroundColorEnabled colorWithAlphaComponent:.75]];
 }
 
 - (void)trackButtonGotUnhighlighted:(UIButton *)trackButton
 {
-    [trackButton setBackgroundColor:kTrackButtonBackgroundColorEnabled];
+    if (trackButton.enabled)
+        [trackButton setBackgroundColor:kTrackButtonBackgroundColorEnabled];
 }
 
 - (UILabel *)classLabelWithWidth:(CGFloat)width
@@ -254,10 +256,16 @@
 - (void)updateTrackButtonState
 {
     self.trackButton.enabled = self.targetEvents.count > 0;
-    if (self.trackButton.enabled) {
-        self.trackButton.backgroundColor = kTrackButtonBackgroundColorEnabled;
-    } else {
-        self.trackButton.backgroundColor = kTrackButtonBackgroundColorDisabled;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (object == self.trackButton && [keyPath isEqualToString:@"enabled"]) {
+        if (self.trackButton.enabled) {
+            self.trackButton.backgroundColor = kTrackButtonBackgroundColorEnabled;
+        } else {
+            self.trackButton.backgroundColor = kTrackButtonBackgroundColorDisabled;
+        }
     }
 }
 
@@ -398,12 +406,21 @@
 
 - (void)trackButtonPressed:(id)sender
 {
+    NSMutableArray *eventIds = [NSMutableArray array];
+    [self.targetEvents enumerateObjectsUsingBlock:^(CNEvent *event, NSUInteger idx, BOOL *stop) {
+        [eventIds addObject:event.eventId];
+    }];
+    logUserAction(@"target_requested",
+  @{
+        @"events_to_target" : eventIds
+    });
     [UIView animateWithDuration:ANIMATION_DURATION
                      animations:^
     {
         self.tableView.alpha = 0.25;
         self.tableView.userInteractionEnabled = NO;
         self.activityIndicator.alpha = 1.0;
+        self.trackButton.enabled = NO;
     }
                      completion:^(BOOL finished)
     {
@@ -419,9 +436,14 @@
             self.tableView.alpha = 1.0;
             self.tableView.userInteractionEnabled = YES;
             self.activityIndicator.alpha = 0.0;
+            self.trackButton.enabled = YES;
         }];
     }];
-    
+}
+
+- (void)dealloc
+{
+    [self.trackButton removeObserver:self forKeyPath:@"enabled"];
 }
 
 @end
