@@ -12,6 +12,7 @@
 #import "CNCloseButton.h"
 #import "AppearanceConstants.h"
 #import "CNPaywallViewController.h"
+#import "CNActivityIndicator.h"
 
 #define kCloseButtonXOffset 17
 #define kCloseButtonYOffset 17
@@ -51,6 +52,9 @@
 
 @property (nonatomic) NSMutableArray *expandedIndexPaths;
 @property (nonatomic) NSMutableArray *targetEvents;
+
+@property (nonatomic) CNActivityIndicator *activityIndicator;
+
 @end
 
 @implementation CNCourseDetailsViewController
@@ -71,15 +75,23 @@
     return _tableView;
 }
 
+- (NSString *)title
+{
+    return self.course.name;
+}
+
 - (void)viewDidLoad
 {    
     [super viewDidLoad];
     self.expandedIndexPaths = [NSMutableArray array];
     self.targetEvents = [NSMutableArray array];
+    self.activityIndicator = [[CNActivityIndicator alloc] initWithFrame:CGRectZero presentedOnLightBackground:YES];
+    self.activityIndicator.alpha = 0.0;
 
     self.view.backgroundColor = [UIColor clearColor];
     self.view.autoresizingMask = UIViewAutoresizingNone;
     
+    [self.view addSubview:self.activityIndicator];
     [self.view addSubview:self.tableView];
     [self.view addSubview:self.closeButton];
     [self.view addSubview:self.trackButton];
@@ -95,6 +107,11 @@
     [super viewDidLayoutSubviews];
     CGSize size = self.tableView.bounds.size;
     self.tableView.tableHeaderView = [self headerViewWithWidth:size.width height:kTableHeaderHeight];
+    
+    CGFloat activityIndicatorDimension = TAPPABLE_AREA_DIMENSION;
+    self.activityIndicator.frame = CGRectMake((self.view.bounds.size.width - activityIndicatorDimension)/2,
+                                              (self.view.bounds.size.height - activityIndicatorDimension)/2,
+                                              activityIndicatorDimension, activityIndicatorDimension);
 }
 
 - (CAGradientLayer*)backgroundGradientLayer
@@ -212,8 +229,6 @@
     return _closeButton;
 }
 
-
-
 - (void)closeButtonPressed:(id)sender
 {
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -251,11 +266,14 @@
 
 - (void)loadContent
 {
+    self.activityIndicator.alpha = 1.0;
     [[CNAPIClient sharedInstance] listChildren:self.course
                                     completion:^(NSArray*children) {
+                                        [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                                            self.activityIndicator.alpha = 0.0;
+                                        }];
                                         self.listOfSections = children;
                                         [self.tableView reloadData];
-                                        [self.tableView flashScrollIndicators];
                                     }];
 }
 
@@ -365,8 +383,6 @@
       @"table_type" : @"course_details"
     });
 }
-
-// code for testing deletion of the target
 
 - (void)trackButtonPressed:(id)sender
 {
