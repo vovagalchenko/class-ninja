@@ -21,6 +21,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [[Analytics sharedInstance] setDelegate:self];
     logAppLifecycleEvent(@"launch", nil);
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -118,6 +119,20 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     logAppLifecycleEvent(@"terminate", nil);
+}
+
+#pragma mark - AnalyticsDelegate
+
+- (NSDictionary *)supplementalData
+{
+    NSDictionary *data = nil;
+    CNUser *loggedInUser = [[[CNAPIClient sharedInstance] authContext] loggedInUser];
+    if (loggedInUser) {
+        data = @{
+            @"logged_in_user" : loggedInUser.phoneNumber
+        };
+    }
+    return data;
 }
 
 @end

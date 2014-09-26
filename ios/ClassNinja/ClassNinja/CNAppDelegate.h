@@ -10,7 +10,7 @@
 
 #define APP_DELEGATE        ((CNAppDelegate *)[[UIApplication sharedApplication] delegate])
 
-@interface CNAppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>
+@interface CNAppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate, AnalyticsDelegate>
 
 - (void)registerForPushNotifications;
 
