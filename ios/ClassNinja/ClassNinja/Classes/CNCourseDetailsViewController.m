@@ -154,12 +154,24 @@
     if  (_trackButton == nil) {
         _trackButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [_trackButton addTarget:self action:@selector(trackButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        [_trackButton addTarget:self action:@selector(trackButtonGotHighlighted:) forControlEvents:UIControlEventTouchDragInside|UIControlEventTouchDown];
+        [_trackButton addTarget:self action:@selector(trackButtonGotUnhighlighted:) forControlEvents:UIControlEventTouchDragOutside|UIControlEventTouchUpInside];
         _trackButton.backgroundColor = kTrackButtonBackgroundColorDisabled;
         [_trackButton setTitle:@"Track" forState:UIControlStateNormal];
         [_trackButton setTitleColor:kTrackButtonTextColorEnabled forState:UIControlStateNormal];
         [_trackButton setTitleColor:kTrackButtonTextColorDisabled forState:UIControlStateDisabled];
     }
     return _trackButton;
+}
+
+- (void)trackButtonGotHighlighted:(UIButton *)trackButton
+{
+    [trackButton setBackgroundColor:[kTrackButtonBackgroundColorEnabled colorWithAlphaComponent:.75]];
+}
+
+- (void)trackButtonGotUnhighlighted:(UIButton *)trackButton
+{
+    [trackButton setBackgroundColor:kTrackButtonBackgroundColorEnabled];
 }
 
 - (UILabel *)classLabelWithWidth:(CGFloat)width
@@ -386,15 +398,30 @@
 
 - (void)trackButtonPressed:(id)sender
 {
-    [[CNAPIClient sharedInstance] targetEvents:self.targetEvents successBlock:^(BOOL success){
-        if (success) {
-            [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
-        } else {
-            CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
-            paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
-            [self presentViewController:paywallVC animated:YES completion:nil];
-        }
+    [UIView animateWithDuration:ANIMATION_DURATION
+                     animations:^
+    {
+        self.tableView.alpha = 0.25;
+        self.tableView.userInteractionEnabled = NO;
+        self.activityIndicator.alpha = 1.0;
+    }
+                     completion:^(BOOL finished)
+    {
+        [[CNAPIClient sharedInstance] targetEvents:self.targetEvents successBlock:^(BOOL success){
+            
+            if (success) {
+                [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
+            } else {
+                CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
+                paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
+                [self presentViewController:paywallVC animated:YES completion:nil];
+            }
+            self.tableView.alpha = 1.0;
+            self.tableView.userInteractionEnabled = YES;
+            self.activityIndicator.alpha = 0.0;
+        }];
     }];
+    
 }
 
 @end

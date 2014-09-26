@@ -136,7 +136,7 @@
         _marketingMessage = [[UILabel alloc] init];
         
         NSString *message =@"The first 2 classes of the semester that you want to track are free.\n\n"
-                            "For just 0.99$, you will be able to track an unlimited number of classes for this semester";
+                            "For just $0.99, you will be able to track an unlimited number of classes for this semester";
         _marketingMessage.numberOfLines = 0;
         _marketingMessage.text = message;
         _marketingMessage.textColor = [UIColor whiteColor];
