@@ -35,6 +35,7 @@
 		80666D9D19CEBECB007003A2 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80666D9C19CEBECB007003A2 /* libz.dylib */; };
 		80666DA119CEE071007003A2 /* NSData+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 80666DA019CEE071007003A2 /* NSData+CNAdditions.m */; };
 		80666DA519CEE20F007003A2 /* CNLoggingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 80666DA419CEE20F007003A2 /* CNLoggingViewController.m */; };
+		80666DAD19D5B4D3007003A2 /* CNGradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 80666DAC19D5B4D3007003A2 /* CNGradientView.m */; };
 		80A05E5E19CAD34100B4A1CD /* CNTargetsDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 80A05E5D19CAD34100B4A1CD /* CNTargetsDiff.m */; };
 		80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 80F1000C19C4ED7500C28C32 /* CNCloseButton.m */; };
 		80F1001019C50E4300C28C32 /* CNTargetSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 80F1000F19C50E4300C28C32 /* CNTargetSectionHeaderView.m */; };
@@ -129,6 +130,8 @@
 		80666DA019CEE071007003A2 /* NSData+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+CNAdditions.m"; sourceTree = "<group>"; };
 		80666DA319CEE20F007003A2 /* CNLoggingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNLoggingViewController.h; sourceTree = "<group>"; };
 		80666DA419CEE20F007003A2 /* CNLoggingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNLoggingViewController.m; sourceTree = "<group>"; };
+		80666DAB19D5B4D3007003A2 /* CNGradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGradientView.h; sourceTree = "<group>"; };
+		80666DAC19D5B4D3007003A2 /* CNGradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGradientView.m; sourceTree = "<group>"; };
 		80A05E5C19CAD34100B4A1CD /* CNTargetsDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNTargetsDiff.h; sourceTree = "<group>"; };
 		80A05E5D19CAD34100B4A1CD /* CNTargetsDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNTargetsDiff.m; sourceTree = "<group>"; };
 		80F1000B19C4ED7500C28C32 /* CNCloseButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCloseButton.h; sourceTree = "<group>"; };
@@ -295,6 +298,8 @@
 				DC08B697198AB0470092EE90 /* CNWelcomeStatusView.m */,
 				80F1000E19C50E4300C28C32 /* CNTargetSectionHeaderView.h */,
 				80F1000F19C50E4300C28C32 /* CNTargetSectionHeaderView.m */,
+				80666DAB19D5B4D3007003A2 /* CNGradientView.h */,
+				80666DAC19D5B4D3007003A2 /* CNGradientView.m */,
 			);
 			name = Welcome;
 			sourceTree = "<group>";
@@ -514,6 +519,7 @@
 				DCCAA3951985FA5D00BC4E7D /* CNAPIResource.m in Sources */,
 				707F984D196899BC00D6E552 /* main.m in Sources */,
 				70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */,
+				80666DAD19D5B4D3007003A2 /* CNGradientView.m in Sources */,
 				70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */,
 				80F1001019C50E4300C28C32 /* CNTargetSectionHeaderView.m in Sources */,
 				80666DA119CEE071007003A2 /* NSData+CNAdditions.m in Sources */,

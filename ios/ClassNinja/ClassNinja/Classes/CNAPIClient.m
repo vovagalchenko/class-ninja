@@ -214,7 +214,7 @@ authenticationRequired:(BOOL)authRequired
         case CNFailRequestOnAuthFailure:
         default:
         {
-            authFailureHandler = ^{ completionBlock(nil); };
+            authFailureHandler = ^{ if (completionBlock) completionBlock(nil); };
             break;
         }
     }

@@ -16,6 +16,9 @@
 #import "CNCourseDetailsTableViewCell.h"
 #import "CNTargetsDiff.h"
 #import "CNPaywallViewController.h"
+#import "CNGradientView.h"
+
+#define SECTION_HEADER_HEIGHT       70.0
 
 @interface CNWelcomeViewController () <CourseDetailsTableViewCellProtocol>
 
@@ -27,6 +30,7 @@
 @property (nonatomic, readonly) NSMutableArray *processingRows;
 @property (nonatomic) NSArray *highlightedTargetRows;
 @property (nonatomic, assign) NSUInteger numOngoingTargetFetches;
+@property (nonatomic) CNGradientView *gradientOccluder;
 
 @end
 
@@ -276,6 +280,9 @@ static NSString *sectionHeaderViewId = @"Section_Header";
     
     self.statusView = [[CNWelcomeStatusView alloc] initWithDelegate:self];
     [self.tableView setTableHeaderView:self.statusView];
+    
+    self.gradientOccluder = [[CNGradientView alloc] initWithColor:WELCOME_BLUE_COLOR];
+    [self.view addSubview:self.gradientOccluder];
 }
 
 - (void)updateViewConstraints
@@ -341,6 +348,15 @@ static NSString *sectionHeaderViewId = @"Section_Header";
                                                                 multiplier:1.0
                                                                   constant:0.0];
         [self.view addConstraints:@[top, left, right, width]];
+        
+        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_gradientOccluder]|"
+                                                                          options:0
+                                                                          metrics:0
+                                                                            views:NSDictionaryOfVariableBindings(_gradientOccluder)]];
+        [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[_gradientOccluder(%f)]", self.topLayoutGuide.length, SECTION_HEADER_HEIGHT/4]
+                                                                          options:0
+                                                                          metrics:0
+                                                                            views:NSDictionaryOfVariableBindings(_gradientOccluder)]];
     }
     [super updateViewConstraints];
 }
@@ -467,7 +483,7 @@ static void getSectionAndEventIndicesForCourse(CNTargetedCourse *course, NSUInte
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-    return 70.0;
+    return SECTION_HEADER_HEIGHT;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
