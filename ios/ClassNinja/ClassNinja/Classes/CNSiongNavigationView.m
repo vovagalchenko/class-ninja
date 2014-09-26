@@ -316,6 +316,11 @@
     CGPoint targetPoint = [self targetPointForPageIndex:index];
     dispatch_block_t localCompletion = ^{
         self.scrollView.contentOffset = targetPoint;
+        for (UIView *view in self.scrollViews) {
+            view.userInteractionEnabled = NO;
+        }
+        UIView *view = [self.scrollViews objectAtIndex:self.currentPageIndex];
+        view.userInteractionEnabled = YES;
     };
     
     if (animated) {
