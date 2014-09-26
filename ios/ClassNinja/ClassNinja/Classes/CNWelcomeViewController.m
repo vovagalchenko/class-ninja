@@ -190,7 +190,10 @@
                      // We don't have anything to highlight – we're just going to apply the diff to the tableview.
                      // TODO: apply updates.
                      [self.tableView beginUpdates];
-                     [self.expandedIndexPaths removeAllObjects];
+                     if (self.expandedIndexPaths.count) {
+                         [self.tableView reloadRowsAtIndexPaths:self.expandedIndexPaths withRowAnimation:UITableViewRowAnimationAutomatic];
+                         [self.expandedIndexPaths removeAllObjects];
+                     }
                      [self.processingRows removeAllObjects];
                      if (diff.sectionsAdditions.count) {
                          [self.tableView insertSections:diff.sectionsAdditions withRowAnimation:UITableViewRowAnimationBottom];
