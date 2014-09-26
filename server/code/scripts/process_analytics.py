@@ -49,7 +49,7 @@ with codecs.open(file_path, "w", encoding='utf-8') as f:
             user_timezone = event.get('user_timezone', None)
             if user_timezone is not None:
                 event['user_time'] = datetime.datetime.fromtimestamp(timestamp, timezone(user_timezone)).isoformat()
-            f.write("%s\tevent_name=\"%s\" event_type=\"%s\" %s\n" % (time_of_event.isoformat(), event_name, event_type, ' '.join(['%s="%s"' % (key, value) for (key, value) in event.items()])))
+            f.write("%s\tevent_name=\"%s\" event_type=\"%s\" %s\n" % (time_of_event.isoformat(), event_name, event_type, ' '.join(['%s="%s"' % (key, "<br/>".join(value.split("\n")) if isinstance(value, basestring) else value) for (key, value) in event.items()])))
 
 os.unlink(sys.argv[1])
 exit(0)
