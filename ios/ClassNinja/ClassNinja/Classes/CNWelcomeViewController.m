@@ -91,9 +91,7 @@
                 [self.statusView setNeedsLayout];
                 [self.statusView layoutIfNeeded];
                 
-                [self.tableView beginUpdates];
                 [self.tableView setTableHeaderView:self.statusView];
-                [self.tableView endUpdates];
             } completion:^(BOOL finished) {
                 if (finished) {
                     [UIView animateWithDuration:ANIMATION_DURATION/2 animations:^{
@@ -244,6 +242,10 @@
 
 #pragma mark - Subview Setup
 
+static NSString *sectionCellId = @"Section_Cell";
+static NSString *eventCellId = @"Event_Cell";
+static NSString *sectionHeaderViewId = @"Section_Header";
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -264,6 +266,7 @@
     self.tableView.separatorStyle = UITableViewCellSelectionStyleNone;
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:sectionCellId];
     [self.tableView registerClass:[CNCourseDetailsTableViewCell class] forCellReuseIdentifier:eventCellId];
+    [self.tableView registerClass:[CNTargetSectionHeaderView class] forHeaderFooterViewReuseIdentifier:sectionHeaderViewId];
     [self.view addSubview:self.tableView];
     self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
     self.tableView.backgroundColor = [UIColor clearColor];
@@ -383,9 +386,6 @@ static void getSectionAndEventIndicesForCourse(CNTargetedCourse *course, NSUInte
     return numSections; // + 1 because for the section cell at the top
 }
 
-static NSString *sectionCellId = @"Section_Cell";
-static NSString *eventCellId = @"Event_Cell";
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     CNTargetedCourse *course = [self.targets objectAtIndex:indexPath.section];
@@ -457,11 +457,8 @@ static NSString *eventCellId = @"Event_Cell";
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    CNTargetSectionHeaderView *headerView = [[CNTargetSectionHeaderView alloc] init];
+    CNTargetSectionHeaderView *headerView = [tableView dequeueReusableHeaderFooterViewWithIdentifier:sectionHeaderViewId];
     [headerView setText:[[self.targets objectAtIndex:section] name]];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [headerView setNeedsLayout];
-    });
     return headerView;
 }
 

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CNTargetSectionHeaderView : UIView
+@interface CNTargetSectionHeaderView : UITableViewHeaderFooterView
 
 - (void)setText:(NSString *)text;
 

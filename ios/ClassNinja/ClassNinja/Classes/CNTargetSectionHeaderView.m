@@ -18,11 +18,11 @@
 
 @implementation CNTargetSectionHeaderView
 
-- (id)init
+- (id)initWithReuseIdentifier:(NSString *)reuseIdentifier
 {
-    self = [super initWithFrame:CGRectZero];
+    self = [super initWithReuseIdentifier:reuseIdentifier];
     if (self) {
-        self.backgroundColor = [UIColor whiteColor];
+        self.contentView.backgroundColor = [UIColor whiteColor];
         self.opaque = NO;
         
         self.label = [[UILabel alloc] init];
