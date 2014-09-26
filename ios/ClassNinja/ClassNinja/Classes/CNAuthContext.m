@@ -73,8 +73,7 @@
     [apiClient makeURLRequest:request
        authenticationRequired:NO
                withAuthPolicy:CNFailRequestOnAuthFailure
-                   completion:^(NSDictionary *response) {
-                    // Ewww
+                   completion:^(NSDictionary *response, NSError *error) {
                     completionCallback([[response objectForKey:@"status"] isEqualToString:@"SMS request sent"]);
                    }];
 }
@@ -93,9 +92,9 @@
     [apiClient makeURLRequest:request
        authenticationRequired:NO
                withAuthPolicy:CNFailRequestOnAuthFailure
-                   completion:^(NSDictionary *response) {
+                   completion:^(NSDictionary *response, NSError *error) {
                        NSString *accessToken = [response objectForKey:@"access_token"];
-                       if (accessToken.length) {
+                       if (accessToken.length && error == nil) {
                            CNUser *user = [[CNUser alloc] init];
                            user.phoneNumber = phoneNumber;
                            user.accessToken = accessToken;

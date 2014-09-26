@@ -288,7 +288,7 @@
 {
     self.activityIndicator.alpha = 1.0;
     [[CNAPIClient sharedInstance] listChildren:self.course
-                                    completion:^(NSArray*children) {
+                                    completion:^(NSArray*children, NSError *error) {
                                         [UIView animateWithDuration:ANIMATION_DURATION animations:^{
                                             self.activityIndicator.alpha = 0.0;
                                         }];
@@ -424,14 +424,25 @@
     }
                      completion:^(BOOL finished)
     {
-        [[CNAPIClient sharedInstance] targetEvents:self.targetEvents successBlock:^(BOOL success){
+        [[CNAPIClient sharedInstance] targetEvents:self.targetEvents completionBlock:^(NSError *error){
             
-            if (success) {
+            if (error == nil) {
                 [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
-            } else {
+            } if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorPaymentRequired) {
                 CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
                 [self presentViewController:paywallVC animated:YES completion:nil];
+            } else {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Targetting failed"
+                                                                               message:@"Failed to set target. Check your internet conection"
+                                                                        preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Ok"
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction *action) {
+                    [alert dismissViewControllerAnimated:YES completion:nil];
+                }];
+                [alert addAction:dismiss];
+                [self presentViewController:alert animated:NO completion:nil];
             }
             self.tableView.alpha = 1.0;
             self.tableView.userInteractionEnabled = YES;

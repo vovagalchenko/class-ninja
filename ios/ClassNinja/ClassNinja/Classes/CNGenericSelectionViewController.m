@@ -109,7 +109,7 @@
 {
     self.activityIndicator.alpha = 1.0;
     [[CNAPIClient sharedInstance] listChildren:self.rootModel
-                                    completion:^(NSArray*children) {
+                                    completion:^(NSArray*children, NSError *error) {
                                         [UIView animateWithDuration:ANIMATION_DURATION animations:^{
                                             self.activityIndicator.alpha = 0.0;
                                         }];
@@ -270,12 +270,25 @@
 {
     self.activityIndicator.alpha = 1.0;
     [[CNAPIClient sharedInstance] list:[CNSchool class]
-                            completion:^(NSArray *children){
-                                [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-                                    self.activityIndicator.alpha = 0.0;
-                                }];
-                                [self reloadResults:children];
-                                [self tryNavigatingToDefaultSchool];
+                            completion:^(NSArray *children, NSError *error){
+                                if (error == nil) {
+                                    [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                                        self.activityIndicator.alpha = 0.0;
+                                    }];
+                                    [self reloadResults:children];
+                                    [self tryNavigatingToDefaultSchool];
+                                } else {
+//                                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Failed to fetch data"
+//                                                                                                   message:@"Check your internet conection and try again"
+//                                                                                            preferredStyle:UIAlertControllerStyleAlert];
+//                                    UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Ok"
+//                                                                                      style:UIAlertActionStyleDefault
+//                                                                                    handler:^(UIAlertAction *action) {
+//                                                                                        [alert dismissViewControllerAnimated:YES completion:nil];
+//                                                                                    }];
+//                                    [alert addAction:dismiss];
+//                                    [self presentViewController:alert animated:NO completion:nil];
+                                }
                             }];
 }
 

@@ -53,26 +53,28 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
 
 #pragma mark API Implementation
 
-- (void)list:(Class<CNModel>)model completion:(void (^)(NSArray *))completionBlock
+- (void)list:(Class<CNModel>)model completion:(void (^)(NSArray *children, NSError *error))completionBlock
 {
     [self list:model authPolicy:CNFailRequestOnAuthFailure completion:completionBlock];
 }
 
-- (void)list:(Class<CNModel>)model authPolicy:(CNAuthenticationPolicy)authPolicy completion:(void (^)(NSArray *))completionBlock
+- (void)list:(Class<CNModel>)model
+  authPolicy:(CNAuthenticationPolicy)authPolicy
+  completion:(void (^)(NSArray *children, NSError *error))completionBlock
 {
     [self listChildrenOfAPIResource:[CNRootAPIResource rootAPIResourceForModel:model]
                authenticationPolicy:authPolicy
                          completion:completionBlock];
 }
 
-- (void)listChildren:(id<CNModel>)parentModel completion:(void (^)(NSArray *))completionBlock
+- (void)listChildren:(id<CNModel>)parentModel completion:(void (^)(NSArray *, NSError *error))completionBlock
 {
     [self listChildren:parentModel authPolicy:CNFailRequestOnAuthFailure completion:completionBlock];
 }
 
 - (void)listChildren:(id<CNModel>)parentModel
           authPolicy:(CNAuthenticationPolicy)authPolicy
-          completion:(void (^)(NSArray *))completionBlock
+          completion:(void (^)(NSArray *, NSError *error))completionBlock
 {
     id<CNAPIResource>apiResource = [CNAPIResourceFactory apiResourceWithModel:parentModel];
     [self listChildrenOfAPIResource:apiResource
@@ -82,7 +84,7 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
 
 - (void)listChildrenOfAPIResource:(id<CNAPIResource>)parentAPIResource
              authenticationPolicy:(CNAuthenticationPolicy)authPolicy
-                       completion:(void (^)(NSArray *))completionBlock
+                       completion:(void (^)(NSArray *children, NSError *error))completionBlock
 {
     NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:[[parentAPIResource resourceTypeName] stringByAppendingPathComponent:[parentAPIResource resourceIdentifier]]
                                                               HTTPMethod:@"GET"
@@ -90,9 +92,9 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
     [self makeURLRequest:request
   authenticationRequired:[[parentAPIResource childResourceClass] needsAuthentication]
           withAuthPolicy:authPolicy
-              completion:^(NSDictionary *jsonResult) {
-                  if (jsonResult == nil) {
-                      completionBlock(nil);
+              completion:^(NSDictionary *jsonResult, NSError *error) {
+                  if (jsonResult == nil || error != nil) {
+                      completionBlock(nil, error);
                   } else {
                       NSString *childrenKey = nil;
                       if ([parentAPIResource isKindOfClass:[CNRootAPIResource class]]) {
@@ -108,7 +110,7 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
                       for (NSDictionary *childDict in children) {
                           [childObjects addObject:[[parentAPIResource childResourceClass] modelWithDictionary:childDict]];
                       }
-                      completionBlock(childObjects);
+                      completionBlock(childObjects, nil);
                   }
               }];
 }
@@ -132,8 +134,8 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
     [self makeURLRequest:request
   authenticationRequired:NO
           withAuthPolicy:CNFailRequestOnAuthFailure
-              completion:^(NSDictionary *jsonResult) {
-                  if (jsonResult == nil) {
+              completion:^(NSDictionary *jsonResult, NSError *error) {
+                  if (jsonResult == nil || error != nil) {
                       if (completionBlock) {
                           completionBlock(nil, nil, nil);
                       }
@@ -190,7 +192,7 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
 - (void)makeURLRequest:(NSMutableURLRequest *)request
 authenticationRequired:(BOOL)authRequired
         withAuthPolicy:(CNAuthenticationPolicy)authPolicy
-            completion:(void (^)(id))completionBlock
+            completion:(void (^)(NSDictionary *response, NSError *error))completionBlock
 {
     CNAssert(completionBlock != nil, @"api_call_completion", @"Must pass in a completion block");
     
@@ -200,13 +202,15 @@ authenticationRequired:(BOOL)authRequired
         {
             authFailureHandler = ^{
                 [self.authContext authenticateWithCompletion:^(BOOL authenticationCompleted){
-                    if (authenticationCompleted)
+                    if (authenticationCompleted) {
                         [self makeURLRequest:request
                       authenticationRequired:YES
                               withAuthPolicy:CNFailRequestOnAuthFailure
                                   completion:completionBlock];
-                    else
-                        completionBlock(nil);
+                    } else {
+                        // fudging error code to 404
+                        completionBlock(nil, [NSError errorWithDomain:CN_API_CLIENT_ERROR_DOMAIN code:404 userInfo:nil]);
+                    }
                 }];
             };
             break;
@@ -214,7 +218,11 @@ authenticationRequired:(BOOL)authRequired
         case CNFailRequestOnAuthFailure:
         default:
         {
-            authFailureHandler = ^{ if (completionBlock) completionBlock(nil); };
+            authFailureHandler = ^{
+                if (completionBlock) {
+                    completionBlock(nil, [NSError errorWithDomain:CN_API_CLIENT_ERROR_DOMAIN code:404 userInfo:nil]);
+                }
+            };
             break;
         }
     }
@@ -257,15 +265,18 @@ authenticationRequired:(BOOL)authRequired
         });
         self.numOngoingRequests--;
         app.networkActivityIndicatorVisible = self.numOngoingRequests > 0;
-        if (connectionError || [(NSHTTPURLResponse *)response statusCode] >= 400) {
+        NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
+        if (connectionError || statusCode >= 400) {
             NSLog(@"Error attempting to execute: %@\n%@\n%@", response, connectionError, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            completionBlock(nil);
-        } else {
-            NSError *serializationError = nil;
-            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&serializationError];
-            if (serializationError) {
+        }
+
+        NSDictionary *jsonDict = nil;
+        NSError *completionError = connectionError;
+        if (connectionError == nil) {
+            jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&completionError];
+            if (completionError) {
                 NSLog(@"Error attempting to deserialize response to: %@\nResponse: %@\nError: %@",
-                      jsonDict, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], serializationError);
+                      jsonDict, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], completionError);
                 logWarning(@"malformed_http_response",
                                 @{
                                   @"http_method" : request.HTTPMethod,
@@ -275,18 +286,23 @@ authenticationRequired:(BOOL)authRequired
                                   @"response_code" : @([(NSHTTPURLResponse *)response statusCode]),
                                   @"response_http_body_length" : @([data length]),
                                   @"response_http_body_except" : [[[NSString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding] substringToIndex:100],
-                                  @"serialization_error" : serializationError.debugDescription,
+                                  @"serialization_error" : completionError.debugDescription,
                                   
                                   });
-                completionBlock(nil);
             } else {
                 NSNumber *credits = [jsonDict objectForKey:@"credits"];
                 if (credits && self.authContext.loggedInUser) {
                     self.authContext.loggedInUser.credits = [credits unsignedIntegerValue];
                 }
-                completionBlock(jsonDict);
+
+                if (statusCode >= 400) {
+                    completionError = [[NSError alloc] initWithDomain:CN_API_CLIENT_ERROR_DOMAIN code:statusCode userInfo:nil];
+                }
             }
         }
+        
+        
+        completionBlock(jsonDict, completionError);
     }];
 }
 
@@ -306,9 +322,9 @@ authenticationRequired:(BOOL)authRequired
     [self makeURLRequest:request
   authenticationRequired:YES
           withAuthPolicy:CNForceAuthenticationOnAuthFailure
-              completion:^(NSDictionary *response) {
+              completion:^(NSDictionary *response, NSError *error) {
                   if (successBlock) {
-                      successBlock(response != nil);
+                      successBlock(error == nil);
                   }
               }];
     
@@ -325,9 +341,9 @@ authenticationRequired:(BOOL)authRequired
     [self makeURLRequest:request
   authenticationRequired:YES
           withAuthPolicy:CNForceAuthenticationOnAuthFailure
-              completion:^(NSDictionary *response) {
+              completion:^(NSDictionary *response, NSError *error) {
                   NSNumber *creditsLeft = [response objectForKey:@"credits"];
-                  if (creditsLeft) {
+                  if (creditsLeft && error == nil) {
                       NSLog(@"IAP receipt verification succeeded. User has %@ credits left", creditsLeft);
                       if (successBlock) {
                           successBlock(YES);
@@ -342,7 +358,7 @@ authenticationRequired:(BOOL)authRequired
 
 }
 
-- (void)targetEvents:(NSArray *)events successBlock:(void (^)(BOOL success))successBlock
+- (void)targetEvents:(NSArray *)events completionBlock:(void (^)(NSError *error))block
 {
     NSMutableArray *event_ids = [[NSMutableArray alloc] initWithCapacity:events.count];
     for (CNEvent *event in events) {
@@ -357,17 +373,17 @@ authenticationRequired:(BOOL)authRequired
     [self makeURLRequest:request
        authenticationRequired:YES
                withAuthPolicy:CNForceAuthenticationOnAuthFailure
-                   completion:^(NSDictionary *response) {
+                   completion:^(NSDictionary *response, NSError *error) {
                        NSNumber *creditsLeft = [response objectForKey:@"credits"];
                        if (creditsLeft) {
                            NSLog(@"Targetting successful, user has %@ credits left", creditsLeft);
-                           if (successBlock) {
-                               successBlock(YES);
+                           if (block) {
+                               block(nil);
                            }
                        } else {
-                           NSLog(@"Targetting failed with response %@", response);
-                           if (successBlock) {
-                               successBlock(NO);
+                           NSLog(@"Targetting failed with response %@, error = %@", response, error);
+                           if (block) {
+                               block(error);
                            }
                        }
                    }];
@@ -391,8 +407,8 @@ authenticationRequired:(BOOL)authRequired
     [self makeURLRequest:req
   authenticationRequired:YES
           withAuthPolicy:CNForceAuthenticationOnAuthFailure
-              completion:^(NSDictionary *response) {
-                  completion(response != nil);
+              completion:^(NSDictionary *response, NSError *error) {
+                  completion(error == nil);
               }];
 }
 
