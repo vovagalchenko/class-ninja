@@ -118,22 +118,22 @@
 
 - (CNUser *)loggedInUser
 {
-    // Assert main thread so we don't have to worry about synchronizing this.
-    ASSERT_MAIN_THREAD();
-    if (!_loggedInUser) {
-        _loggedInUser = [self retrieveLoggedInUserFromKeychain];
-        [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
+    @synchronized(self) {
+        if (!_loggedInUser) {
+            _loggedInUser = [self retrieveLoggedInUserFromKeychain];
+            [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
+        }
     }
     return _loggedInUser;
 }
 
 - (void)setLoggedInUser:(CNUser *)loggedInUser
 {
-    // Assert main thread so we don't have to worry about synchronizing this.
-    ASSERT_MAIN_THREAD();
-    _loggedInUser = loggedInUser;
-    [self writeLoggedInUserToKeychain:loggedInUser];
-    [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
+    @synchronized(self) {
+        _loggedInUser = loggedInUser;
+        [self writeLoggedInUserToKeychain:loggedInUser];
+        [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
+    }
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
