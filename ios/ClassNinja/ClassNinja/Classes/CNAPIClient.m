@@ -208,8 +208,9 @@ authenticationRequired:(BOOL)authRequired
                               withAuthPolicy:CNFailRequestOnAuthFailure
                                   completion:completionBlock];
                     } else {
-                        // fudging error code to 404
-                        completionBlock(nil, [NSError errorWithDomain:CN_API_CLIENT_ERROR_DOMAIN code:404 userInfo:nil]);
+                        completionBlock(nil, [NSError errorWithDomain:CN_API_CLIENT_ERROR_DOMAIN
+                                                                 code:CNAPIClientErrorAuthenticationRequired
+                                                             userInfo:nil]);
                     }
                 }];
             };
@@ -220,7 +221,9 @@ authenticationRequired:(BOOL)authRequired
         {
             authFailureHandler = ^{
                 if (completionBlock) {
-                    completionBlock(nil, [NSError errorWithDomain:CN_API_CLIENT_ERROR_DOMAIN code:404 userInfo:nil]);
+                    completionBlock(nil, [NSError errorWithDomain:CN_API_CLIENT_ERROR_DOMAIN
+                                                             code:CNAPIClientErrorAuthenticationRequired
+                                                         userInfo:nil]);
                 }
             };
             break;

@@ -117,7 +117,7 @@
     CNAPIClient *apiClient = [CNAPIClient sharedInstance];
     [apiClient list:[CNTargetedCourse class]
          authPolicy:CNFailRequestOnAuthFailure
-         completion:^(NSArray *targets)
+         completion:^(NSArray *targets, NSError *error)
      {
          self.numOngoingTargetFetches--;
          if (self.numOngoingTargetFetches == 0)

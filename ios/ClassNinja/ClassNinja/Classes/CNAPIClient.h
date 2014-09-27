@@ -13,7 +13,8 @@
 #define CN_API_CLIENT_ERROR_DOMAIN @"API_CLIENT_ERROR_DOMAIN"
 
 typedef enum NSUInteger {
-    CNAPIClientErrorPaymentRequired = 402
+    CNAPIClientErrorPaymentRequired = 402,
+    CNAPIClientErrorAuthenticationRequired = 401
 } CNAPIClientErrors;
 
 typedef enum : NSUInteger {
