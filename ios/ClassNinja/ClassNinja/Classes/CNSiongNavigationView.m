@@ -316,11 +316,7 @@
     CGPoint targetPoint = [self targetPointForPageIndex:index];
     dispatch_block_t localCompletion = ^{
         self.scrollView.contentOffset = targetPoint;
-        for (UIView *view in self.scrollViews) {
-            view.userInteractionEnabled = NO;
-        }
-        UIView *view = [self.scrollViews objectAtIndex:self.currentPageIndex];
-        view.userInteractionEnabled = YES;
+        [self configureUserInteractionStatus];
     };
     
     if (animated) {
@@ -348,6 +344,13 @@
     }
 }
 
+- (void)configureUserInteractionStatus
+{
+    [self.scrollViews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, BOOL *stop) {
+        view.userInteractionEnabled = idx == self.currentPageIndex;
+    }];
+}
+
 
 - (void)popViewAtIndex:(NSUInteger)viewIndex
               animated:(BOOL)animated
@@ -371,6 +374,7 @@
 
         self.scrollView.contentSize = [self scrollViewcontentSizeForVCIndex:self.currentPageIndex];
         [self.searchButton setHidden:([CNUserProfile defaultSchool] == nil)];
+        [self configureUserInteractionStatus];
         if (completionBlock) {
             completionBlock();
         }
