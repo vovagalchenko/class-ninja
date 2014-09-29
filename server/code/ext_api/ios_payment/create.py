@@ -1,5 +1,5 @@
 from model.db_session import DB_Session_Factory
-from ext_api.exceptions import API_Exception
+from ext_api.exceptions import Bad_Gateway_Exception, API_Exception
 from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
 from ext_api.parameter import Parameter, String_Parameter_Type
 
@@ -22,27 +22,22 @@ class create_ios_payment(HTTP_Response_Builder):
         if user_profile is None:
             raise API_Exception("500 Server Error", "User profile does not exist")
         
-        url = "https://buy.itunes.apple.com/verifyReceipt"
-        phone = self.user.phonenumber
-
-        # use specific phone number for debugging
-        if (phone == "4089126890"):
-            url = "https://sandbox.itunes.apple.com/verifyReceipt"
-
-        iapResponse = requests.post(url, json.dumps({'receipt-data': self.appleReceiptData}), verify=False)
-        if iapResponse.status_code != 200:
-            raise API_Exception("400 Bad Request", "Failed to connect to iTunes server")
-  
-        responseContentDict = json.loads(iapResponse.content)
-        iapStatus = responseContentDict['status']
-        
-        if iapStatus != 0:
-            raise API_Exception("400 Bad Request", {'iap_status' : str(iapStatus)})
-
-        # if status == 0, we're cool, let's give a lot of credits to user profile
-        # very large number
+        # This throws if the check fails.
+        self.checkVerificationService()
+        # The check succeeded. Let's give a lot of credits to user profile.
         user_profile.credits = 99999
         db_session.commit()
- 
         return HTTP_Response('200 OK', {'credits' : user_profile.credits})
- 
+
+    def checkVerificationService(self, passedInUrl = None):
+        urlToUse = "https://buy.itunes.apple.com/verifyReceipt" if passedInUrl is None else passedInUrl
+        iapResponse = requests.post(urlToUse, json.dumps({'receipt-data': self.appleReceiptData}), verify=False)
+        if iapResponse.status_code != 200:
+            raise Bad_Gateway_Exception("Failed to connect to iTunes server")
+        iapResponseJson = iapResponse.json()
+        status = iapResponseJson['status']
+        if passedInUrl is None and status == 21007:
+            self.checkVerificationService("https://sandbox.itunes.apple.com/verifyReceipt")
+        elif status != 0:
+            raise API_Exception("400 Bad Request", {'iap_status' : str(iapResponseJson)})
+        

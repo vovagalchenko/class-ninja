@@ -31,3 +31,7 @@ class Authorization_Exception(API_Exception):
 class Unprocessable_Entity_Exception(API_Exception):
     def __init__(self, message):
         super(Unprocessable_Entity_Exception, self).__init__("422 Unprocessable Entity", message)
+
+class Bad_Gateway_Exception(API_Exception):
+    def __init__(self, message):
+        super(Bad_Gateway_Exception, self).__init__("502 Bad Gateway", message)
