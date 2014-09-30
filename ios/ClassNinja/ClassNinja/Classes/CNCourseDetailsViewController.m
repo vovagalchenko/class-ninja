@@ -289,11 +289,20 @@
     self.activityIndicator.alpha = 1.0;
     [[CNAPIClient sharedInstance] listChildren:self.course
                                     completion:^(NSArray*children, NSError *error) {
-                                        [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-                                            self.activityIndicator.alpha = 0.0;
-                                        }];
-                                        self.listOfSections = children;
-                                        [self.tableView reloadData];
+                                        if (children) {
+                                            [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                                                self.activityIndicator.alpha = 0.0;
+                                            }];
+                                            self.listOfSections = children;
+                                            [self.tableView reloadData];
+                                        } else {
+                                            [self dismissViewControllerAnimated:YES completion:nil];
+                                            [[[UIAlertView alloc] initWithTitle:@"Error"
+                                                                        message:@"Check your internet connection and try again."
+                                                                       delegate:nil
+                                                              cancelButtonTitle:@"OK"
+                                                              otherButtonTitles:nil] show];
+                                        }
                                     }];
 }
 
@@ -433,16 +442,11 @@
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
                 [self presentViewController:paywallVC animated:YES completion:nil];
             } else {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Targetting failed"
-                                                                               message:@"Failed to set target. Check your internet conection"
-                                                                        preferredStyle:UIAlertControllerStyleAlert];
-                UIAlertAction *dismiss = [UIAlertAction actionWithTitle:@"Ok"
-                                                                  style:UIAlertActionStyleDefault
-                                                                handler:^(UIAlertAction *action) {
-                    [alert dismissViewControllerAnimated:YES completion:nil];
-                }];
-                [alert addAction:dismiss];
-                [self presentViewController:alert animated:NO completion:nil];
+                [[[UIAlertView alloc] initWithTitle:@"Error"
+                                            message:@"Failed to set the target. Check your internet connection."
+                                           delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil] show];
             }
             self.tableView.alpha = 1.0;
             self.tableView.userInteractionEnabled = YES;

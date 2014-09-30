@@ -45,7 +45,7 @@
 
 - (void)backButtonPressed:(id)sender
 {
-    [self popViewControllerAnimated:YES deselectRows:YES];
+    [self popViewControllerAnimated:YES];
 }
 
 - (void)searchButtonPressed:(id)sender
@@ -120,12 +120,12 @@
     return resultVC;
 }
 
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated deselectRows:(BOOL)deselectRows
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated
 {
     NSUInteger currentPageIndex = [self.siongView currentPageIndex];
     return [self popViewControllerAtIndex:currentPageIndex
                                  animated:animated
-                             deselectRows:deselectRows];
+                             deselectRows:YES];
 }
 
 @end

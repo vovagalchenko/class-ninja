@@ -101,7 +101,7 @@
 		705571261988BC7B008F66F1 /* CNGenericSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionViewController.m; sourceTree = "<group>"; };
 		706521A419C4C8A200522714 /* CNPaywallViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNPaywallViewController.h; sourceTree = "<group>"; };
 		706521A519C4C8A200522714 /* CNPaywallViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNPaywallViewController.m; sourceTree = "<group>"; };
-		707F983D196899BC00D6E552 /* classalert.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = classalert.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		707F983D196899BC00D6E552 /* Class Radar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Class Radar.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		707F9840196899BC00D6E552 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		707F9842196899BC00D6E552 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		707F9844196899BC00D6E552 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -209,7 +209,7 @@
 		707F983E196899BC00D6E552 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				707F983D196899BC00D6E552 /* classalert.app */,
+				707F983D196899BC00D6E552 /* Class Radar.app */,
 				707F9858196899BC00D6E552 /* ClassNinjaTests.xctest */,
 			);
 			name = Products;
@@ -396,7 +396,7 @@
 			);
 			name = ClassNinja;
 			productName = ClassNinja;
-			productReference = 707F983D196899BC00D6E552 /* classalert.app */;
+			productReference = 707F983D196899BC00D6E552 /* Class Radar.app */;
 			productType = "com.apple.product-type.application";
 		};
 		707F9857196899BC00D6E552 /* ClassNinjaTests */ = {
@@ -615,7 +615,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = classalert;
 				PROVISIONING_PROFILE = "B5B5172E-A905-4380-B5E7-D79EBADDC12A";
@@ -650,7 +650,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = classalert;
 				PROVISIONING_PROFILE = "B5B5172E-A905-4380-B5E7-D79EBADDC12A";
 				SDKROOT = iphoneos;
@@ -669,7 +669,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
-				PRODUCT_NAME = classalert;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -685,7 +684,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
-				PRODUCT_NAME = classalert;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
