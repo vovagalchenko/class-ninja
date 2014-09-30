@@ -12,7 +12,7 @@
 		7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320139199736EF0032F16B /* CNSiongNavigationView.m */; };
 		7032013D1997F8C40032F16B /* CNCourseDetailsTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7032013C1997F8C40032F16B /* CNCourseDetailsTableViewCell.m */; };
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
-		70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */; };
+		70557118197B1F1E008F66F1 /* CNInAppPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseManager.m */; };
 		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
 		7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */; };
 		705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705571261988BC7B008F66F1 /* CNGenericSelectionViewController.m */; };
@@ -91,8 +91,8 @@
 		7032013B1997F8C40032F16B /* CNCourseDetailsTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCourseDetailsTableViewCell.h; sourceTree = "<group>"; };
 		7032013C1997F8C40032F16B /* CNCourseDetailsTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCourseDetailsTableViewCell.m; sourceTree = "<group>"; };
 		70557114197B1ED7008F66F1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNInAppPurchaseHelper.h; sourceTree = "<group>"; };
-		70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseHelper.m; sourceTree = "<group>"; };
+		70557116197B1F1E008F66F1 /* CNInAppPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNInAppPurchaseManager.h; sourceTree = "<group>"; };
+		70557117197B1F1E008F66F1 /* CNInAppPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseManager.m; sourceTree = "<group>"; };
 		7055711919858293008F66F1 /* CNWelcomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNWelcomeViewController.h; sourceTree = "<group>"; };
 		7055711A19858293008F66F1 /* CNWelcomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNWelcomeViewController.m; sourceTree = "<group>"; };
 		7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSiongNavigationViewController.h; sourceTree = "<group>"; };
@@ -256,8 +256,8 @@
 				708D688A19B6D6A600BE9156 /* CNUserProfile.m */,
 				DCCAA3981985FABA00BC4E7D /* Model */,
 				DC08B6A2198D7D910092EE90 /* UI */,
-				70557116197B1F1E008F66F1 /* CNInAppPurchaseHelper.h */,
-				70557117197B1F1E008F66F1 /* CNInAppPurchaseHelper.m */,
+				70557116197B1F1E008F66F1 /* CNInAppPurchaseManager.h */,
+				70557117197B1F1E008F66F1 /* CNInAppPurchaseManager.m */,
 				707F984F196899BC00D6E552 /* CNAppDelegate.h */,
 				707F9850196899BC00D6E552 /* CNAppDelegate.m */,
 				70320132199719950032F16B /* UIFont+CNAdditions.h */,
@@ -526,7 +526,7 @@
 				7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */,
 				80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */,
 				705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */,
-				70557118197B1F1E008F66F1 /* CNInAppPurchaseHelper.m in Sources */,
+				70557118197B1F1E008F66F1 /* CNInAppPurchaseManager.m in Sources */,
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
 				80666DA519CEE20F007003A2 /* CNLoggingViewController.m in Sources */,
 				DC08B69F198AF3D50092EE90 /* UITableView+LayoutSubviews.m in Sources */,

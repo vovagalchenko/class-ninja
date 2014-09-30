@@ -8,7 +8,7 @@
 #import "CNCourseDetailsViewController.h"
 #import "CNAPIClient.h"
 #import "CNAppDelegate.h"
-#import "CNInAppPurchaseHelper.h"
+#import "CNInAppPurchaseManager.h"
 #import "CNCloseButton.h"
 #import "AppearanceConstants.h"
 #import "CNPaywallViewController.h"
@@ -428,7 +428,7 @@
             
             if (error == nil) {
                 [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
-            } if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorPaymentRequired) {
+            } else if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorPaymentRequired) {
                 CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
                 [self presentViewController:paywallVC animated:YES completion:nil];

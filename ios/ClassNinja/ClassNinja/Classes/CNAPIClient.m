@@ -333,8 +333,9 @@ authenticationRequired:(BOOL)authRequired
     
 }
 
-- (void)verify:(NSData *)receipt successBlock:(void (^)(BOOL success))successBlock
+- (void)verifyPurchaseOfProduct:(NSString *)productId withReceipt:(NSData *)receipt completion:(void (^)(CNAPIClientInAppPurchaseReceiptStatus receiptStatus))completion
 {
+    // For now we'll ignore the product ID and simply check that the receipt is valid.
     NSString *receiptString = [receipt base64EncodedStringWithOptions:0];
     NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:@"ios_payment"
                                                               HTTPMethod:@"POST"
@@ -346,16 +347,12 @@ authenticationRequired:(BOOL)authRequired
           withAuthPolicy:CNForceAuthenticationOnAuthFailure
               completion:^(NSDictionary *response, NSError *error) {
                   NSNumber *creditsLeft = [response objectForKey:@"credits"];
-                  if (creditsLeft && error == nil) {
-                      NSLog(@"IAP receipt verification succeeded. User has %@ credits left", creditsLeft);
-                      if (successBlock) {
-                          successBlock(YES);
-                      }
-                  } else {
-                      NSLog(@"IAP receipt verification failed with response %@", response);
-                      if (successBlock) {
-                          successBlock(NO);
-                      }
+                  if (creditsLeft && error == nil && completion) {
+                      completion(CNAPIClientInAppPurchaseReceiptStatusPassed);
+                  } else if ([error code] == CNAPIClientInAppPurchaseReceiptStatusFailed && completion){
+                      completion(CNAPIClientInAppPurchaseReceiptStatusFailed);
+                  } else if (completion) {
+                      completion(CNAPIClientInAppPurchaseReceiptStatusNone);
                   }
               }];
 

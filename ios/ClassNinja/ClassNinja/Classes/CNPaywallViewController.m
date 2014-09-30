@@ -7,7 +7,7 @@
 //
 
 #import "CNPaywallViewController.h"
-#import "CNInAppPurchaseHelper.h"
+#import "CNInAppPurchaseManager.h"
 #import "CNActivityIndicator.h"
 
 #define kSpinnerRadius 36
@@ -26,8 +26,8 @@
 #define kCancelMaxWidth 60
 #define kCancelMaxHeight 44
 
-#define kCancelButtonFont [UIFont cnSystemFontOfSize:16]
-#define kSignupButtonFont [UIFont cnBoldSystemFontOfSize:16]
+#define kCancelButtonFont           [UIFont cnSystemFontOfSize:16]
+#define kSignupButtonFont           [UIFont cnBoldSystemFontOfSize:16]
 
 
 @interface CNPaywallViewController ()
@@ -35,6 +35,7 @@
 @property (nonatomic) UIButton *signUp;
 @property (nonatomic) UILabel *marketingMessage;
 @property (nonatomic) CNActivityIndicator *activityIndicator;
+@property (nonatomic) SKProduct *product;
 @end
 
 
@@ -52,6 +53,47 @@
     [self.view addSubview:self.cancel];
     [self.view addSubview:self.signUp];
     [self.view addSubview:self.marketingMessage];
+    [self.view addSubview:self.activityIndicator];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.activityIndicator.alpha = 1.0;
+    self.cancel.alpha = 0;
+    self.signUp.alpha = 0;
+    self.marketingMessage.alpha = 0;
+    
+    // Whenever a transaction is either finished, deferred or failed, just dismiss ourselves
+    for (NSString *notificationName in @[TRANSACTION_FINISHED_NOTIFICATION_NAME,
+                                         TRANSACTION_DEFERRED_NOTIFICATION_NAME,
+                                         TRANSACTION_FAILED_NOTIFICATION_NAME])
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismiss) name:notificationName object:nil];
+    
+    [[CNInAppPurchaseManager sharedInstance] fetchProductForProductId:@"UQ_9_99" completion:^(SKProduct *product) {
+        if (!product) {
+            [self dismiss];
+        } else {
+            NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+            numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
+            numberFormatter.locale = product.priceLocale;
+            NSString *localizedPrice = [numberFormatter stringFromNumber:product.price];
+            self.marketingMessage.text = [NSString stringWithFormat:@"You can track two classes of any term that you want to track for free.\n\n"
+                                          "For just %@, you will be able to track an unlimited number of classes for this term.", localizedPrice];
+            self.product = product;
+            [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                self.activityIndicator.alpha = 0.0;
+                self.cancel.alpha = 1.0;
+                self.signUp.alpha = 1.0;
+                self.marketingMessage.alpha = 1.0;
+            }];
+        }
+    }];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidLayoutSubviews
@@ -64,29 +106,31 @@
 
 - (void)signUpButtonPressed
 {
+    logUserAction(@"purchase_intent", nil);
     self.signUp.enabled = NO;
-    [self.view addSubview:self.activityIndicator];
     
-    [UIView animateWithDuration:0.3 animations:^{
+    [UIView animateWithDuration:ANIMATION_DURATION animations:^{
         self.marketingMessage.alpha = 0;
         self.cancel.alpha = 0;
         self.signUp.alpha = 0;
         self.activityIndicator.alpha = 1;
-    } completion:nil];
-    
-    [[CNInAppPurchaseHelper sharedInstance] purchase:@"UQ_9_99" withCompletionBlock:^{
-        [self dismiss];
-    }] ;
-}
-
-- (void)dealloc
-{
-    NSLog(@"Dealloc called!");
+    } completion:^(BOOL finished){
+        [[CNInAppPurchaseManager sharedInstance] addProductToPaymentQueue:self.product];
+    }];
 }
 
 - (void)dismiss
 {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    // The notifications aren't guaranteed to be sent out on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self dismissViewControllerAnimated:YES completion:nil];
+    });
+}
+
+- (void)cancelButtonPressed
+{
+    logUserAction(@"purchase_cancelled", nil);
+    [self dismiss];
 }
 
 - (UIButton *)cancel
@@ -134,11 +178,7 @@
 {
     if (_marketingMessage == nil) {
         _marketingMessage = [[UILabel alloc] init];
-        
-        NSString *message =@"The first 2 classes of the semester that you want to track are free.\n\n"
-                            "For just $0.99, you will be able to track an unlimited number of classes for this semester";
         _marketingMessage.numberOfLines = 0;
-        _marketingMessage.text = message;
         _marketingMessage.textColor = [UIColor whiteColor];
         _marketingMessage.font = [UIFont systemFontOfSize:20];
     }

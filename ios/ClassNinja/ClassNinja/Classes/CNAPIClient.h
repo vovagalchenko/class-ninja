@@ -18,6 +18,12 @@ typedef enum NSUInteger {
 } CNAPIClientErrors;
 
 typedef enum : NSUInteger {
+    CNAPIClientInAppPurchaseReceiptStatusPassed = 200,
+    CNAPIClientInAppPurchaseReceiptStatusFailed = 400,
+    CNAPIClientInAppPurchaseReceiptStatusNone = 0,
+} CNAPIClientInAppPurchaseReceiptStatus;
+
+typedef enum : NSUInteger {
     CNFailRequestOnAuthFailure,
     CNForceAuthenticationOnAuthFailure,
 } CNAuthenticationPolicy;
@@ -38,7 +44,7 @@ typedef enum : NSUInteger {
           searchString:(NSString *)string
             completion:(void (^)(NSArray *departments, NSArray *courses, NSArray *departments_for_courses))completionBlock;
 
-- (void)verify:(NSData *)receipt successBlock:(void (^)(BOOL success))successBlock;
+- (void)verifyPurchaseOfProduct:(NSString *)productId withReceipt:(NSData *)receipt completion:(void (^)(CNAPIClientInAppPurchaseReceiptStatus receiptStatus))completion;
 - (void)targetEvents:(NSArray *)events completionBlock:(void (^)(NSError *error))block;
 - (void)removeEventFromTargetting:(CNEvent *)event successBlock:(void (^)(BOOL success))successBlock;
 

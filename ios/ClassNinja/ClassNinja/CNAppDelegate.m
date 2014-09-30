@@ -8,13 +8,10 @@
 
 #import "CNAppDelegate.h"
 #import "CNAPIClient.h"
-#import "CNInAppPurchaseHelper.h"
 #import "CNWelcomeViewController.h"
+#import "CNInAppPurchaseManager.h"
 #import "NSData+CNAdditions.h"
-
-@interface CNAppDelegate ()
-@property (nonatomic)CNInAppPurchaseHelper *iap;
-@end
+#import "CNPaywallViewController.h"
 
 @implementation CNAppDelegate
 
@@ -32,6 +29,14 @@
     
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    for (NSString *notificationName in @[TRANSACTION_DEFERRED_NOTIFICATION_NAME,
+                                         TRANSACTION_FAILED_NOTIFICATION_NAME]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transactionStateChanged:) name:notificationName object:nil];
+    }
+    
+    [[CNInAppPurchaseManager sharedInstance] ensurePaymentQueueObserving];
+    
     return YES;
 }
 
@@ -119,6 +124,37 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     logAppLifecycleEvent(@"terminate", nil);
+}
+
+#pragma mark - Transaction State Notifications
+
+- (void)transactionStateChanged:(NSNotification *)notification
+{
+    // The notifications aren't guaranteed to be sent out on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        SKPaymentTransaction *transaction = ((SKPaymentTransaction *)notification.object);
+        if ([notification.name isEqualToString:TRANSACTION_FAILED_NOTIFICATION_NAME] &&
+            transaction.error.code != SKErrorPaymentCancelled) {
+            // If the user didn't straight up cancel the transaction, let's let them know something went wrong.
+            [[[UIAlertView alloc] initWithTitle:@":("
+                                        message:[NSString stringWithFormat:@"Apple says: %@", transaction.error.localizedDescription]
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+        } else if ([notification.name isEqualToString:TRANSACTION_DEFERRED_NOTIFICATION_NAME]) {
+            [[[UIAlertView alloc] initWithTitle:@"Purchase Pending"
+                                        message:@"Your purchase is pending approval from the responsible party."
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+        }
+
+    });
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - AnalyticsDelegate
