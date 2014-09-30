@@ -40,6 +40,33 @@
     return YES;
 }
 
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    logAppLifecycleEvent(@"resign_active", nil);
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    logAppLifecycleEvent(@"enter_background", nil);
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    logAppLifecycleEvent(@"enter_foreground", nil);
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    logAppLifecycleEvent(@"become_active", nil);
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+    logAppLifecycleEvent(@"terminate", nil);
+}
+
+#pragma mark - Push Notifications
+
 - (void)registerForPushNotifications
 {
     UIApplication *app = [UIApplication sharedApplication];
@@ -65,7 +92,7 @@
                                    delegate:nil
                           cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
     }
-
+    
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
@@ -94,36 +121,20 @@
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
     logIssue(@"pns_registration_error",
-  @{
-        @"error_code" : @(error.code),
-        @"error_msg" : error.description,
-        @"error_domain" : error.domain
-    });
+             @{
+               @"error_code" : @(error.code),
+               @"error_msg" : error.description,
+               @"error_domain" : error.domain
+               });
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
-    logAppLifecycleEvent(@"resign_active", nil);
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-    logAppLifecycleEvent(@"enter_background", nil);
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-    logAppLifecycleEvent(@"enter_foreground", nil);
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-    logAppLifecycleEvent(@"become_active", nil);
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-    logAppLifecycleEvent(@"terminate", nil);
+    [[[UIAlertView alloc] initWithTitle:@"Class Alert"
+                                message:userInfo[@"aps"][@"alert"][@"body"]
+                               delegate:nil
+                      cancelButtonTitle:@"OK"
+                      otherButtonTitles:nil] show];
 }
 
 #pragma mark - Transaction State Notifications
