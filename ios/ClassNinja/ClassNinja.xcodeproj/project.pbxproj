@@ -37,6 +37,7 @@
 		80666DA519CEE20F007003A2 /* CNLoggingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 80666DA419CEE20F007003A2 /* CNLoggingViewController.m */; };
 		80666DAD19D5B4D3007003A2 /* CNGradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 80666DAC19D5B4D3007003A2 /* CNGradientView.m */; };
 		80A05E5E19CAD34100B4A1CD /* CNTargetsDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 80A05E5D19CAD34100B4A1CD /* CNTargetsDiff.m */; };
+		80E2936319E0928F004B1CDB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 80E2936219E0928F004B1CDB /* LaunchScreen.xib */; };
 		80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 80F1000C19C4ED7500C28C32 /* CNCloseButton.m */; };
 		80F1001019C50E4300C28C32 /* CNTargetSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 80F1000F19C50E4300C28C32 /* CNTargetSectionHeaderView.m */; };
 		DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */ = {isa = PBXBuildFile; fileRef = DC08B67819883E020092EE90 /* CNAuthContext.m */; };
@@ -101,7 +102,7 @@
 		705571261988BC7B008F66F1 /* CNGenericSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionViewController.m; sourceTree = "<group>"; };
 		706521A419C4C8A200522714 /* CNPaywallViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNPaywallViewController.h; sourceTree = "<group>"; };
 		706521A519C4C8A200522714 /* CNPaywallViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNPaywallViewController.m; sourceTree = "<group>"; };
-		707F983D196899BC00D6E552 /* Class Radar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Class Radar.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		707F983D196899BC00D6E552 /* classalert.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = classalert.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		707F9840196899BC00D6E552 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		707F9842196899BC00D6E552 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		707F9844196899BC00D6E552 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -134,6 +135,7 @@
 		80666DAC19D5B4D3007003A2 /* CNGradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGradientView.m; sourceTree = "<group>"; };
 		80A05E5C19CAD34100B4A1CD /* CNTargetsDiff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNTargetsDiff.h; sourceTree = "<group>"; };
 		80A05E5D19CAD34100B4A1CD /* CNTargetsDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNTargetsDiff.m; sourceTree = "<group>"; };
+		80E2936219E0928F004B1CDB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		80F1000B19C4ED7500C28C32 /* CNCloseButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCloseButton.h; sourceTree = "<group>"; };
 		80F1000C19C4ED7500C28C32 /* CNCloseButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCloseButton.m; sourceTree = "<group>"; };
 		80F1000E19C50E4300C28C32 /* CNTargetSectionHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNTargetSectionHeaderView.h; sourceTree = "<group>"; };
@@ -209,7 +211,7 @@
 		707F983E196899BC00D6E552 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				707F983D196899BC00D6E552 /* Class Radar.app */,
+				707F983D196899BC00D6E552 /* classalert.app */,
 				707F9858196899BC00D6E552 /* ClassNinjaTests.xctest */,
 			);
 			name = Products;
@@ -241,6 +243,7 @@
 		707F9847196899BC00D6E552 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				80E2936219E0928F004B1CDB /* LaunchScreen.xib */,
 				707F9848196899BC00D6E552 /* ClassNinja-Info.plist */,
 				707F9849196899BC00D6E552 /* InfoPlist.strings */,
 				707F984C196899BC00D6E552 /* main.m */,
@@ -396,7 +399,7 @@
 			);
 			name = ClassNinja;
 			productName = ClassNinja;
-			productReference = 707F983D196899BC00D6E552 /* Class Radar.app */;
+			productReference = 707F983D196899BC00D6E552 /* classalert.app */;
 			productType = "com.apple.product-type.application";
 		};
 		707F9857196899BC00D6E552 /* ClassNinjaTests */ = {
@@ -482,6 +485,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				707F984B196899BC00D6E552 /* InfoPlist.strings in Resources */,
+				80E2936319E0928F004B1CDB /* LaunchScreen.xib in Resources */,
 				707F9853196899BC00D6E552 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
