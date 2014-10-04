@@ -25,7 +25,7 @@
 	<key>IANSettings</key>
 	<dict>
 		<key>PostURL</key>
-		<string>http://vova.class-ninja.com/api/analytics</string>
+		<string>http://class-ninja.com/api/analytics</string>
 	</dict>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
