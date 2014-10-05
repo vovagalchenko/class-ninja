@@ -25,7 +25,7 @@ class create_ios_payment(HTTP_Response_Builder):
         # This throws if the check fails.
         self.checkVerificationService()
         # The check succeeded. Let's give a lot of credits to user profile.
-        user_profile.credits = 99999
+        user_profile.credits += 10
         db_session.commit()
         return HTTP_Response('200 OK', {'credits' : user_profile.credits})
 
