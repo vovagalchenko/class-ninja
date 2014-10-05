@@ -52,12 +52,13 @@ class update_user(HTTP_Response_Builder):
         if user.access_token is None:
             user.access_token = self.generate_access_token()
  
+        userProfile = db_session.query(UserProfile).get(self.resource_id)
+        if userProfile is None:
             userProfile = UserProfile()
             userProfile.phonenumber =  user.phonenumber
             # brand new user get 3 free credits
             userProfile.credits = 3
             userProfile.email = None
-
             db_session.add(userProfile)
         
         db_session.commit()
