@@ -44,13 +44,13 @@ class HTTP_Response_Builder(object):
                     raise ValueError("The HTTP body must be a dictionary")
             except ValueError as e:
                 error_log.write(e.args[0])
-                raise API_Exception("400 Bad Request", "The HTTP body must be a JSON-encoded dictionary.")
+                raise API_Exception(400, "The HTTP body must be a JSON-encoded dictionary.")
         query_param_list = {}
         if query_string:
             try:
                 query_param_list = parse_qsl(query_string, True, True)
             except ValueError as e:
-                raise API_Exception("400 Bad Request", "The query string must be URL encoded.")
+                raise API_Exception(400, "The query string must be URL encoded.")
         for k,v in query_param_list:
             if k in passed_in_param_dict:
                 raise Invalid_Parameter_Exception(k, "This parameter is given twice. Between the query string and the HTTP body, every parameter can only be specified once.")
@@ -70,7 +70,7 @@ class HTTP_Response_Builder(object):
             db_session = DB_Session_Factory.get_db_session() 
             results = db_session.query(User, UserProfile).filter(User.phonenumber == UserProfile.phonenumber).filter(User.access_token == auth_header).all()
             if len(results) > 1:
-                raise API_Exception("500 Server Error", "This access token is being used by multiple users.")
+                raise API_Exception(500, "This access token is being used by multiple users.")
             elif len(results) == 1:
                 self.user = results[0][0]
                 self.user_profile = results[0][1]

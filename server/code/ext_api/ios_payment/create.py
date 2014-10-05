@@ -20,7 +20,7 @@ class create_ios_payment(HTTP_Response_Builder):
         user_profile = db_session.query(UserProfile).get(self.user.phonenumber)
 
         if user_profile is None:
-            raise API_Exception("500 Server Error", "User profile does not exist")
+            raise API_Exception(500, "User profile does not exist")
         
         # This throws if the check fails.
         self.checkVerificationService()
@@ -39,5 +39,5 @@ class create_ios_payment(HTTP_Response_Builder):
         if passedInUrl is None and status == 21007:
             self.checkVerificationService("https://sandbox.itunes.apple.com/verifyReceipt")
         elif status != 0:
-            raise API_Exception("400 Bad Request", {'iap_status' : str(iapResponseJson)})
+            raise API_Exception(400, {'iap_status' : str(iapResponseJson)})
         

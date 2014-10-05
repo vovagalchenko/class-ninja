@@ -31,10 +31,10 @@ class get_school(HTTP_Response_Builder):
         search_terms.reverse()
 
         if len(search_terms) == 0:
-            raise API_Exception("400 Bad Request", "Search string not supplied")
+            raise API_Exception(400, "Search string not supplied")
 
         if len(search_terms[0]) <= 2: 
-            raise API_Exception("400 Bad Request", "At least one search string has to be more than 2 symbols")
+            raise API_Exception(400, "At least one search string has to be more than 2 symbols")
 
         where_clause = self.form_where_clause_for_search_terms(search_terms)
         departments = self.search_for_departments(where_clause)

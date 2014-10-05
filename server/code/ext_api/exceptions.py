@@ -4,6 +4,9 @@ class API_Exception(Exception):
     http_status_map = {
         400 : 'Bad Request',
         401 : 'Unauthorized',
+        402 : 'Payment Required',
+        403 : 'Forbidden',
+        404 : 'Not Found',
         405 : 'Method Not Allowed',
         422 : 'Unprocessable Entity',
         500 : 'Server Error',
@@ -44,3 +47,7 @@ class Unprocessable_Entity_Exception(API_Exception):
 class Bad_Gateway_Exception(API_Exception):
     def __init__(self, message):
         super(Bad_Gateway_Exception, self).__init__(502, message)
+
+class Payment_Required_Exception(API_Exception):
+    def __init__(self, message):
+        super(Payment_Required_Exception, self).__init__(402, message)

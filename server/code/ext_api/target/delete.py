@@ -14,7 +14,7 @@ class delete_target(HTTP_Response_Builder):
         db_session = DB_Session_Factory.get_db_session()
         target = db_session.query(Target).get(self.resource_id)
         if target is None:
-            raise API_Exception("404 Not Found", "Entry does not exist in DB")
+            raise API_Exception(404, "Entry does not exist in DB")
         
         if target.user_phone_number == self.user.phonenumber:        
             db_session.delete(target)

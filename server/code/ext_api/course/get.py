@@ -10,7 +10,7 @@ class get_course(HTTP_Response_Builder):
         db_session = DB_Session_Factory.get_db_session()
         sections = db_session.query(Section).filter(Section.course_id == self.resource_id)
         if sections is None:
-            raise API_Exception("404 Not Found", "Requested course_id was not found.")
+            raise API_Exception(404, "Requested course_id was not found.")
         else:
             sectionsCollection = []
             for section in sections:

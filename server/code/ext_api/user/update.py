@@ -18,29 +18,29 @@ class update_user(HTTP_Response_Builder):
         phonenumber = self.resource_id
         result = phonenumber_regex.match(phonenumber)
         if result is None:
-            raise API_Exception("400 Bad Request", "Invalid phone number")
+            raise API_Exception(400, "Invalid phone number")
             return
 
         result = confirmation_token_regex.match(self.confirmation_token)                
         if result is None:
-            raise API_Exception("400 Bad Request", "Invalid confirmation token")
+            raise API_Exception(400, "Invalid confirmation token")
             return
 
         db_session = DB_Session_Factory.get_db_session()
         user = db_session.query(User).get(self.resource_id)
         if user is None:
-            raise API_Exception("404 Not Found", "Entry does not exist in DB")
+            raise API_Exception(404, "Entry does not exist in DB")
             return
         
         current_ts = datetime.now()
         
         if (current_ts > user.confirmation_deadline):
-            raise API_Exception("403 Forbidden", "Confirmation token request came exceeded confirmation deadline. Request next confirmation token")
+            raise API_Exception(403, "Confirmation token request came exceeded confirmation deadline. Request next confirmation token")
             return
 
        
         if (user.confirmation_token != self.confirmation_token):
-            raise API_Exception("401 Unauthorized", "Wrong confirmation token")
+            raise API_Exception(401, "Wrong confirmation token")
             return
         
         # if all of above checks passed we have a valid phone number, confirmation token and confirmation done within

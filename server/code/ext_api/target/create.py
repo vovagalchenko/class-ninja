@@ -21,13 +21,13 @@ class create_target(HTTP_Response_Builder):
         user_profile = db_session.query(UserProfile).get(self.user.phonenumber)
 
         if user_profile is None:
-            raise API_Exception("500 Server Error", "User profile does not exist")
+            raise API_Exception(500, "User profile does not exist")
         
         creditsWillConsume = len(self.event_ids)
         
         if user_profile.credits < creditsWillConsume:
             creditsRequired = creditsWillConsume - user_profile.credits
-            raise API_Exception("402 Payment Required", {'credits_required' : creditsRequired})
+            raise API_Exception(402, {'credits_required' : creditsRequired})
 
         for event_id in self.event_ids:
             target = Target()

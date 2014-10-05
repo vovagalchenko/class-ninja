@@ -18,7 +18,7 @@ class create_user(HTTP_Response_Builder):
         phonenumber_regex = re.compile(r"\d{10}")
         result = phonenumber_regex.match(self.phonenumber)
         if result is None:
-            raise API_Exception("400 Bad Request", "Invalid phone number")
+            raise API_Exception(400, "Invalid phone number")
         else:
             db_session = DB_Session_Factory.get_db_session()
             user = db_session.query(User).get(self.phonenumber)
