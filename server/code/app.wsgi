@@ -25,7 +25,7 @@ def basic_application(environ, start_response):
         controller = get_controller(environ)
         response = controller.run()
     except API_Exception as e:
-        response = HTTP_Response(e.get_http_status(), {'error' : e.as_string()})
+        response = HTTP_Response(e.get_http_status(), {'error' : e.as_string(), 'error_code' : e.get_error_code()})
     except Exception as e:
         traceback.print_exc(file=error_log)
         response = HTTP_Response("500 Server Error", {'error' : 'Unexpected backend issue'})
