@@ -12,7 +12,6 @@
 
 @interface CNAuthContext()
 
-@property (nonatomic, readwrite) CNUser *loggedInUser;
 @property (nonatomic, copy) void (^authenticationCompletionBlock)(BOOL);
 
 @end
@@ -115,6 +114,11 @@
 
 @synthesize loggedInUser = _loggedInUser;
 
+- (void)logUserOut
+{
+    self.loggedInUser = nil;
+}
+
 - (CNUser *)loggedInUser
 {
     @synchronized(self) {
@@ -129,6 +133,7 @@
 - (void)setLoggedInUser:(CNUser *)loggedInUser
 {
     @synchronized(self) {
+        [_loggedInUser removeObserver:self forKeyPath:@"credits"];
         _loggedInUser = loggedInUser;
         [self writeLoggedInUserToKeychain:loggedInUser];
         [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];

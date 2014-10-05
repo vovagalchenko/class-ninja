@@ -271,6 +271,11 @@ authenticationRequired:(BOOL)authRequired
         NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
         if (connectionError || statusCode >= 400) {
             NSLog(@"Error attempting to execute: %@\n%@\n%@", response, connectionError, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            if ([jsonDict[@"error_code"] respondsToSelector:@selector(isEqualToNumber:)] && [jsonDict[@"error_code"] isEqualToNumber:@(401)]) {
+                logWarning(@"access_token_invalidated", @{@"old_token" : self.authContext.loggedInUser.accessToken});
+                [self.authContext logUserOut];
+            }
         }
 
         NSDictionary *jsonDict = nil;
@@ -358,7 +363,7 @@ authenticationRequired:(BOOL)authRequired
 
 }
 
-- (void)targetEvents:(NSArray *)events completionBlock:(void (^)(NSError *error))block
+- (void)targetEvents:(NSArray *)events completionBlock:(void (^)(NSDictionary *userAlert, NSError *error))block
 {
     NSMutableArray *event_ids = [[NSMutableArray alloc] initWithCapacity:events.count];
     for (CNEvent *event in events) {
@@ -378,12 +383,18 @@ authenticationRequired:(BOOL)authRequired
                        if (creditsLeft) {
                            NSLog(@"Targetting successful, user has %@ credits left", creditsLeft);
                            if (block) {
-                               block(nil);
+                               NSDictionary *receivedUserMsgDict = [response objectForKey:@"user_msg"];
+                               NSMutableDictionary *userMsgDict = [receivedUserMsgDict isKindOfClass:[NSDictionary class]]? [NSMutableDictionary dictionaryWithDictionary:receivedUserMsgDict] : nil;
+                               if (userMsgDict != nil) {
+                                   userMsgDict[@"title"] = userMsgDict[@"title"] ?: @"Congratulations!";
+                                   userMsgDict[@"msg"] = userMsgDict[@"msg"] ?: @"You've set up your first tracked class. Whenever your tracked classes change enrollment status to 'Open' or 'Waitlist' we will send you push notifications immediately.";
+                               }
+                               block(userMsgDict, nil);
                            }
                        } else {
                            NSLog(@"Targetting failed with response %@, error = %@", response, error);
                            if (block) {
-                               block(error);
+                               block(nil, error);
                            }
                        }
                    }];
@@ -410,6 +421,28 @@ authenticationRequired:(BOOL)authRequired
               completion:^(NSDictionary *response, NSError *error) {
                   completion(error == nil);
               }];
+}
+
+
+
+- (void)fetchSalesPitch:(void (^)(NSString *salesPitch))completion
+{
+    NSMutableURLRequest *req = [self mutableURLRequestForAPIEndpoint:@"sales_pitch"
+                                                          HTTPMethod:@"GET"
+                                                  HTTPBodyParameters:nil];
+    [self makeURLRequest:req
+  authenticationRequired:NO
+          withAuthPolicy:CNFailRequestOnAuthFailure
+              completion:^(NSDictionary *response, NSError *error)
+    {
+        NSString *pitch = [response objectForKey:@"sales_pitch"];
+        if (error) {
+            completion(nil);
+        } else {
+            completion(pitch);
+        }
+    }];
+    
 }
 
 @end

@@ -46,6 +46,12 @@
     for (SKProduct *product in [response products]) {
         [self invokeProductDetailCallbacksForProduct:product];
     }
+    if (response.products.count <= 0) {
+        logIssue(@"iap_purchase_product_empty_response", @{@"response" : response.description});
+        for (NSString *productId in self.productDetailsCallbacks.allKeys) {
+            [self invokeProductDetailCallbacksForProductId:productId product:nil];
+        }
+    }
 }
 
 #pragma mark - Payment Queue Management

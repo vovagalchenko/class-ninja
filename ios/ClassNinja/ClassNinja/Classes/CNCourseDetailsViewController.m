@@ -433,10 +433,17 @@
     }
                      completion:^(BOOL finished)
     {
-        [[CNAPIClient sharedInstance] targetEvents:self.targetEvents completionBlock:^(NSError *error){
+        [[CNAPIClient sharedInstance] targetEvents:self.targetEvents completionBlock:^(NSDictionary *userMsg, NSError *error){
             
             if (error == nil) {
                 [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
+                if (userMsg) {
+                    [[[UIAlertView alloc] initWithTitle:userMsg[@"title"]
+                                                message:userMsg[@"msg"]
+                                               delegate:nil
+                                      cancelButtonTitle:@"OK"
+                                      otherButtonTitles:nil] show];
+                }
             } else if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorPaymentRequired) {
                 CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;

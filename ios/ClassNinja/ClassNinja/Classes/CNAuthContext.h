@@ -15,5 +15,6 @@
 @property (nonatomic, readonly) CNUser *loggedInUser;
 
 - (void)authenticateWithCompletion:(void (^)(BOOL))completionBlock;
+- (void)logUserOut;
 
 @end

@@ -45,10 +45,12 @@ typedef enum : NSUInteger {
             completion:(void (^)(NSArray *departments, NSArray *courses, NSArray *departments_for_courses))completionBlock;
 
 - (void)verifyPurchaseOfProduct:(NSString *)productId withReceipt:(NSData *)receipt completion:(void (^)(CNAPIClientInAppPurchaseReceiptStatus receiptStatus))completion;
-- (void)targetEvents:(NSArray *)events completionBlock:(void (^)(NSError *error))block;
+- (void)targetEvents:(NSArray *)events completionBlock:(void (^)(NSDictionary *userAlert, NSError *error))block;
 - (void)removeEventFromTargetting:(CNEvent *)event successBlock:(void (^)(BOOL success))successBlock;
 
 - (void)registerDeviceForPushNotifications:(NSData *)token completion:(void (^)(BOOL success))completion;
+
+- (void)fetchSalesPitch:(void (^)(NSString *salesPitch))completion;
 
 - (NSMutableURLRequest *)mutableURLRequestForAPIEndpoint:(NSString *)endpoint
                                               HTTPMethod:(NSString *)httpMethod

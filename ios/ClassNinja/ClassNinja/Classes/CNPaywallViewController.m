@@ -9,6 +9,7 @@
 #import "CNPaywallViewController.h"
 #import "CNInAppPurchaseManager.h"
 #import "CNActivityIndicator.h"
+#import "CNAPIClient.h"
 
 #define kSpinnerRadius 36
 
@@ -70,25 +71,61 @@
                                          TRANSACTION_FAILED_NOTIFICATION_NAME])
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismiss) name:notificationName object:nil];
     
-    [[CNInAppPurchaseManager sharedInstance] fetchProductForProductId:@"UQ_9_99" completion:^(SKProduct *product) {
-        if (!product) {
+    __block NSString *salesPitchTemplate = nil;
+    __block SKProduct *tenCreditsProduct = nil;
+    NSDate *beforeTime = [NSDate date];
+    void (^presentSalesPitch)(NSString *, SKProduct *) = ^(NSString *salesPitch, SKProduct *product)
+    {
+        if ((!salesPitch && !product)) {
+            logIssue(@"sales_pitch_present_fail", nil);
             [self dismiss];
         } else {
-            NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
-            numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
-            numberFormatter.locale = product.priceLocale;
-            NSString *localizedPrice = [numberFormatter stringFromNumber:product.price];
-            self.marketingMessage.text = [NSString stringWithFormat:@"You can track two classes of any term that you want to track for free.\n\n"
-                                          "For just %@, you will be able to track an unlimited number of classes for this term.", localizedPrice];
-            self.product = product;
-            [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-                self.activityIndicator.alpha = 0.0;
-                self.cancel.alpha = 1.0;
-                self.signUp.alpha = 1.0;
-                self.marketingMessage.alpha = 1.0;
-            }];
+            @synchronized(self) {
+                if (salesPitch) {
+                    salesPitchTemplate = salesPitch;
+                }
+                if (product) {
+                    tenCreditsProduct = product;
+                }
+                
+                if (salesPitchTemplate && tenCreditsProduct) {
+                    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+                    numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
+                    numberFormatter.locale = tenCreditsProduct.priceLocale;
+                    NSString *localizedPrice = [numberFormatter stringFromNumber:tenCreditsProduct.price];
+                    NSString *salesPitchText = [NSString stringWithFormat:salesPitchTemplate, localizedPrice];
+                    self.marketingMessage.text = salesPitchText;
+                    self.product = tenCreditsProduct;
+                    [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+                        self.activityIndicator.alpha = 0.0;
+                        self.cancel.alpha = 1.0;
+                        self.signUp.alpha = 1.0;
+                        self.marketingMessage.alpha = 1.0;
+                    }];
+                    
+                    logUserAction(@"sales_pitch_present", @
+                    {
+                        @"sales_pitch" : salesPitchText,
+                        @"load_time" : @([[NSDate date] timeIntervalSinceDate:beforeTime])
+                    });
+                }
+                
+            }
         }
+    };
+    
+    [[CNAPIClient sharedInstance] fetchSalesPitch:^(NSString *salesPitch) {
+        if (!salesPitch) {
+            salesPitch = @"For just %@, you will be able to track ten more classes.";
+        }
+        presentSalesPitch(salesPitch, nil);
     }];
+    
+    [[CNInAppPurchaseManager sharedInstance] fetchProductForProductId:@"10_Classes" completion:^(SKProduct *product) {
+        presentSalesPitch(nil, product);
+    }];
+            
+    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
