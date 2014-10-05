@@ -54,8 +54,8 @@ class update_user(HTTP_Response_Builder):
  
             userProfile = UserProfile()
             userProfile.phonenumber =  user.phonenumber
-            # brand new user get 2 free credits
-            userProfile.credits = 2
+            # brand new user get 3 free credits
+            userProfile.credits = 3
             userProfile.email = None
 
             db_session.add(userProfile)

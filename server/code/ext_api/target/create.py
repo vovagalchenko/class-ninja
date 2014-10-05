@@ -6,7 +6,7 @@ from model.user_model import User
 from model.user_profile import UserProfile
 from model.target import Target
 
-from datetime import datetime, timedelta
+from datetime import datetime
 import re
 import uuid
 
@@ -36,7 +36,14 @@ class create_target(HTTP_Response_Builder):
             db_session.add(target)
 
         user_profile.credits = user_profile.credits - creditsWillConsume
+        user_alert_dict = None
+        if user_profile.first_target_timestamp is None:
+            user_profile.first_target_timestamp = datetime.now()
+            user_alert_dict = {
+                'title' : 'Congratulations!',
+                'msg'   : "You've set up your first tracked class. Whenever your tracked classes change enrollment status to 'Open' or 'Waitlist' we will send you push notifications immediately."
+            }
         db_session.commit()
  
-        return HTTP_Response('200 OK', {'credits' : user_profile.credits})
+        return HTTP_Response('200 OK', {'credits' : user_profile.credits, 'user_msg' : user_alert_dict})
  
