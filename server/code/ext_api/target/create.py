@@ -1,5 +1,5 @@
 from model.db_session import DB_Session_Factory
-from ext_api.exceptions import API_Exception
+from ext_api.exceptions import API_Exception, Authorization_Exception
 from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
 from ext_api.parameter import Parameter, Array_Parameter_Type
 from model.user_model import User
