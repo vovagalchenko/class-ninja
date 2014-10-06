@@ -44,7 +44,11 @@
 
 - (NSString *)title
 {
-    return self.rootModel.name;
+    NSString *title = self.rootModel.name;
+    if ([self.rootModel respondsToSelector:@selector(currentTermName)]) {
+        title = [NSString stringWithFormat:@"%@ (%@)", title, [self.rootModel performSelector:@selector(currentTermName)]];
+    }
+    return title;
 }
 
 - (NSIndexPath *)selectRowForSelectedModel:(id <CNModel>)selectedModel
