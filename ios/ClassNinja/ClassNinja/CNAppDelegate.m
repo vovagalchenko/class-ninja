@@ -160,6 +160,9 @@
                               otherButtonTitles:nil] show];
         }
 
+        if (transaction.error) {
+            [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
+        }
     });
 }
 
