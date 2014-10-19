@@ -24,9 +24,6 @@
 		707F984D196899BC00D6E552 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 707F984C196899BC00D6E552 /* main.m */; };
 		707F9851196899BC00D6E552 /* CNAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 707F9850196899BC00D6E552 /* CNAppDelegate.m */; };
 		707F9853196899BC00D6E552 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 707F9852196899BC00D6E552 /* Images.xcassets */; };
-		707F985A196899BC00D6E552 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9859196899BC00D6E552 /* XCTest.framework */; };
-		707F985B196899BC00D6E552 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9840196899BC00D6E552 /* Foundation.framework */; };
-		707F985C196899BC00D6E552 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 707F9844196899BC00D6E552 /* UIKit.framework */; };
 		708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 708D688A19B6D6A600BE9156 /* CNUserProfile.m */; };
 		70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A5F36E19B444780060EB0C /* CNSearchViewController.m */; };
 		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
@@ -52,13 +49,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		707F985D196899BC00D6E552 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 707F9835196899BC00D6E552 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 707F983C196899BC00D6E552;
-			remoteInfo = ClassNinja;
-		};
 		80666D9419CEBE54007003A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 80666D8F19CEBE54007003A2 /* VGAnalytics.xcodeproj */;
@@ -113,7 +103,6 @@
 		707F984F196899BC00D6E552 /* CNAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CNAppDelegate.h; path = ../CNAppDelegate.h; sourceTree = "<group>"; };
 		707F9850196899BC00D6E552 /* CNAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CNAppDelegate.m; path = ../CNAppDelegate.m; sourceTree = "<group>"; };
 		707F9852196899BC00D6E552 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		707F9858196899BC00D6E552 /* ClassNinjaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClassNinjaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		707F9859196899BC00D6E552 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		707F989619689D8700D6E552 /* CNModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNModels.h; sourceTree = "<group>"; };
 		707F989719689D8700D6E552 /* CNModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNModels.m; sourceTree = "<group>"; };
@@ -173,16 +162,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		707F9855196899BC00D6E552 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				707F985A196899BC00D6E552 /* XCTest.framework in Frameworks */,
-				707F985C196899BC00D6E552 /* UIKit.framework in Frameworks */,
-				707F985B196899BC00D6E552 /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -212,7 +191,6 @@
 			isa = PBXGroup;
 			children = (
 				707F983D196899BC00D6E552 /* classalert.app */,
-				707F9858196899BC00D6E552 /* ClassNinjaTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -402,24 +380,6 @@
 			productReference = 707F983D196899BC00D6E552 /* classalert.app */;
 			productType = "com.apple.product-type.application";
 		};
-		707F9857196899BC00D6E552 /* ClassNinjaTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 707F986C196899BC00D6E552 /* Build configuration list for PBXNativeTarget "ClassNinjaTests" */;
-			buildPhases = (
-				707F9854196899BC00D6E552 /* Sources */,
-				707F9855196899BC00D6E552 /* Frameworks */,
-				707F9856196899BC00D6E552 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				707F985E196899BC00D6E552 /* PBXTargetDependency */,
-			);
-			name = ClassNinjaTests;
-			productName = ClassNinjaTests;
-			productReference = 707F9858196899BC00D6E552 /* ClassNinjaTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -432,9 +392,6 @@
 				TargetAttributes = {
 					707F983C196899BC00D6E552 = {
 						DevelopmentTeam = FPJM4NGXTD;
-					};
-					707F9857196899BC00D6E552 = {
-						TestTargetID = 707F983C196899BC00D6E552;
 					};
 				};
 			};
@@ -457,7 +414,6 @@
 			projectRoot = "";
 			targets = (
 				707F983C196899BC00D6E552 /* ClassNinja */,
-				707F9857196899BC00D6E552 /* ClassNinjaTests */,
 			);
 		};
 /* End PBXProject section */
@@ -487,13 +443,6 @@
 				707F984B196899BC00D6E552 /* InfoPlist.strings in Resources */,
 				80E2936319E0928F004B1CDB /* LaunchScreen.xib in Resources */,
 				707F9853196899BC00D6E552 /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		707F9856196899BC00D6E552 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,21 +502,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		707F9854196899BC00D6E552 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		707F985E196899BC00D6E552 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 707F983C196899BC00D6E552 /* ClassNinja */;
-			targetProxy = 707F985D196899BC00D6E552 /* PBXContainerItemProxy */;
-		};
 		80666D9A19CEBEB8007003A2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = VGAnalytics;
@@ -690,46 +627,6 @@
 			};
 			name = Release;
 		};
-		707F986D196899BC00D6E552 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ClassNinja.app/ClassNinja";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "ClassNinjaTests/ClassNinjaTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		707F986E196899BC00D6E552 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ClassNinja.app/ClassNinja";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
-				INFOPLIST_FILE = "ClassNinjaTests/ClassNinjaTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -747,15 +644,6 @@
 			buildConfigurations = (
 				707F986A196899BC00D6E552 /* Debug */,
 				707F986B196899BC00D6E552 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		707F986C196899BC00D6E552 /* Build configuration list for PBXNativeTarget "ClassNinjaTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				707F986D196899BC00D6E552 /* Debug */,
-				707F986E196899BC00D6E552 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
