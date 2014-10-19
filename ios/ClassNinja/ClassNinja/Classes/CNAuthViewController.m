@@ -209,6 +209,8 @@ typedef enum : NSUInteger {
         _detailLabel.textColor = [UIColor whiteColor];
         _detailLabel.font = INSTRUCTION_LABEL_FONT;
         _detailLabel.numberOfLines = 0;
+        _detailLabel.adjustsFontSizeToFitWidth = YES;
+        _detailLabel.minimumScaleFactor = 0.1;
         
         _detailLabel.translatesAutoresizingMaskIntoConstraints = NO;
         [_detailLabel setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
