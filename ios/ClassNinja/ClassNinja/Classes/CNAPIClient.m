@@ -274,7 +274,11 @@ authenticationRequired:(BOOL)authRequired
             if (data) {
                 NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
                 if ([jsonDict[@"error_code"] respondsToSelector:@selector(isEqualToNumber:)] && [jsonDict[@"error_code"] isEqualToNumber:@(401)]) {
-                    logWarning(@"access_token_invalidated", @{@"old_token" : self.authContext.loggedInUser.accessToken});
+                    if (self.authContext.loggedInUser.accessToken) {
+                        logWarning(@"access_token_invalidated", @{@"old_token" : self.authContext.loggedInUser.accessToken});
+                    } else {
+                        logWarning(@"access_token_verification_failed", nil);
+                    }
                     [self.authContext logUserOut];
                 }
             }
