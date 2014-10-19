@@ -320,7 +320,7 @@
 
 - (NSString *)headerText
 {
-    return @"Which department are you enrolled in?";
+    return @"Which department are you interested in?";
 }
 
 - (Class)nextVCClass

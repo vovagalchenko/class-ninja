@@ -223,11 +223,11 @@
                 actionButtonType:CNWelcomeStatusViewActionStatusButtonTypePay
                       completion:refreshTargetsTable];
              } else if (targets.count) {
-                 [self setStatus:@"Here are the classes you're tracking this term"
+                 [self setStatus:@"Here are the classes you're tracking"
                 actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeNone
                       completion:refreshTargetsTable];
              } else {
-                 [self setStatus:@"You're not tracking any classes this term :("
+                 [self setStatus:@"You're not tracking any classes :("
                 actionButtonType:CNWelcomeStatusViewActionStatusButtonTypeNone
                       completion:refreshTargetsTable];
              }

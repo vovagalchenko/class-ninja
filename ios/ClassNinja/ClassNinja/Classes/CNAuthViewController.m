@@ -11,6 +11,7 @@
 #import "CNNumberEntryTextField.h"
 #import "CNActivityIndicator.h"
 #import "CNCloseButton.h"
+#import "CNAPIClient.h"
 
 typedef enum : NSUInteger {
     CNAuthViewControllerStatePhoneNumberEntry,
@@ -28,6 +29,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, readwrite) CNAuthViewControllerState currentState;
 @property (nonatomic, weak) id<CNAuthViewControllerDelegate>delegate;
 @property (nonatomic, readwrite) NSString *phoneNumber;
+@property (nonatomic) NSString *authPitch;
 @property (nonatomic, readonly) NSMutableArray *statesChain;
 
 @end
@@ -39,7 +41,7 @@ typedef enum : NSUInteger {
 - (instancetype)initWithDelegate:(id<CNAuthViewControllerDelegate>)delegate
 {
     if (self = [super init]) {
-        self.currentState = CNAuthViewControllerStatePhoneNumberEntry;
+        self.currentState = CNAuthViewControllerStateWait;
         self.delegate = delegate;
     }
     return self;
@@ -52,12 +54,6 @@ typedef enum : NSUInteger {
     // Dispose of any resources that can be recreated.
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [self changeState:self.currentState animated:NO];
-    [super viewWillAppear:animated];
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -66,6 +62,9 @@ typedef enum : NSUInteger {
     [self.view addSubview:self.confirmationButton];
     [self.view addSubview:self.activityIndicator];
     [self.view addSubview:self.cancelButton];
+    
+    self.view.backgroundColor = AUTH_BLUE_COLOR;
+
     
     NSArray *horizontal = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|-%f-[_detailLabel]-%f-|", HORIZONTAL_MARGIN, HORIZONTAL_MARGIN]
                                                                   options:0
@@ -131,6 +130,8 @@ typedef enum : NSUInteger {
     [self.view addConstraints:@[activityIndicatorHorizontal, activityIndicatorVertical, activityIndicatorWidth, activityIndicatorHeight]];
     [self.view addConstraints:horizontalCancelConstraints];
     [self.view addConstraints:@[tfCentering, detailLabelCenter]];
+    
+    [self changeState:self.currentState animated:NO];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle
@@ -142,6 +143,14 @@ typedef enum : NSUInteger {
 {
     [super viewDidAppear:animated];
     [self setNeedsStatusBarAppearanceUpdate];
+    
+    [[CNAPIClient sharedInstance] fetchAuthPitch:^(NSString *authPitch)
+     {
+         if (self.currentState == CNAuthViewControllerStateWait) {
+             self.authPitch = authPitch;
+             [self changeState:CNAuthViewControllerStatePhoneNumberEntry animated:YES];
+         }
+     }];
 }
 
 #pragma mark - Read-Only Properties
@@ -245,12 +254,12 @@ static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
     return result;
 }
 
-static inline NSString *detailLabelStringForState(CNAuthViewControllerState state)
+- (NSString *)detailLabelStringForState:(CNAuthViewControllerState)state
 {
     NSString *result = @"UNKNOWN_STATE";
     switch (state) {
         case CNAuthViewControllerStatePhoneNumberEntry:
-            result = @"We’ll send you a text message when a class you’re tracking becomes available so you can register immediately.";
+            result = self.authPitch.length > 0 ? self.authPitch : @"Please register with Class Radar to start tracking classes you are interested in. You can track 3 classes for free after you register. We don't use your phone number for anything other than keeping track of your targets.";
             break;
         case CNAuthViewControllerStateVerificationCodeEntry:
             result = @"We’ve just sent you a text message with code to verify that this is your phone number. Please enter it.";
@@ -340,7 +349,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
     [self.textField.layer removeAllAnimations];
     [self.confirmationButton.layer removeAllAnimations];
     void (^switchUIToNewState)(CNAuthViewControllerState) = ^(CNAuthViewControllerState state){
-        self.detailLabel.text = detailLabelStringForState(state);
+        self.detailLabel.text = [self detailLabelStringForState:state];
         NSArray *groups = textFieldGroupArray(state);
         if (groups) {
             self.textField.groupArray = groups;
@@ -402,7 +411,7 @@ static inline NSString *detailLabelStringForState(CNAuthViewControllerState stat
 
 - (void)closeButtonTapped:(id)sender
 {
-    logUserAction(@"auth_view_cancel", @{ @"state_chain" : self.statesChain });
+    logUserAction(@"auth_view_cancel", @{ @"state_chain" : self.statesChain, @"auth_pitch" : [self detailLabelStringForState:CNAuthViewControllerStatePhoneNumberEntry] });
     [self.delegate authViewControllerCancelledAuthentication:self];
 }
 

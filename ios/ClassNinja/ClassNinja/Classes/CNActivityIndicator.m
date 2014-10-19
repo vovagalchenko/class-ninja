@@ -71,7 +71,7 @@
         self.gradientImageView.layer.mask = maskLayer;
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.gradientImageView.layer removeAllAnimations];
+            [self stopSpin];
             if (self.alpha > 0)
                 [self spin];
         });
@@ -83,9 +83,14 @@
     if (alpha == 1.0 && self.gradientImageView.layer.animationKeys.count == 0) {
         [self spin];
     } else if (alpha == 0 && self.alpha != 0) {
-        [self.gradientImageView.layer removeAllAnimations];
+        [self stopSpin];
     }
     [super setAlpha:alpha];
+}
+
+- (void)stopSpin
+{
+    [self.gradientImageView.layer removeAllAnimations];
 }
 
 - (void)spin

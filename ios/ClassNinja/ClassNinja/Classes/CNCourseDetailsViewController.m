@@ -269,6 +269,14 @@
     }
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    // UIKit kills the activity indicator animation when we present a modal VC.
+    // Resetting alpha of the activity indicator will kick off the animation again if needed.
+    self.activityIndicator.alpha = self.activityIndicator.alpha;
+    [super viewWillAppear:animated];
+}
+
 - (void)viewWillLayoutSubviews
 {
     [super viewWillLayoutSubviews];
@@ -448,6 +456,12 @@
                 CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
                 [self presentViewController:paywallVC animated:YES completion:nil];
+            } else if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorAuthenticationRequired) {
+                [[[UIAlertView alloc] initWithTitle:@"Error"
+                                            message:@"Without your phone number, we have no way of telling you apart from other Class Radar users. Thus we can't track any classes for you."
+                                           delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil] show];
             } else {
                 [[[UIAlertView alloc] initWithTitle:@"Error"
                                             message:@"Failed to set the target. Check your internet connection."

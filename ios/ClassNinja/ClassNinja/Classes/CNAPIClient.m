@@ -271,10 +271,12 @@ authenticationRequired:(BOOL)authRequired
         NSInteger statusCode = [(NSHTTPURLResponse *)response statusCode];
         if (connectionError || statusCode >= 400) {
             NSLog(@"Error attempting to execute: %@\n%@\n%@", response, connectionError, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            if ([jsonDict[@"error_code"] respondsToSelector:@selector(isEqualToNumber:)] && [jsonDict[@"error_code"] isEqualToNumber:@(401)]) {
-                logWarning(@"access_token_invalidated", @{@"old_token" : self.authContext.loggedInUser.accessToken});
-                [self.authContext logUserOut];
+            if (data) {
+                NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                if ([jsonDict[@"error_code"] respondsToSelector:@selector(isEqualToNumber:)] && [jsonDict[@"error_code"] isEqualToNumber:@(401)]) {
+                    logWarning(@"access_token_invalidated", @{@"old_token" : self.authContext.loggedInUser.accessToken});
+                    [self.authContext logUserOut];
+                }
             }
         }
 
@@ -436,6 +438,25 @@ authenticationRequired:(BOOL)authRequired
               completion:^(NSDictionary *response, NSError *error)
     {
         NSString *pitch = [response objectForKey:@"sales_pitch"];
+        if (error) {
+            completion(nil);
+        } else {
+            completion(pitch);
+        }
+    }];
+}
+
+- (void)fetchAuthPitch:(void (^)(NSString *authPitch))completion
+{
+    NSMutableURLRequest *req = [self mutableURLRequestForAPIEndpoint:@"auth_pitch"
+                                                          HTTPMethod:@"GET"
+                                                  HTTPBodyParameters:nil];
+    [self makeURLRequest:req
+  authenticationRequired:NO
+          withAuthPolicy:CNFailRequestOnAuthFailure
+              completion:^(NSDictionary *response, NSError *error)
+    {
+        NSString *pitch = [response objectForKey:@"auth_pitch"];
         if (error) {
             completion(nil);
         } else {
