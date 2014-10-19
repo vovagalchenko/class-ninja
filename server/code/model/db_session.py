@@ -10,7 +10,7 @@ class DB_Session_Factory(object):
     @staticmethod
     def get_db_session(debug=False):
         if DB_Session_Factory.Session is None:
-            db_engine = create_engine(CFG.get_instance().get('db', 'dsn'), echo=debug, poolclass=QueuePool, pool_size = 5, pool_recycle = 3600, pool_reset_on_return = 'rollback', pool_timeout = 30)
+            db_engine = create_engine(CFG.get_instance().get('db', 'dsn'), echo=debug, poolclass=QueuePool, pool_size = 5, pool_recycle = 3600, pool_reset_on_return = 'rollback', pool_timeout = 30, encoding = 'utf-8')
             DB_Session_Factory.Session = scoped_session(sessionmaker(bind = db_engine))
         session = DB_Session_Factory.Session()
         return session
