@@ -33,6 +33,7 @@
 
 
 #define kCellTitleFont ([UIFont systemFontOfSize:14.0])
+#define kCellBoldTermFont ([UIFont boldSystemFontOfSize:14.0])
 
 @interface CNSearchResultsCell : UITableViewCell
 @property (nonatomic) UIView *separatorLine;
@@ -100,7 +101,7 @@
     while(range.location != NSNotFound) {
         range = [[boldedTitle string] rangeOfString:term options:NSCaseInsensitiveSearch range:range];
         if(range.location != NSNotFound) {
-            NSDictionary *boldAttrs = @{NSFontAttributeName : kCellTitleFont};
+            NSDictionary *boldAttrs = @{NSFontAttributeName : kCellBoldTermFont};
             [boldedTitle setAttributes:boldAttrs range:range];
             range = NSMakeRange(range.location + range.length, length - (range.location + range.length));
         }
