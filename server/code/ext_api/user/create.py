@@ -21,28 +21,30 @@ class create_user(HTTP_Response_Builder):
             raise API_Exception(400, "Invalid phone number")
         else:
             db_session = DB_Session_Factory.get_db_session()
-            user = db_session.query(User).get(self.phonenumber)
-            current_ts = datetime.now()
-            if user is None:
-                user = User()
-                user.phonenumber = self.phonenumber
-                user.device_vendor_id = self.device_vendor_id
-                user.access_token = None
-                user.confirmation_token = self.generate_confirmation_token()
-                user.confirmation_deadline = current_ts + timedelta(minutes = 5)
-                user.last_request_ts = current_ts
-                db_session.add(user)
-                db_session.commit()
-            else:
-                user.confirmation_token = self.generate_confirmation_token()
-                user.confirmation_deadline = current_ts + timedelta(minutes = 5)
-                user.last_request_ts = current_ts
+            cfg = CFG.get_instance()
+            if self.phonenumber != str(cfg.get('apple_tester', 'phone_number')):
+                user = db_session.query(User).get(self.phonenumber)
+                current_ts = datetime.now()
+                if user is None:
+                    user = User()
+                    user.phonenumber = self.phonenumber
+                    user.device_vendor_id = self.device_vendor_id
+                    user.access_token = None
+                    user.confirmation_token = self.generate_confirmation_token()
+                    user.confirmation_deadline = current_ts + timedelta(minutes = 5)
+                    user.last_request_ts = current_ts
+                    db_session.add(user)
+                    db_session.commit()
+                else:
+                    user.confirmation_token = self.generate_confirmation_token()
+                    user.confirmation_deadline = current_ts + timedelta(minutes = 5)
+                    user.last_request_ts = current_ts
                
-                db_session.add(user)
-                db_session.commit()
+                    db_session.add(user)
+                    db_session.commit()
             
-            message = "Your code is " + user.confirmation_token
-            self.send_code_to_phone(code_message=message, to_number=user.phonenumber) 
+                message = "Your code is " + user.confirmation_token
+                self.send_code_to_phone(code_message=message, to_number=user.phonenumber) 
             return HTTP_Response('200 OK', {'status' : 'SMS request sent'})
 
     def generate_confirmation_token(self):
