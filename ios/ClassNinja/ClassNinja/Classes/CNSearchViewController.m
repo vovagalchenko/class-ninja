@@ -209,6 +209,7 @@
                                               }
                                           }];
     } else {
+        self.lastSearchString = nil;
         self.resultsView.hidden = YES;
         self.departmentsForLastSearch = nil;
         self.coursesForLastSearch = nil;
