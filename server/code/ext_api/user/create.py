@@ -3,7 +3,7 @@ from ext_api.exceptions import API_Exception
 from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
 from ext_api.parameter import Parameter, String_Parameter_Type
 from model.user_model import User
-from model.config import Config
+from lib.cfg import CFG
 from random import randint
 from twilio.rest import TwilioRestClient
 
@@ -49,9 +49,8 @@ class create_user(HTTP_Response_Builder):
         return str(randint(100000, 999999))
 
     def send_code_to_phone(self, code_message, to_number):
-        db_session = DB_Session_Factory.get_db_session()
-        configuration = db_session.query(Config).get("debug")
-        client = TwilioRestClient(configuration.account, configuration.auth_token)
-        client.sms.messages.create(to=to_number,from_=configuration.from_phone,body=code_message)
+        cfg = CFG.get_instance()
+        client = TwilioRestClient(cfg.get('twilio', 'account'), cfg.get('twilio', 'auth_token'))
+        client.sms.messages.create(to=to_number,from_=cfg.get('twilio', 'from_phone'),body=code_message)
     
      
