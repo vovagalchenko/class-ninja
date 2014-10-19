@@ -192,9 +192,8 @@
                                                      context:nil];
     self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset - leftShift,
                                                            yOffset,
-                                                           ceilf(kDetailsFieldWidth),
-                                                           ceilf(boundingRect.size.height)+1);
-    [self.multilineDetailsLeftFieldLabel sizeToFit];
+                                                           ceilf(boundingRect.size.width),
+                                                           ceilf(boundingRect.size.height));
     
     stringToSize = self.multilineDetailsRightFieldLabel.attributedText;
     CGFloat width = self.bounds.size.width - (kStatusDetailsXOffset - leftShift) - kStatusDetailsPadding;
@@ -204,7 +203,7 @@
     self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset - leftShift,
                                                             yOffset,
                                                             ceilf(boundingRect.size.width),
-                                                            ceilf(boundingRect.size.height)+1);
+                                                            ceilf(boundingRect.size.height));
 
     self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight*2, 11, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
     self.activityIndicatorAccessoryView.frame = self.expandAccessoryView.frame;
@@ -360,15 +359,19 @@
         _multilineDetailsLeftFieldLabel = [[UILabel alloc] init];
         _multilineDetailsLeftFieldLabel.textAlignment = NSTextAlignmentLeft;
         _multilineDetailsLeftFieldLabel.numberOfLines = 0;
-        _multilineDetailsLeftFieldLabel.font = kDetailsLabelFont;
         _multilineDetailsLeftFieldLabel.textColor = kDaysOFWeekColor;
         _multilineDetailsLeftFieldLabel.clipsToBounds = YES;
         
         NSMutableParagraphStyle *paragrahStyle = [[NSMutableParagraphStyle alloc] init];
         [paragrahStyle setLineSpacing:kParagraphLineSpacing];
+        NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    paragrahStyle, NSParagraphStyleAttributeName,
+                                    kDetailsLabelFont, NSFontAttributeName,
+                                    nil];
+        
         NSString *text = @"Status\nSection\nLocation";
-        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text];
-        [attributedString addAttribute:NSParagraphStyleAttributeName value:paragrahStyle range:NSMakeRange(0, [text length])];
+        NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributes];
+
         _multilineDetailsLeftFieldLabel.attributedText = attributedString;
     }
     
