@@ -310,6 +310,7 @@
 {
     CNSchool *school = [self modelForIndexPath:indexPath];
     [CNUserProfile  setDefaultSchool:school];
+    self.didNavigateToDefaultSchool = YES;
     [super tableView:tableView didSelectRowAtIndexPath:indexPath];
 }
 
