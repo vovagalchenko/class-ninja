@@ -17,4 +17,8 @@
 - (void)authenticateWithCompletion:(void (^)(BOOL))completionBlock;
 - (void)logUserOut;
 
+- (void)setCreditsForLoggedInUser:(NSUInteger)credits;
+- (void)setDidPostOnFbForLoggedInUser:(BOOL)didPostOnFb;
+- (void)setDidPostOnTwitterForLoggedInUser:(BOOL)didPostOnTwitter;
+
 @end

@@ -307,15 +307,16 @@ authenticationRequired:(BOOL)authRequired
                 if (self.authContext.loggedInUser) {
                     NSNumber *credits = [jsonDict objectForKey:@"credits"];
                     if (credits) {
-                        self.authContext.loggedInUser.credits = [credits unsignedIntegerValue];
+                        [self.authContext setCreditsForLoggedInUser:[credits unsignedIntegerValue]];
                     }
 
                     NSDictionary *userProfile = [jsonDict objectForKey:@"userprofile"];
                     if (userProfile) {
                         BOOL didPostOnFb = [[userProfile objectForKey:@"didPostOnFB"] boolValue];
                         BOOL didPostOnTwitter = [[userProfile objectForKey:@"didPostOnTwitter"] boolValue];
-                        self.authContext.loggedInUser.didPostOnFb = didPostOnFb;
-                        self.authContext.loggedInUser.didPostOnTwitter = didPostOnTwitter;
+                        
+                        [self.authContext setDidPostOnFbForLoggedInUser:didPostOnFb];
+                        [self.authContext setDidPostOnTwitterForLoggedInUser:didPostOnTwitter];
                     }
                 }
                 

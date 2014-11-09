@@ -106,4 +106,8 @@
 @property (nonatomic) BOOL didPostOnFb;
 @property (nonatomic) BOOL didPostOnTwitter;
 
++ (CNUser *)retrieveLoggedInUserFromKeychain;
++ (void)writeLoggedInUserToKeychain:(CNUser *)newLoggedInUser;
++ (void)deleteUserEntryFromKeychain;
+
 @end

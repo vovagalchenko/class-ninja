@@ -116,15 +116,17 @@
 
 - (void)logUserOut
 {
-    self.loggedInUser = nil;
+    @synchronized(self) {
+        _loggedInUser = nil;
+        [CNUser deleteUserEntryFromKeychain];
+    }
 }
 
 - (CNUser *)loggedInUser
 {
     @synchronized(self) {
         if (!_loggedInUser) {
-            _loggedInUser = [self retrieveLoggedInUserFromKeychain];
-            [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
+            _loggedInUser = [CNUser retrieveLoggedInUserFromKeychain];
         }
     }
     return _loggedInUser;
@@ -133,55 +135,35 @@
 - (void)setLoggedInUser:(CNUser *)loggedInUser
 {
     @synchronized(self) {
-        [_loggedInUser removeObserver:self forKeyPath:@"credits"];
         _loggedInUser = loggedInUser;
-        [self writeLoggedInUserToKeychain:loggedInUser];
-        [_loggedInUser addObserver:self forKeyPath:@"credits" options:NSKeyValueObservingOptionNew context:nil];
+        [CNUser writeLoggedInUserToKeychain:loggedInUser];
     }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void)setCreditsForLoggedInUser:(NSUInteger)credits
 {
-    if (object == self.loggedInUser) {
-        [self writeLoggedInUserToKeychain:object];
+    @synchronized(self) {
+        self.loggedInUser.credits = credits;
+        [CNUser writeLoggedInUserToKeychain:self.loggedInUser];
     }
 }
 
-static inline NSMutableDictionary *keychainSearchDictionaryForLoggedInUser()
+-(void)setDidPostOnFbForLoggedInUser:(BOOL)didPostOnFb
 {
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setObject:(__bridge_transfer id)kSecClassGenericPassword forKey:(__bridge_transfer id)kSecClass];
-    [dict setObject:[@"logged_in_user" dataUsingEncoding:NSUTF8StringEncoding] forKey:(__bridge_transfer id)kSecAttrGeneric];
-    return dict;
-}
-
-- (CNUser *)retrieveLoggedInUserFromKeychain
-{
-    CFTypeRef loggedInUser = nil;
-    NSMutableDictionary *searchDict = keychainSearchDictionaryForLoggedInUser();
-    [searchDict setObject:(__bridge_transfer id)kCFBooleanTrue forKey:(__bridge_transfer id)kSecReturnData];
-    [searchDict setObject:(__bridge_transfer id)kSecMatchLimitOne forKey:(__bridge_transfer id)kSecMatchLimit];
-    SecItemCopyMatching((__bridge CFDictionaryRef)searchDict, &loggedInUser);
-    NSData *data = (__bridge_transfer NSData *)loggedInUser;
-    return (data == nil)? nil : [NSKeyedUnarchiver unarchiveObjectWithData:data];
-}
-
-- (void)writeLoggedInUserToKeychain:(CNUser *)newLoggedInUser
-{
-    NSMutableDictionary *keychainSearchDict = keychainSearchDictionaryForLoggedInUser();
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:newLoggedInUser];
-    [keychainSearchDict setObject:data forKey:(__bridge_transfer id)kSecValueData];
-    OSStatus status = SecItemAdd((__bridge CFDictionaryRef)keychainSearchDict, NULL);
-    if (status == errSecDuplicateItem) {
-        status = SecItemUpdate((__bridge CFDictionaryRef)keychainSearchDict,
-                               (__bridge CFDictionaryRef)[NSDictionary dictionaryWithObject:data forKey:(__bridge_transfer id)kSecValueData]);
+    @synchronized(self) {
+        self.loggedInUser.didPostOnFb = didPostOnFb;
+        [CNUser writeLoggedInUserToKeychain:self.loggedInUser];
     }
-    CNAssert(status == errSecSuccess, @"keychain_write", @"Error writing to keychain: %d", status);
 }
 
-- (void)dealloc
+-(void)setDidPostOnTwitterForLoggedInUser:(BOOL)didPostOnTwitter
 {
-    [_loggedInUser removeObserver:self forKeyPath:@"credits"];
+    @synchronized(self) {
+        self.loggedInUser.didPostOnTwitter = didPostOnTwitter;
+        [CNUser writeLoggedInUserToKeychain:self.loggedInUser];
+    }
 }
+
+
 
 @end

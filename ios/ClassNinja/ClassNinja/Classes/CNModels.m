@@ -225,5 +225,44 @@ typedef NS_ENUM(NSInteger, CNUserKeychainVersion) {
     return [NSString stringWithFormat:@"%@", self.phoneNumber];
 }
 
+static inline NSMutableDictionary *keychainSearchDictionaryForLoggedInUser()
+{
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    [dict setObject:(__bridge_transfer id)kSecClassGenericPassword forKey:(__bridge_transfer id)kSecClass];
+    [dict setObject:[@"logged_in_user" dataUsingEncoding:NSUTF8StringEncoding] forKey:(__bridge_transfer id)kSecAttrGeneric];
+    return dict;
+}
+
++ (CNUser *)retrieveLoggedInUserFromKeychain
+{
+    CFTypeRef loggedInUser = nil;
+    NSMutableDictionary *searchDict = keychainSearchDictionaryForLoggedInUser();
+    [searchDict setObject:(__bridge_transfer id)kCFBooleanTrue forKey:(__bridge_transfer id)kSecReturnData];
+    [searchDict setObject:(__bridge_transfer id)kSecMatchLimitOne forKey:(__bridge_transfer id)kSecMatchLimit];
+    SecItemCopyMatching((__bridge CFDictionaryRef)searchDict, &loggedInUser);
+    NSData *data = (__bridge_transfer NSData *)loggedInUser;
+    return (data == nil)? nil : [NSKeyedUnarchiver unarchiveObjectWithData:data];
+}
+
++ (void)writeLoggedInUserToKeychain:(CNUser *)newLoggedInUser
+{
+    NSMutableDictionary *keychainSearchDict = keychainSearchDictionaryForLoggedInUser();
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:newLoggedInUser];
+    [keychainSearchDict setObject:data forKey:(__bridge_transfer id)kSecValueData];
+    OSStatus status = SecItemAdd((__bridge CFDictionaryRef)keychainSearchDict, NULL);
+    if (status == errSecDuplicateItem) {
+        status = SecItemUpdate((__bridge CFDictionaryRef)keychainSearchDict,
+                               (__bridge CFDictionaryRef)[NSDictionary dictionaryWithObject:data forKey:(__bridge_transfer id)kSecValueData]);
+    }
+    CNAssert(status == errSecSuccess, @"keychain_write", @"Error writing to keychain: %d", status);
+}
+
++ (void)deleteUserEntryFromKeychain
+{
+    NSMutableDictionary *keychainSearchDict = keychainSearchDictionaryForLoggedInUser();
+    OSStatus status = SecItemDelete((__bridge CFDictionaryRef)keychainSearchDict);
+    CNAssert(status == errSecSuccess || status == errSecItemNotFound, @"keychain_delete", @"Error writing to keychain: %d", status);
+}
+
 @end
 
