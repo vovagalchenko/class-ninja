@@ -310,9 +310,9 @@ authenticationRequired:(BOOL)authRequired
                         [self.authContext setCreditsForLoggedInUser:[credits unsignedIntegerValue]];
                     }
 
-                    NSDictionary *userProfile = [jsonDict objectForKey:@"userprofile"];
+                    NSDictionary *userProfile = [jsonDict objectForKey:@"user_profile"];
                     if (userProfile) {
-                        BOOL didPostOnFb = [[userProfile objectForKey:@"didPostOnFB"] boolValue];
+                        BOOL didPostOnFb = [[userProfile objectForKey:@"didPostOnFb"] boolValue];
                         BOOL didPostOnTwitter = [[userProfile objectForKey:@"didPostOnTwitter"] boolValue];
                         
                         [self.authContext setDidPostOnFbForLoggedInUser:didPostOnFb];
@@ -365,7 +365,7 @@ authenticationRequired:(BOOL)authRequired
         putArgs = @{ @"didPostOnTwitter" : @"true"};
     }
     
-    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:@"userprofile"
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:@"user_profile"
                                                               HTTPMethod:@"PUT"
                                                       HTTPBodyParameters:putArgs];
     [self makeURLRequest:request
