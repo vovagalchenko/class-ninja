@@ -11,6 +11,8 @@
 #import "CNActivityIndicator.h"
 #import "CNAPIClient.h"
 
+#import <FacebookSDK/FacebookSDK.h>
+
 #define kSpinnerRadius 36
 
 #define kMessageOffsetX     30
@@ -18,6 +20,9 @@
 #define KMessageMaxHeight   200
 
 #define kSignUpOffsetX  160
+
+#define kSharingOffsetY kSignUpOffsetY
+
 #define kSignUpOffsetY  385
 #define kSignupMaxWidth 160
 #define kSignupMaxHeight 44
@@ -32,6 +37,7 @@
 
 
 @interface CNPaywallViewController ()
+@property (nonatomic) UIButton *shareOnFacebook;
 @property (nonatomic) UIButton *cancel;
 @property (nonatomic) UIButton *signUp;
 @property (nonatomic) UILabel *marketingMessage;
@@ -47,6 +53,14 @@
     return UIStatusBarStyleLightContent;
 }
 
+- (BOOL)isFacebookSharingEnabled
+{
+    CNUser *loggedInUser = [[[CNAPIClient sharedInstance] authContext] loggedInUser];
+    BOOL fbUserIsLoggedIn = [FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]];
+
+    return [loggedInUser didPostOnFb] == NO && fbUserIsLoggedIn;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -55,6 +69,10 @@
     [self.view addSubview:self.signUp];
     [self.view addSubview:self.marketingMessage];
     [self.view addSubview:self.activityIndicator];
+    
+    if ([self isFacebookSharingEnabled]) {
+        [self.view addSubview:self.shareOnFacebook];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -138,8 +156,16 @@
 {
     [super viewDidLayoutSubviews];
     self.marketingMessage.frame = CGRectMake(kMessageOffsetX, kMessageOffsetY, self.view.bounds.size.width - 2 * kMessageOffsetX, KMessageMaxHeight);
-    self.signUp.frame = CGRectMake(kSignUpOffsetX, kSignUpOffsetY, kSignupMaxWidth, kSignupMaxHeight);
-    self.cancel.frame = CGRectMake(kCancelOffsetX, kCancelOffsetY, kCancelMaxWidth, kCancelMaxHeight);
+    
+    
+    CGFloat sharingYOffset = 0;
+    if ([self isFacebookSharingEnabled]) {
+        self.shareOnFacebook.frame = CGRectMake(kSignUpOffsetX, kSharingOffsetY, kSignupMaxWidth, kSignupMaxHeight);
+        sharingYOffset += kSignupMaxHeight;
+    }
+    
+    self.signUp.frame = CGRectMake(kSignUpOffsetX, kSignUpOffsetY + sharingYOffset, kSignupMaxWidth, kSignupMaxHeight);
+    self.cancel.frame = CGRectMake(kCancelOffsetX, kCancelOffsetY + sharingYOffset, kCancelMaxWidth, kCancelMaxHeight);
 }
 
 - (void)signUpButtonPressed
@@ -156,6 +182,27 @@
         [[CNInAppPurchaseManager sharedInstance] addProductToPaymentQueue:self.product];
     }];
 }
+
+- (void)shareOnFacebookButtonPressed
+{
+    NSURL *url = [NSURL URLWithString:@"http://class-ninja.com"];
+    FBOSIntegratedShareDialogHandler handler = ^(FBOSIntegratedShareDialogResult result, NSError *error) {
+        if (result == FBOSIntegratedShareDialogResultSucceeded) {
+            [[CNAPIClient sharedInstance] creditUserForSharing:CNAPIClientSharedOnFb
+                                                    completion:^(BOOL didSucceed) {
+                                                        [self dismiss];
+                                                    }];
+        }
+    };
+    
+    // TODO: Check if Siong has a better image for this
+    [FBDialogs presentOSIntegratedShareDialogModallyFrom:self
+                                             initialText:@"Get notified when class opens up for registration!"
+                                                   image:[UIImage imageNamed:@"AppIcon57x57"]
+                                                     url:url
+                                                handler:handler];
+}
+
 
 - (void)dismiss
 {
@@ -196,6 +243,21 @@
         _activityIndicator.alpha = 0;
     }
     return _activityIndicator;
+}
+
+
+- (UIButton *)shareOnFacebook
+{
+    if (_shareOnFacebook == nil) {
+        _shareOnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_shareOnFacebook setTitle: @"Share on Facebook" forState:UIControlStateNormal];
+        [_shareOnFacebook addTarget:self action:@selector(shareOnFacebookButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+        
+        _shareOnFacebook.backgroundColor = [UIColor clearColor];
+        _shareOnFacebook.titleLabel.textColor = [UIColor whiteColor];
+        _shareOnFacebook.titleLabel.font = kSignupButtonFont;
+    }
+    return _shareOnFacebook;
 }
 
 - (UIButton *)signUp
