@@ -20,18 +20,20 @@ class edit_userprofile(HTTP_Response_Builder):
             raise API_Exception("406 Not Acceptable", "Provided argument are not valid to change user profile")
             
         db_session = DB_Session_Factory.get_db_session() 
-        user_profile = db_session.query(UserProfile).get(self.user.phonenumber)
+        self.user_profile = db_session.query(UserProfile).get(self.user.phonenumber)
 
-        if user_profile is None:
+        if self.user_profile is None:
             raise API_Exception("500 Server Error", "User profile does not exist")
        
-        if self.didPostOnFb == True and user_profile.didPostOnFb == False:
-            user_profile.credits += 3
+        if self.didPostOnFb == True and self.user_profile.didPostOnFb == False:
+            self.user_profile.didPostOnFb = True
+            self.user_profile.credits += 3
 
-        if self.didPostOnTwitter == True and user_profile.didPostOnTwitter == False:
-            user_profile.credits += 3
+        if self.didPostOnTwitter == True and self.user_profile.didPostOnTwitter == False:
+            self.user_profile.didPostOnTwitter = True
+            self.user_profile.credits += 3
 
         db_session.commit()
  
-        return HTTP_Response('200 OK', {'credits' : user_profile.credits})
+        return HTTP_Response('200 OK', {'credits' : self.user_profile.credits})
  
