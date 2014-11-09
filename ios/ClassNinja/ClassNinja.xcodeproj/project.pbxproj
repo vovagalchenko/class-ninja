@@ -25,10 +25,10 @@
 		707F9851196899BC00D6E552 /* CNAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 707F9850196899BC00D6E552 /* CNAppDelegate.m */; };
 		707F9853196899BC00D6E552 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 707F9852196899BC00D6E552 /* Images.xcassets */; };
 		708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 708D688A19B6D6A600BE9156 /* CNUserProfile.m */; };
-		70A0F2761A0ED09C0018B655 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70A0F2751A0ED09C0018B655 /* FacebookSDK.framework */; };
 		70A5F36F19B444780060EB0C /* CNSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70A5F36E19B444780060EB0C /* CNSearchViewController.m */; };
 		70DB470E198D967000F81F43 /* CNGenericSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */; };
 		70E7619E19A02075003F3984 /* UIColor+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */; };
+		70EA00841A1010DF00B91F60 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70EA00831A1010DF00B91F60 /* FacebookSDK.framework */; };
 		80666D9B19CEBEBD007003A2 /* libVGAnalytics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 80666D9519CEBE54007003A2 /* libVGAnalytics.a */; };
 		80666D9D19CEBECB007003A2 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 80666D9C19CEBECB007003A2 /* libz.dylib */; };
 		80666DA119CEE071007003A2 /* NSData+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 80666DA019CEE071007003A2 /* NSData+CNAdditions.m */; };
@@ -109,13 +109,13 @@
 		707F989719689D8700D6E552 /* CNModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNModels.m; sourceTree = "<group>"; };
 		708D688919B6D6A600BE9156 /* CNUserProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNUserProfile.h; sourceTree = "<group>"; };
 		708D688A19B6D6A600BE9156 /* CNUserProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNUserProfile.m; sourceTree = "<group>"; };
-		70A0F2751A0ED09C0018B655 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../../../../Documents/FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
 		70A5F36D19B444780060EB0C /* CNSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSearchViewController.h; sourceTree = "<group>"; };
 		70A5F36E19B444780060EB0C /* CNSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSearchViewController.m; sourceTree = "<group>"; };
 		70DB470C198D967000F81F43 /* CNGenericSelectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGenericSelectionTableViewCell.h; sourceTree = "<group>"; };
 		70DB470D198D967000F81F43 /* CNGenericSelectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNGenericSelectionTableViewCell.m; sourceTree = "<group>"; };
 		70E7619C19A02075003F3984 /* UIColor+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+CNAdditions.h"; sourceTree = "<group>"; };
 		70E7619D19A02075003F3984 /* UIColor+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+CNAdditions.m"; sourceTree = "<group>"; };
+		70EA00831A1010DF00B91F60 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ClassNinja/Frameworks/FacebookSDK.framework; sourceTree = "<group>"; };
 		80666D8F19CEBE54007003A2 /* VGAnalytics.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = VGAnalytics.xcodeproj; path = "../../submodules/ios-analytics/iOS Analytics/VGAnalytics.xcodeproj"; sourceTree = "<group>"; };
 		80666D9C19CEBECB007003A2 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		80666D9F19CEE071007003A2 /* NSData+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+CNAdditions.h"; sourceTree = "<group>"; };
@@ -161,7 +161,7 @@
 				707F9843196899BC00D6E552 /* CoreGraphics.framework in Frameworks */,
 				707F9845196899BC00D6E552 /* UIKit.framework in Frameworks */,
 				707F9841196899BC00D6E552 /* Foundation.framework in Frameworks */,
-				70A0F2761A0ED09C0018B655 /* FacebookSDK.framework in Frameworks */,
+				70EA00841A1010DF00B91F60 /* FacebookSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,7 +202,7 @@
 			isa = PBXGroup;
 			children = (
 				80666D9C19CEBECB007003A2 /* libz.dylib */,
-				70A0F2751A0ED09C0018B655 /* FacebookSDK.framework */,
+				70EA00831A1010DF00B91F60 /* FacebookSDK.framework */,
 				70557114197B1ED7008F66F1 /* StoreKit.framework */,
 				707F9840196899BC00D6E552 /* Foundation.framework */,
 				707F9842196899BC00D6E552 /* CoreGraphics.framework */,
@@ -611,6 +611,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/bsuvorov/Documents/FacebookSDK,
+					"$(PROJECT_DIR)/ClassNinja/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
@@ -630,6 +631,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/bsuvorov/Documents/FacebookSDK,
+					"$(PROJECT_DIR)/ClassNinja/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
