@@ -8,7 +8,7 @@ from model.user_profile import UserProfile
 import requests
 import json
 
-class edit_userprofile(HTTP_Response_Builder): 
+class edit_user_profile(HTTP_Response_Builder): 
     didPostOnFb = Parameter("didPostOnFb", required = False, parameter_type = Boolean_Parameter_Type) 
     didPostOnTwitter = Parameter("didPostOnTwitter", required = False, parameter_type = Boolean_Parameter_Type) 
     
