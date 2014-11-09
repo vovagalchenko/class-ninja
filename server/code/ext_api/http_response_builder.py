@@ -80,6 +80,8 @@ class HTTP_Response_Builder(object):
             http_response.add_to_body('warnings', self.warnings)
         if self.user_profile is not None:
             http_response.add_to_body('credits', self.user_profile.credits)
+            http_response.add_to_body('user_profile', self.user_profile)
+
         return http_response
 
     def do_controller_specific_work(self):
