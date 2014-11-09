@@ -304,11 +304,21 @@ authenticationRequired:(BOOL)authRequired
                                   
                                   });
             } else {
-                NSNumber *credits = [jsonDict objectForKey:@"credits"];
-                if (credits && self.authContext.loggedInUser) {
-                    self.authContext.loggedInUser.credits = [credits unsignedIntegerValue];
-                }
+                if (self.authContext.loggedInUser) {
+                    NSNumber *credits = [jsonDict objectForKey:@"credits"];
+                    if (credits) {
+                        self.authContext.loggedInUser.credits = [credits unsignedIntegerValue];
+                    }
 
+                    NSDictionary *userProfile = [jsonDict objectForKey:@"userprofile"];
+                    if (userProfile) {
+                        BOOL didPostOnFb = [[userProfile objectForKey:@"didPostOnFB"] boolValue];
+                        BOOL didPostOnTwitter = [[userProfile objectForKey:@"didPostOnTwitter"] boolValue];
+                        self.authContext.loggedInUser.didPostOnFb = didPostOnFb;
+                        self.authContext.loggedInUser.didPostOnTwitter = didPostOnTwitter;
+                    }
+                }
+                
                 if (statusCode >= 400) {
                     completionError = [[NSError alloc] initWithDomain:CN_API_CLIENT_ERROR_DOMAIN code:statusCode userInfo:nil];
                 }
@@ -339,6 +349,30 @@ authenticationRequired:(BOOL)authRequired
               completion:^(NSDictionary *response, NSError *error) {
                   if (successBlock) {
                       successBlock(error == nil);
+                  }
+              }];
+    
+}
+
+
+- (void)creditUserForSharing:(CNAPIClientSharedStatus)sharedStatus completion:(void (^)(BOOL didSucceed))completion
+{
+    NSDictionary *putArgs = nil;
+    if (sharedStatus == CNAPIClientSharedOnFb) {
+        putArgs = @{ @"didPostOnFb" : @"true"};
+    } else if (sharedStatus == CNAPIClientSharedOnTwitter) {
+        putArgs = @{ @"didPostOnTwitter" : @"true"};
+    }
+    
+    NSMutableURLRequest *request = [self mutableURLRequestForAPIEndpoint:@"userprofile"
+                                                              HTTPMethod:@"PUT"
+                                                      HTTPBodyParameters:putArgs];
+    [self makeURLRequest:request
+  authenticationRequired:YES
+          withAuthPolicy:CNFailRequestOnAuthFailure
+              completion:^(NSDictionary *response, NSError *error) {
+                  if (completion) {
+                      completion(error == nil);
                   }
               }];
     

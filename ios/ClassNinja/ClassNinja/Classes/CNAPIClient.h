@@ -24,6 +24,11 @@ typedef enum : NSUInteger {
 } CNAPIClientInAppPurchaseReceiptStatus;
 
 typedef enum : NSUInteger {
+    CNAPIClientSharedOnFb,
+    CNAPIClientSharedOnTwitter,
+} CNAPIClientSharedStatus;
+
+typedef enum : NSUInteger {
     CNFailRequestOnAuthFailure,
     CNForceAuthenticationOnAuthFailure,
 } CNAuthenticationPolicy;
@@ -43,6 +48,9 @@ typedef enum : NSUInteger {
 - (void)searchInSchool:(CNSchool *)school
           searchString:(NSString *)string
             completion:(void (^)(NSArray *departments, NSArray *courses, NSArray *departments_for_courses))completionBlock;
+
+
+- (void)creditUserForSharing:(CNAPIClientSharedStatus)sharedStatus completion:(void (^)(BOOL didSucceed))completion;
 
 - (void)verifyPurchaseOfProduct:(NSString *)productId withReceipt:(NSData *)receipt completion:(void (^)(CNAPIClientInAppPurchaseReceiptStatus receiptStatus))completion;
 - (void)targetEvents:(NSArray *)events completionBlock:(void (^)(NSDictionary *userAlert, NSError *error))block;

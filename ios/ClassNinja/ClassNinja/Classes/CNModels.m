@@ -180,12 +180,25 @@
 
 @implementation CNUser
 
+typedef NS_ENUM(NSInteger, CNUserKeychainVersion) {
+    CNUserKeychainVersion1_1__1_2,
+    CNUserKeychainVersionLatestVersion,
+};
+
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
     if (self = [super init]) {
         _phoneNumber = [aDecoder decodeObjectForKey:@"phoneNumber"];
         _accessToken = [aDecoder decodeObjectForKey:@"accessToken"];
         _credits = [[aDecoder decodeObjectForKey:@"credits"] unsignedIntegerValue];
+        
+        if ([aDecoder containsValueForKey:@"didPostOnFb"]) {
+            _didPostOnFb = [[aDecoder decodeObjectForKey:@"didPostOnFb"] boolValue];
+        }
+        
+        if ([aDecoder containsValueForKey:@"didPostOnTwitter"]) {
+            _didPostOnTwitter = [[aDecoder decodeObjectForKey:@"didPostOnTwitter"] boolValue];
+        }
     }
     return self;
 }
@@ -195,6 +208,11 @@
     [aCoder encodeObject:self.phoneNumber forKey:@"phoneNumber"];
     [aCoder encodeObject:self.accessToken forKey:@"accessToken"];
     [aCoder encodeObject:@(self.credits) forKey:@"credits"];
+
+    [aCoder encodeObject:@(self.didPostOnFb) forKey:@"didPostOnFb"];
+    [aCoder encodeObject:@(self.didPostOnTwitter) forKey:@"didPostOnTwitter"];
+    
+    [aCoder encodeObject:@(CNUserKeychainVersionLatestVersion) forKey:@"version"];
 }
 
 - (NSString *)description
