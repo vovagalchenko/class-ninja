@@ -50,8 +50,8 @@ def get_api_endpoint(env):
 def get_controller(env):
     endpoint = get_api_endpoint(env)
     http_method = env['REQUEST_METHOD'].upper()
-    if http_method not in ("GET", "POST", "DELETE"):
-        raise ext_api.exceptions.Invalid_API_Method_Exception(http_method, endpoint, "At this point only GET, POST, DELETE HTTP methods are part of the API")
+    if http_method not in ("GET", "POST", "DELETE", "PUT"):
+        raise ext_api.exceptions.Invalid_API_Method_Exception(http_method, endpoint, "At this point only GET, POST, DELETE, PUT HTTP methods are part of the API")
     content_length = int(env.get('CONTENT_LENGTH', 0))
     if content_length > 0 and http_method == 'GET':
         raise Invalid_API_Call_Exception(http_method, endpoint, "This API doesn't accept HTTP body for GET requests.")
@@ -78,6 +78,8 @@ def get_controller(env):
                 action = "list"
             elif http_method == "POST":
                 action = "create"
+            elif http_method == "PUT":
+                action = "edit"
             elif http_method == "DELETE":
                 raise Invalid_API_Call_Exception(http_method, endpoint, "This API requires resource ID to delete.")
         else:
@@ -85,6 +87,8 @@ def get_controller(env):
                 action = "get"
             elif http_method == "POST":
                 action = "update"
+            elif http_method == "PUT":
+                action = "edit"
             elif http_method == "DELETE":
                 action = "delete"
         class_name = action + '_' + resource
