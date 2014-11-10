@@ -242,6 +242,8 @@
         if (result == SLComposeViewControllerResultDone) {
             [self creditUserForSharingWithService:serviceType];
         }
+        NSString *statusString = (result == SLComposeViewControllerResultCancelled) ? @"cancelled" : @"posted";
+        logUserAction(@"paywall_share", @{ @"completion_status" : statusString, @"service" : serviceType});
     };
     
     [self presentViewController:vc animated:YES completion:nil];
@@ -254,7 +256,7 @@
     } else {
         [FBDialogs presentShareDialogWithLink:kShareURL
                                          name:nil
-                                      caption:@"Never miss class spots!"
+                                      caption:@"Never miss class spots again!"
                                   description:kShareMessage
                                       picture:nil
                                   clientState:nil
@@ -262,6 +264,7 @@
                                           // there is no way of actually knowing if user cancelled or posted, unless user authorizes our app
                                           // We don't want to go through this just yet for two reasons: 1) time 2) it can alienate users
                                           // Let's grant them their free targets anyways, because we're testing sharing to begin with.
+                                          logUserAction(@"paywall_share", @{ @"completion_status" : @"unknown", @"service" : @"fb_app"});
                                           [self creditUserForSharingWithService:SLServiceTypeFacebook];
                                       }];
     }
