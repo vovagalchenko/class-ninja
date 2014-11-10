@@ -168,13 +168,44 @@
     return NO;
 }
 
-- (void)searchBarTextDidChange:(id)sender
+- (void)searchWithinDefaultSchool
 {
     CNSchool *school = [CNUserProfile defaultSchool];
     if (school == nil) {
         NSLog(@"%@ shown without user profile having deafult school", self);
         return;
     }
+
+    __weak CNSearchViewController *me = self;
+    NSString *searchString = [self.lastSearchString copy];
+    
+    NSLog(@"Searching for %@", searchString);
+    
+    [[CNAPIClient sharedInstance] searchInSchool:school
+                                    searchString:self.lastSearchString
+                                      completion:^(NSArray *departments, NSArray *courses, NSArray *departments_for_courses) {
+                                          if ([me.lastSearchString isEqualToString:searchString]) {
+                                              me.departmentsForLastSearch = departments;
+                                              me.coursesForLastSearch = courses;
+                                              
+                                              self.courseDepartmentNameByIDLookup = [[NSMutableDictionary alloc] init];
+                                              for (CNDepartment *dept in departments_for_courses) {
+                                                  [self.courseDepartmentNameByIDLookup setObject:dept.name forKey:dept.departmentId];
+                                              }
+                                              
+                                              me.lastUsedSearchTerms = [searchString componentsSeparatedByString:@" "];;
+                                              if (courses.count > 0 || departments > 0) {
+                                                  self.resultsView.hidden = NO;
+                                              }
+                                              
+                                              [me.resultsView reloadData];
+                                          }
+                                      }];
+    
+}
+
+- (void)searchBarTextDidChange:(id)sender
+{
 
     NSString *searchString = [self.searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSArray *searchTerms = [searchString componentsSeparatedByString:@" "];
@@ -186,29 +217,11 @@
     searchTerms = [searchTerms sortedArrayUsingDescriptors:@[sortDescriptor]];
 
     if ([searchTerms.firstObject length] >= 3) {
-        __weak CNSearchViewController *me = self;
         self.lastSearchString = searchString;
-        [[CNAPIClient sharedInstance] searchInSchool:school
-                                        searchString:searchString
-                                          completion:^(NSArray *departments, NSArray *courses, NSArray *departments_for_courses) {
-                                              if (searchString == me.lastSearchString) {
-                                                  me.departmentsForLastSearch = departments;
-                                                  me.coursesForLastSearch = courses;
-                                                  
-                                                  self.courseDepartmentNameByIDLookup = [[NSMutableDictionary alloc] init];
-                                                  for (CNDepartment *dept in departments_for_courses) {
-                                                      [self.courseDepartmentNameByIDLookup setObject:dept.name forKey:dept.departmentId];
-                                                  }
-                                                  
-                                                  me.lastUsedSearchTerms = searchTerms;
-                                                  if (courses.count > 0 || departments > 0) {
-                                                      self.resultsView.hidden = NO;
-                                                  }
-
-                                                  [me.resultsView reloadData];
-                                              }
-                                          }];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self];
+        [self performSelector:@selector(searchWithinDefaultSchool) withObject:nil afterDelay:0.35];
     } else {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self];
         self.lastSearchString = nil;
         self.resultsView.hidden = YES;
         self.departmentsForLastSearch = nil;
