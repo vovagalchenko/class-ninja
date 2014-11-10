@@ -95,13 +95,20 @@
     }
 }
 
+- (void)changeElementsVisibilityWithActivityIndicatorVisible:(BOOL)showActivityIndicator
+{
+    self.activityIndicator.alpha = showActivityIndicator;
+    self.cancel.alpha = !showActivityIndicator;
+    self.signUp.alpha = !showActivityIndicator;
+    self.marketingMessage.alpha = !showActivityIndicator;
+    self.shareOnTwitter.alpha = !showActivityIndicator;
+    self.shareOnFacebook.alpha = !showActivityIndicator;
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.activityIndicator.alpha = 1.0;
-    self.cancel.alpha = 0;
-    self.signUp.alpha = 0;
-    self.marketingMessage.alpha = 0;
+    [self changeElementsVisibilityWithActivityIndicatorVisible:YES];
     
     // Whenever a transaction is either finished, deferred or failed, just dismiss ourselves
     for (NSString *notificationName in @[TRANSACTION_FINISHED_NOTIFICATION_NAME,
@@ -135,10 +142,7 @@
                     self.marketingMessage.text = salesPitchText;
                     self.product = tenCreditsProduct;
                     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-                        self.activityIndicator.alpha = 0.0;
-                        self.cancel.alpha = 1.0;
-                        self.signUp.alpha = 1.0;
-                        self.marketingMessage.alpha = 1.0;
+                        [self changeElementsVisibilityWithActivityIndicatorVisible:NO];
                     }];
                     
                     logUserAction(@"sales_pitch_present", @
@@ -199,10 +203,7 @@
     self.signUp.enabled = NO;
     
     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-        self.marketingMessage.alpha = 0;
-        self.cancel.alpha = 0;
-        self.signUp.alpha = 0;
-        self.activityIndicator.alpha = 1;
+        [self changeElementsVisibilityWithActivityIndicatorVisible:YES];
     } completion:^(BOOL finished){
         [[CNInAppPurchaseManager sharedInstance] addProductToPaymentQueue:self.product];
     }];
@@ -218,7 +219,7 @@
     }
 
     if (status != CNAPIClientSharedOnNone) {
-        self.activityIndicator.alpha = 1;
+        [self changeElementsVisibilityWithActivityIndicatorVisible:YES];
         [[CNAPIClient sharedInstance] creditUserForSharing:status
                                                 completion:^(BOOL didSucceed) {
                                                     [self dismiss];
