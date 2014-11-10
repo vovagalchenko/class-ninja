@@ -110,7 +110,7 @@
             self.separatorTopMarginConstraint.constant = 2*VERTICAL_MARGIN;
             self.addClassesTopMarginConstraint.constant = 2*VERTICAL_MARGIN;
             self.separatorHeightConstraint.constant = 1.0;
-            NSString *actionButtonTitle = (actionButtonType == CNWelcomeStatusViewActionStatusButtonTypeRefreshTargets)? @"Retry" : @"Pay to track more";
+            NSString *actionButtonTitle = (actionButtonType == CNWelcomeStatusViewActionStatusButtonTypeRefreshTargets)? @"Retry" : @"Get more targets";
             [self.actionButton setTitle:actionButtonTitle
                                forState:UIControlStateNormal];
             [self.actionButton setTitle:actionButtonTitle
