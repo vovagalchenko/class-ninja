@@ -12,6 +12,7 @@
 #import "CNInAppPurchaseManager.h"
 #import "NSData+CNAdditions.h"
 #import "CNPaywallViewController.h"
+#import <FacebookSDK/FacebookSDK.h>
 
 @implementation CNAppDelegate
 
@@ -94,6 +95,14 @@
     }
     
 }
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+    return [FBSession.activeSession handleOpenURL:url];
+}
+
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {

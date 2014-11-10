@@ -24,6 +24,7 @@ typedef enum : NSUInteger {
 } CNAPIClientInAppPurchaseReceiptStatus;
 
 typedef enum : NSUInteger {
+    CNAPIClientSharedOnNone,
     CNAPIClientSharedOnFb,
     CNAPIClientSharedOnTwitter,
 } CNAPIClientSharedStatus;

@@ -12,6 +12,7 @@
 #import "CNAPIClient.h"
 
 #import <FacebookSDK/FacebookSDK.h>
+#import <Social/Social.h>
 
 #define kSpinnerRadius 36
 
@@ -37,7 +38,10 @@
 
 
 @interface CNPaywallViewController ()
+@property (nonatomic) FBAppCall *call;
+
 @property (nonatomic) UIButton *shareOnFacebook;
+@property (nonatomic) UIButton *shareOnTwitter;
 @property (nonatomic) UIButton *cancel;
 @property (nonatomic) UIButton *signUp;
 @property (nonatomic) UILabel *marketingMessage;
@@ -56,10 +60,19 @@
 - (BOOL)isFacebookSharingEnabled
 {
     CNUser *loggedInUser = [[[CNAPIClient sharedInstance] authContext] loggedInUser];
-    BOOL fbUserIsLoggedIn = [FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]];
-
+    BOOL fbUserIsLoggedIn = [FBDialogs canPresentShareDialog] && [FBSession activeSession];
+    
     return [loggedInUser didPostOnFb] == NO && fbUserIsLoggedIn;
 }
+
+
+- (BOOL)isTwitterSharingEnabled
+{
+    CNUser *loggedInUser = [[[CNAPIClient sharedInstance] authContext] loggedInUser];
+    BOOL twitterUserIsLoggedIn =  [SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter];
+    return [loggedInUser didPostOnTwitter] == NO && twitterUserIsLoggedIn;
+}
+
 
 - (void)viewDidLoad
 {
@@ -72,6 +85,10 @@
     
     if ([self isFacebookSharingEnabled]) {
         [self.view addSubview:self.shareOnFacebook];
+    }
+    
+    if ([self isTwitterSharingEnabled]) {
+        [self.view addSubview:self.shareOnTwitter];
     }
 }
 
@@ -164,6 +181,11 @@
         sharingYOffset += kSignupMaxHeight;
     }
     
+    if ([self isTwitterSharingEnabled]) {
+        self.shareOnTwitter.frame = CGRectMake(kSignUpOffsetX, kSharingOffsetY + sharingYOffset, kSignupMaxWidth, kSignupMaxHeight);
+        sharingYOffset += kSignupMaxHeight;
+    }
+    
     self.signUp.frame = CGRectMake(kSignUpOffsetX, kSignUpOffsetY + sharingYOffset, kSignupMaxWidth, kSignupMaxHeight);
     self.cancel.frame = CGRectMake(kCancelOffsetX, kCancelOffsetY + sharingYOffset, kCancelMaxWidth, kCancelMaxHeight);
 }
@@ -183,26 +205,68 @@
     }];
 }
 
-- (void)shareOnFacebookButtonPressed
+- (void)creditUserForSharingWithService:(NSString *)serviceType
 {
-    NSURL *url = [NSURL URLWithString:@"http://class-ninja.com"];
-    FBOSIntegratedShareDialogHandler handler = ^(FBOSIntegratedShareDialogResult result, NSError *error) {
-        if (result == FBOSIntegratedShareDialogResultSucceeded) {
-            [[CNAPIClient sharedInstance] creditUserForSharing:CNAPIClientSharedOnFb
-                                                    completion:^(BOOL didSucceed) {
-                                                        [self dismiss];
-                                                    }];
+    CNAPIClientSharedStatus status = CNAPIClientSharedOnNone;
+    if ([serviceType isEqualToString:SLServiceTypeFacebook]) {
+        status = CNAPIClientSharedOnFb;
+    } else if ([serviceType isEqualToString:SLServiceTypeTwitter]) {
+        status = CNAPIClientSharedOnTwitter;
+    }
+
+    if (status != CNAPIClientSharedOnNone) {
+        [[CNAPIClient sharedInstance] creditUserForSharing:status
+                                                completion:^(BOOL didSucceed) {
+                                                    [self dismiss];
+                                                }];
+    }
+}
+
+#define kShareURL ([NSURL URLWithString:@"http://class-ninja.com"])
+#define kShareImage ([UIImage imageNamed:@"AppIcon57x57"])
+#define kShareMessage (@"Get notified when class has space to register!")
+
+- (void)shareWithiOSDialogForService:(NSString *)serviceType
+{
+    SLComposeViewController *vc = [SLComposeViewController composeViewControllerForServiceType:serviceType];
+    [vc addImage:kShareImage];
+    [vc addURL:kShareURL];
+
+    [vc setInitialText:kShareMessage];
+    
+    vc.completionHandler = ^(SLComposeViewControllerResult result) {
+        if (result == SLComposeViewControllerResultDone) {
+            [self creditUserForSharingWithService:serviceType];
         }
     };
     
-    // TODO: Check if Siong has a better image for this
-    [FBDialogs presentOSIntegratedShareDialogModallyFrom:self
-                                             initialText:@"Get notified when class opens up for registration!"
-                                                   image:[UIImage imageNamed:@"AppIcon57x57"]
-                                                     url:url
-                                                handler:handler];
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
+- (void)shareOnFacebookButtonPressed
+{
+    if ([FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]]) {
+        [self shareWithiOSDialogForService:SLServiceTypeFacebook];
+    } else {
+        [FBDialogs presentShareDialogWithLink:kShareURL
+                                         name:nil
+                                      caption:@"Never miss class spots!"
+                                  description:kShareMessage
+                                      picture:nil
+                                  clientState:nil
+                                      handler:^(FBAppCall *call, NSDictionary *results, NSError *error) {
+                                          // there is no way of actually knowing if user cancelled or posted, unless user authorizes our app
+                                          // We don't want to go through this just yet for two reasons: 1) time 2) it can alienate users
+                                          // Let's grant them their free targets anyways, because we're testing sharing to begin with.
+                                          [self creditUserForSharingWithService:SLServiceTypeFacebook];
+                                      }];
+    }
+}
+
+- (void)shareOnTwitterButtonPressed
+{
+    [self shareWithiOSDialogForService:SLServiceTypeTwitter];
+}
 
 - (void)dismiss
 {
@@ -245,7 +309,6 @@
     return _activityIndicator;
 }
 
-
 - (UIButton *)shareOnFacebook
 {
     if (_shareOnFacebook == nil) {
@@ -258,6 +321,20 @@
         _shareOnFacebook.titleLabel.font = kSignupButtonFont;
     }
     return _shareOnFacebook;
+}
+
+- (UIButton *)shareOnTwitter
+{
+    if (_shareOnTwitter == nil) {
+        _shareOnTwitter = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_shareOnTwitter setTitle: @"Share on Twitter" forState:UIControlStateNormal];
+        [_shareOnTwitter addTarget:self action:@selector(shareOnTwitterButtonPressed) forControlEvents:UIControlEventTouchUpInside];
+        
+        _shareOnTwitter.backgroundColor = [UIColor clearColor];
+        _shareOnTwitter.titleLabel.textColor = [UIColor whiteColor];
+        _shareOnTwitter.titleLabel.font = kSignupButtonFont;
+    }
+    return _shareOnTwitter;
 }
 
 - (UIButton *)signUp

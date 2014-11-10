@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7007B2351A101C4800169DB4 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7007B2341A101C4800169DB4 /* Social.framework */; };
 		70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320133199719950032F16B /* UIFont+CNAdditions.m */; };
 		70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320136199722320032F16B /* CNCourseDetailsViewController.m */; };
 		7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320139199736EF0032F16B /* CNSiongNavigationView.m */; };
@@ -74,6 +75,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7007B2341A101C4800169DB4 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		70320132199719950032F16B /* UIFont+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+CNAdditions.h"; sourceTree = "<group>"; };
 		70320133199719950032F16B /* UIFont+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+CNAdditions.m"; sourceTree = "<group>"; };
 		70320135199722320032F16B /* CNCourseDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCourseDetailsViewController.h; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7007B2351A101C4800169DB4 /* Social.framework in Frameworks */,
 				80666D9D19CEBECB007003A2 /* libz.dylib in Frameworks */,
 				80666D9B19CEBEBD007003A2 /* libVGAnalytics.a in Frameworks */,
 				70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */,
@@ -201,6 +204,7 @@
 		707F983F196899BC00D6E552 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7007B2341A101C4800169DB4 /* Social.framework */,
 				80666D9C19CEBECB007003A2 /* libz.dylib */,
 				70EA00831A1010DF00B91F60 /* FacebookSDK.framework */,
 				70557114197B1ED7008F66F1 /* StoreKit.framework */,
