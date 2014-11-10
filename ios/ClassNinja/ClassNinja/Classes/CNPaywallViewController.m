@@ -60,11 +60,14 @@
 - (BOOL)isFacebookSharingEnabled
 {
     CNUser *loggedInUser = [[[CNAPIClient sharedInstance] authContext] loggedInUser];
-    BOOL fbUserIsLoggedIn = [FBDialogs canPresentShareDialog] && [FBSession activeSession];
-    
-    return [loggedInUser didPostOnFb] == NO && fbUserIsLoggedIn;
+    BOOL canPresentDialogInFBApp = ([FBDialogs canPresentShareDialog] && [FBSession activeSession]);
+    return [loggedInUser didPostOnFb] == NO && (canPresentDialogInFBApp || [self canPresentSystemFacebookDialog]);
 }
 
+- (BOOL)canPresentSystemFacebookDialog
+{
+   return [FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]];
+}
 
 - (BOOL)isTwitterSharingEnabled
 {
@@ -215,6 +218,7 @@
     }
 
     if (status != CNAPIClientSharedOnNone) {
+        self.activityIndicator.alpha = 1;
         [[CNAPIClient sharedInstance] creditUserForSharing:status
                                                 completion:^(BOOL didSucceed) {
                                                     [self dismiss];
@@ -245,7 +249,7 @@
 
 - (void)shareOnFacebookButtonPressed
 {
-    if ([FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]]) {
+    if ([self canPresentSystemFacebookDialog]) {
         [self shareWithiOSDialogForService:SLServiceTypeFacebook];
     } else {
         [FBDialogs presentShareDialogWithLink:kShareURL
