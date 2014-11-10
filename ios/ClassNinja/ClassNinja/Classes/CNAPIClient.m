@@ -466,7 +466,7 @@ authenticationRequired:(BOOL)authRequired
 
 
 
-- (void)fetchSalesPitch:(void (^)(NSString *salesPitch))completion
+- (void)fetchSalesPitch:(void (^)(NSString *salesPitch, NSNumber *freeTargetsForTweet, NSNumber *freeTargetsForFBShare))completion
 {
     NSMutableURLRequest *req = [self mutableURLRequestForAPIEndpoint:@"sales_pitch"
                                                           HTTPMethod:@"GET"
@@ -477,10 +477,12 @@ authenticationRequired:(BOOL)authRequired
               completion:^(NSDictionary *response, NSError *error)
     {
         NSString *pitch = [response objectForKey:@"sales_pitch"];
+        NSNumber *freeTargetsForTweet = [response objectForKey:@"targets_for_tweet"];
+        NSNumber *freeTargetsForFBShare = [response objectForKey:@"targets_for_fb_share"];
         if (error) {
-            completion(nil);
+            completion(nil, nil, nil);
         } else {
-            completion(pitch);
+            completion(pitch, freeTargetsForTweet, freeTargetsForFBShare);
         }
     }];
 }

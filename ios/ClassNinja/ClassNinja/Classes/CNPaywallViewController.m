@@ -22,6 +22,9 @@
 
 #define kSignUpOffsetX  160
 
+#define kShareOffSetX 5
+#define kShareMaxWidth 310
+
 #define kSharingOffsetY kSignUpOffsetY
 
 #define kSignUpOffsetY  385
@@ -40,6 +43,9 @@
 @interface CNPaywallViewController ()
 @property (nonatomic) FBAppCall *call;
 
+
+@property (nonatomic) NSNumber *freeTargetsForTweet;
+@property (nonatomic) NSNumber *freeTargetsForFbShare;
 @property (nonatomic) UIButton *shareOnFacebook;
 @property (nonatomic) UIButton *shareOnTwitter;
 @property (nonatomic) UIButton *cancel;
@@ -156,10 +162,26 @@
         }
     };
     
-    [[CNAPIClient sharedInstance] fetchSalesPitch:^(NSString *salesPitch) {
+    [[CNAPIClient sharedInstance] fetchSalesPitch:^(NSString *salesPitch, NSNumber *freeTargetsForTweet, NSNumber *freeTargetsForFBShare) {
         if (!salesPitch) {
             salesPitch = @"For just %@, you will be able to track ten more classes.";
         }
+        if (!freeTargetsForTweet) {
+            freeTargetsForTweet = @(3);
+        }
+        if (!freeTargetsForFBShare) {
+            freeTargetsForFBShare = @(3);
+        }
+
+        // TODO: This is not final design, in fact even layout is broken. Need to get designs from Siong
+        self.freeTargetsForTweet = freeTargetsForTweet;
+        self.freeTargetsForFbShare = freeTargetsForFBShare;
+        
+        NSString *fbShareTitle = [NSString stringWithFormat:@"Share on Facebook and get %@ targets", freeTargetsForFBShare];
+        NSString *twitterShareTitle = [NSString stringWithFormat:@"Tweet and get %@ targets", freeTargetsForTweet];
+        [self.shareOnFacebook setTitle:fbShareTitle forState:UIControlStateNormal];
+        [self.shareOnTwitter setTitle:twitterShareTitle forState:UIControlStateNormal];
+        
         presentSalesPitch(salesPitch, nil);
     }];
     
@@ -184,12 +206,12 @@
     
     CGFloat sharingYOffset = 0;
     if ([self isFacebookSharingEnabled]) {
-        self.shareOnFacebook.frame = CGRectMake(kSignUpOffsetX, kSharingOffsetY, kSignupMaxWidth, kSignupMaxHeight);
+        self.shareOnFacebook.frame = CGRectMake(kShareOffSetX, kSharingOffsetY, kShareMaxWidth, kSignupMaxHeight);
         sharingYOffset += kSignupMaxHeight;
     }
     
     if ([self isTwitterSharingEnabled]) {
-        self.shareOnTwitter.frame = CGRectMake(kSignUpOffsetX, kSharingOffsetY + sharingYOffset, kSignupMaxWidth, kSignupMaxHeight);
+        self.shareOnTwitter.frame = CGRectMake(kShareOffSetX, kSharingOffsetY + sharingYOffset, kShareMaxWidth, kSignupMaxHeight);
         sharingYOffset += kSignupMaxHeight;
     }
     
@@ -243,8 +265,12 @@
         if (result == SLComposeViewControllerResultDone) {
             [self creditUserForSharingWithService:serviceType];
         }
+
+        NSNumber *freeTargets = [serviceType isEqualToString:SLServiceTypeTwitter] ? self.freeTargetsForTweet : self.freeTargetsForFbShare;
         NSString *statusString = (result == SLComposeViewControllerResultCancelled) ? @"cancelled" : @"posted";
-        logUserAction(@"paywall_share", @{ @"completion_status" : statusString, @"service" : serviceType});
+        logUserAction(@"paywall_share", @{ @"completion_status" : statusString,
+                                           @"service" : serviceType,
+                                           @"free_targets_offered" : freeTargets});
     };
     
     [self presentViewController:vc animated:YES completion:nil];
@@ -265,7 +291,9 @@
                                           // there is no way of actually knowing if user cancelled or posted, unless user authorizes our app
                                           // We don't want to go through this just yet for two reasons: 1) time 2) it can alienate users
                                           // Let's grant them their free targets anyways, because we're testing sharing to begin with.
-                                          logUserAction(@"paywall_share", @{ @"completion_status" : @"unknown", @"service" : @"fb_app"});
+                                          logUserAction(@"paywall_share", @{ @"completion_status" : @"unknown",
+                                                                             @"service" : @"fb_app",
+                                                                             @"free_targets_offered" : self.freeTargetsForFbShare});
                                           [self creditUserForSharingWithService:SLServiceTypeFacebook];
                                       }];
     }

@@ -59,7 +59,7 @@ typedef enum : NSUInteger {
 
 - (void)registerDeviceForPushNotifications:(NSData *)token completion:(void (^)(BOOL success))completion;
 
-- (void)fetchSalesPitch:(void (^)(NSString *salesPitch))completion;
+- (void)fetchSalesPitch:(void (^)(NSString *salesPitch, NSNumber *freeTargetsForTweet, NSNumber *freeTargetsForFBShare))completion;
 - (void)fetchAuthPitch:(void (^)(NSString *authPitch))completion;
 
 - (NSMutableURLRequest *)mutableURLRequestForAPIEndpoint:(NSString *)endpoint
