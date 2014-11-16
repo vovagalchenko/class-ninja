@@ -35,18 +35,6 @@
 
 #pragma mark - UIViewController lifecycle
 
-- (void)didReceiveMemoryWarning
-{
-    // TODO: implement this
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (UIStatusBarStyle)preferredStatusBarStyle
-{
-    return UIStatusBarStyleLightContent;
-}
-
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];

@@ -13,6 +13,7 @@
 		70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320136199722320032F16B /* CNCourseDetailsViewController.m */; };
 		7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320139199736EF0032F16B /* CNSiongNavigationView.m */; };
 		7032013D1997F8C40032F16B /* CNCourseDetailsTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7032013C1997F8C40032F16B /* CNCourseDetailsTableViewCell.m */; };
+		704403071A192C7300915C9B /* CNContainerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 704403061A192C7300915C9B /* CNContainerViewController.m */; };
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseManager.m */; };
 		7055711B19858293008F66F1 /* CNDashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNDashboardViewController.m */; };
@@ -86,6 +87,8 @@
 		70320139199736EF0032F16B /* CNSiongNavigationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSiongNavigationView.m; sourceTree = "<group>"; };
 		7032013B1997F8C40032F16B /* CNCourseDetailsTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCourseDetailsTableViewCell.h; sourceTree = "<group>"; };
 		7032013C1997F8C40032F16B /* CNCourseDetailsTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCourseDetailsTableViewCell.m; sourceTree = "<group>"; };
+		704403051A192C7300915C9B /* CNContainerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNContainerViewController.h; sourceTree = "<group>"; };
+		704403061A192C7300915C9B /* CNContainerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNContainerViewController.m; sourceTree = "<group>"; };
 		70557114197B1ED7008F66F1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		70557116197B1F1E008F66F1 /* CNInAppPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNInAppPurchaseManager.h; sourceTree = "<group>"; };
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseManager.m; sourceTree = "<group>"; };
@@ -310,6 +313,8 @@
 				70E7619D19A02075003F3984 /* CNCategories.m */,
 				80F1000B19C4ED7500C28C32 /* CNCloseButton.h */,
 				80F1000C19C4ED7500C28C32 /* CNCloseButton.m */,
+				704403051A192C7300915C9B /* CNContainerViewController.h */,
+				704403061A192C7300915C9B /* CNContainerViewController.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -498,6 +503,7 @@
 				DC08B6A4198D8DD00092EE90 /* CNModels.m in Sources */,
 				706521A619C4C8A200522714 /* CNPaywallViewController.m in Sources */,
 				DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */,
+				704403071A192C7300915C9B /* CNContainerViewController.m in Sources */,
 				708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */,
 				7055711B19858293008F66F1 /* CNDashboardViewController.m in Sources */,
 				DC42205A1996D96100739068 /* CNActivityIndicator.m in Sources */,
