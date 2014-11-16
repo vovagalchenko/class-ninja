@@ -10,8 +10,10 @@
 #import "CNAPIClient.h"
 #import "CNDashboardViewController.h"
 #import "CNInAppPurchaseManager.h"
-#import "NSData+CNAdditions.h"
 #import "CNPaywallViewController.h"
+#import "CNUserProfile.h"
+#import "CNFirstPageViewController.h"
+
 #import <FacebookSDK/FacebookSDK.h>
 
 @implementation CNAppDelegate
@@ -25,8 +27,15 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     configureStaticAppearance();
     
-    CNDashboardViewController *dashboardVC = [[CNDashboardViewController alloc] init];
-    self.window.rootViewController = dashboardVC;
+    
+    if ([CNUserProfile defaultSchool] == nil) {
+        CNFirstPageViewController *vc = [[CNFirstPageViewController alloc] init];
+        self.window.rootViewController = vc;
+    } else {
+        CNDashboardViewController *dashboardVC = [[CNDashboardViewController alloc] init];
+        self.window.rootViewController = dashboardVC;
+    }
+    
     
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];

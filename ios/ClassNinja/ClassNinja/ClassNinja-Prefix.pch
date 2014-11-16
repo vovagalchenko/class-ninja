@@ -13,8 +13,7 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
-    #import "UIFont+CNAdditions.h"
-    #import "UIColor+CNAdditions.h"
+    #import "CNCategories.h"
     #import "AppearanceConstants.h"
     #import <VGAnalytics/Analytics.h>
 #endif

@@ -193,7 +193,7 @@
 {
     if (_welcomeLabel == nil) {
         _welcomeLabel = [[UILabel alloc] init];
-        _welcomeLabel.font = [UIFont cnSystemFontOfSize:FOCAL_LABEL_TEXT_SIZE];
+        _welcomeLabel.font = HEADER_FONT;
         _welcomeLabel.text = @"Hello";
         _welcomeLabel.textColor = [UIColor whiteColor];
         _welcomeLabel.numberOfLines = 1;

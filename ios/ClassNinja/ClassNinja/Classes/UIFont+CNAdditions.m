@@ -8,16 +8,3 @@
 
 #import "UIFont+CNAdditions.h"
 
-@implementation UIFont (CNAdditions)
-
-+ (UIFont *)cnSystemFontOfSize:(CGFloat)fontSize
-{
-    return [UIFont fontWithName:@"HelveticaNeue-Light" size:fontSize];
-}
-
-+ (UIFont *)cnBoldSystemFontOfSize:(CGFloat)fontSize
-{
-    return [UIFont fontWithName:@"HelveticaNeue-Bold" size:fontSize];
-}
-
-@end

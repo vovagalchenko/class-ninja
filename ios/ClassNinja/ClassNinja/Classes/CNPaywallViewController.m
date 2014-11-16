@@ -385,22 +385,13 @@
     return _activityIndicator;
 }
 
-- (void)customizeButton:(UIButton *)button
-{
-    button.backgroundColor = [UIColor clearColor];
-    button.titleLabel.textColor = [UIColor whiteColor];
-    button.titleLabel.font = BUTTON_FONT;
-}
 
 - (UIButton *)shareOnFacebook
 {
     if (_shareOnFacebook == nil) {
-        _shareOnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
+        _shareOnFacebook = [UIButton cnTextButtonForAutolayout];
         [_shareOnFacebook setTitle: @"Share on Facebook" forState:UIControlStateNormal];
         [_shareOnFacebook addTarget:self action:@selector(shareOnFacebookButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-        
-        [self customizeButton:_shareOnFacebook];
-        setDefaultAutoLayoutSettings(_shareOnFacebook);
     }
     return _shareOnFacebook;
 }
@@ -408,12 +399,9 @@
 - (UIButton *)shareOnTwitter
 {
     if (_shareOnTwitter == nil) {
-        _shareOnTwitter = [UIButton buttonWithType:UIButtonTypeCustom];
+        _shareOnTwitter = [UIButton cnTextButtonForAutolayout];
         [_shareOnTwitter setTitle: @"Share on Twitter" forState:UIControlStateNormal];
         [_shareOnTwitter addTarget:self action:@selector(shareOnTwitterButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-        
-        [self customizeButton:_shareOnTwitter];
-        setDefaultAutoLayoutSettings(_shareOnTwitter);
     }
     return _shareOnTwitter;
 }
@@ -421,12 +409,9 @@
 - (UIButton *)signUp
 {
     if (_signUp == nil) {
-        _signUp = [UIButton buttonWithType:UIButtonTypeCustom];
+        _signUp = [UIButton cnTextButtonForAutolayout];
         [_signUp setTitle: @"Sure, sign me up!" forState:UIControlStateNormal];
         [_signUp addTarget:self action:@selector(signUpButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-        
-        [self customizeButton:_signUp];
-        setDefaultAutoLayoutSettings(_signUp);
     }
     return _signUp;
 }
@@ -434,10 +419,7 @@
 - (UILabel *)marketingMessageForPurchaseLabel
 {
     if (_marketingMessageForPurchaseLabel == nil) {
-        _marketingMessageForPurchaseLabel = [[UILabel alloc] init];
-        _marketingMessageForPurchaseLabel.numberOfLines = 0;
-        _marketingMessageForPurchaseLabel.textColor = [UIColor whiteColor];
-        _marketingMessageForPurchaseLabel.font =  DESCRIPTION_FONT;
+        _marketingMessageForPurchaseLabel = [UILabel cnMessageLabelForAutoLayout];
         
         setDefaultAutoLayoutSettings(_marketingMessageForPurchaseLabel);
     }
@@ -447,11 +429,7 @@
 - (UILabel *)reminderOfFreeTargetsForSignupLabel
 {
     if (_reminderOfFreeTargetsForSignupLabel == nil) {
-        _reminderOfFreeTargetsForSignupLabel = [[UILabel alloc] init];
-        _reminderOfFreeTargetsForSignupLabel.numberOfLines = 0;
-        _reminderOfFreeTargetsForSignupLabel.textColor = [UIColor whiteColor];
-        _reminderOfFreeTargetsForSignupLabel.textAlignment = NSTextAlignmentLeft;
-        _reminderOfFreeTargetsForSignupLabel.font = DESCRIPTION_FONT;
+        _reminderOfFreeTargetsForSignupLabel = [UILabel cnMessageLabelForAutoLayout];
        
         setDefaultAutoLayoutSettings(_reminderOfFreeTargetsForSignupLabel);
     }
@@ -461,12 +439,7 @@
 - (UILabel *)sharingPitchLabel
 {
     if (_sharingPitchLabel == nil) {
-        _sharingPitchLabel = [[UILabel alloc] init];
-        _sharingPitchLabel.numberOfLines = 0;
-        _sharingPitchLabel.textColor = [UIColor whiteColor];
-        _sharingPitchLabel.font = DESCRIPTION_FONT;
-        
-        setDefaultAutoLayoutSettings(_sharingPitchLabel);
+        _sharingPitchLabel = [UILabel cnMessageLabelForAutoLayout];
     }
     return _sharingPitchLabel;
 }

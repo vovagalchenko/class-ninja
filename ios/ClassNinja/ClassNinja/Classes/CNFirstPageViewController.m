@@ -8,37 +8,6 @@
 
 #import "CNFirstPageViewController.h"
 
-
-
-@interface UIButton (CNAdditions)
-+ (instancetype)cnTextButton;
-+ (instancetype)cnTextButtonForAutolayout;
-@end
-
-@implementation UIButton (CNAdditions)
-+ (instancetype)cnTextButton
-{
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.backgroundColor = [UIColor clearColor];
-    button.titleLabel.textColor = [UIColor whiteColor];
-    button.titleLabel.font = BUTTON_FONT;
-    return button;
-}
-
-+ (instancetype)cnTextButtonForAutolayout
-{
-    UIButton *button = [self cnTextButton];
-    
-    button.translatesAutoresizingMaskIntoConstraints = NO;
-    [button setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    [button setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    [button setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
-    
-    return button;
-}
-@end
-
-
 @interface CNSiongsTernaryViewController ()
 @property (nonatomic) UILabel *titleLabel;
 @property (nonatomic) UILabel *descriptionLabel;
@@ -90,13 +59,10 @@
 - (UILabel *)titleLabel
 {
     if (_titleLabel == nil) {
-        _titleLabel = [[UILabel alloc] init];
+        _titleLabel = [UILabel cnMessageLabelForAutoLayout];
         _titleLabel.numberOfLines = 1;
         _titleLabel.textAlignment = NSTextAlignmentLeft;
         _titleLabel.font = HEADER_FONT;
-        _titleLabel.textColor = [UIColor whiteColor];
-        
-        setDefaultAutoLayoutSettings(_titleLabel);
     }
     
     return _titleLabel;
@@ -105,13 +71,8 @@
 - (UILabel *)descriptionLabel
 {
     if (_descriptionLabel == nil) {
-        _descriptionLabel = [[UILabel alloc] init];
-        _descriptionLabel.numberOfLines = 0;
-        _descriptionLabel.textAlignment = NSTextAlignmentLeft;
+        _descriptionLabel = [UILabel cnMessageLabelForAutoLayout];
         _descriptionLabel.font = [UIFont cnSystemFontOfSize:20];
-        _descriptionLabel.textColor = [UIColor whiteColor];
-        
-        setDefaultAutoLayoutSettings(_descriptionLabel);
     }
     return _descriptionLabel;
 }

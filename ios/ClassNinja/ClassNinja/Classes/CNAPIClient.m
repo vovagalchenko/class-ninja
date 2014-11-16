@@ -8,7 +8,6 @@
 
 #import "CNAPIClient.h"
 #import "CNAPIResource.h"
-#import "NSData+CNAdditions.h"
 
 @interface CNAPIClient()
 
