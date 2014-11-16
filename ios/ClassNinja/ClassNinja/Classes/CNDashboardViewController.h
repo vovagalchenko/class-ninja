@@ -11,6 +11,6 @@
 #import "CNSearchViewController.h"
 #import "CNLoggingViewController.h"
 
-@interface CNWelcomeViewController : CNLoggingViewController <CNWelcomeStatusViewDelegate, CNSearchViewControllerDelegateProtocol, UITableViewDataSource, UITableViewDelegate>
+@interface CNDashboardViewController : CNLoggingViewController <CNWelcomeStatusViewDelegate, CNSearchViewControllerDelegateProtocol, UITableViewDataSource, UITableViewDelegate>
 
 @end

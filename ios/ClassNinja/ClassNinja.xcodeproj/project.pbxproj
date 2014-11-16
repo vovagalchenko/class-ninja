@@ -15,7 +15,7 @@
 		7032013D1997F8C40032F16B /* CNCourseDetailsTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7032013C1997F8C40032F16B /* CNCourseDetailsTableViewCell.m */; };
 		70557115197B1ED7008F66F1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70557114197B1ED7008F66F1 /* StoreKit.framework */; };
 		70557118197B1F1E008F66F1 /* CNInAppPurchaseManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 70557117197B1F1E008F66F1 /* CNInAppPurchaseManager.m */; };
-		7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNWelcomeViewController.m */; };
+		7055711B19858293008F66F1 /* CNDashboardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055711A19858293008F66F1 /* CNDashboardViewController.m */; };
 		7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */; };
 		705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 705571261988BC7B008F66F1 /* CNGenericSelectionViewController.m */; };
 		706521A619C4C8A200522714 /* CNPaywallViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 706521A519C4C8A200522714 /* CNPaywallViewController.m */; };
@@ -90,8 +90,8 @@
 		70557114197B1ED7008F66F1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		70557116197B1F1E008F66F1 /* CNInAppPurchaseManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNInAppPurchaseManager.h; sourceTree = "<group>"; };
 		70557117197B1F1E008F66F1 /* CNInAppPurchaseManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNInAppPurchaseManager.m; sourceTree = "<group>"; };
-		7055711919858293008F66F1 /* CNWelcomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNWelcomeViewController.h; sourceTree = "<group>"; };
-		7055711A19858293008F66F1 /* CNWelcomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNWelcomeViewController.m; sourceTree = "<group>"; };
+		7055711919858293008F66F1 /* CNDashboardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNDashboardViewController.h; sourceTree = "<group>"; };
+		7055711A19858293008F66F1 /* CNDashboardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNDashboardViewController.m; sourceTree = "<group>"; };
 		7055712219861A85008F66F1 /* CNSiongNavigationViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSiongNavigationViewController.h; sourceTree = "<group>"; };
 		7055712319861A85008F66F1 /* CNSiongNavigationViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSiongNavigationViewController.m; sourceTree = "<group>"; };
 		705571251988BC7B008F66F1 /* CNGenericSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNGenericSelectionViewController.h; sourceTree = "<group>"; };
@@ -286,8 +286,8 @@
 			children = (
 				DC08B69D198AF3D50092EE90 /* UITableView+LayoutSubviews.h */,
 				DC08B69E198AF3D50092EE90 /* UITableView+LayoutSubviews.m */,
-				7055711919858293008F66F1 /* CNWelcomeViewController.h */,
-				7055711A19858293008F66F1 /* CNWelcomeViewController.m */,
+				7055711919858293008F66F1 /* CNDashboardViewController.h */,
+				7055711A19858293008F66F1 /* CNDashboardViewController.m */,
 				DC08B696198AB0470092EE90 /* CNWelcomeStatusView.h */,
 				DC08B697198AB0470092EE90 /* CNWelcomeStatusView.m */,
 				80F1000E19C50E4300C28C32 /* CNTargetSectionHeaderView.h */,
@@ -505,7 +505,7 @@
 				706521A619C4C8A200522714 /* CNPaywallViewController.m in Sources */,
 				DC08B67919883E020092EE90 /* CNAuthContext.m in Sources */,
 				708D688B19B6D6A600BE9156 /* CNUserProfile.m in Sources */,
-				7055711B19858293008F66F1 /* CNWelcomeViewController.m in Sources */,
+				7055711B19858293008F66F1 /* CNDashboardViewController.m in Sources */,
 				DC42205A1996D96100739068 /* CNActivityIndicator.m in Sources */,
 				80A05E5E19CAD34100B4A1CD /* CNTargetsDiff.m in Sources */,
 				DCCAA3921985ECB200BC4E7D /* CNAPIClient.m in Sources */,

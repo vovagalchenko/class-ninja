@@ -1,12 +1,9 @@
 //
-//  CNWelcomeViewController.m
-//  ClassNinja
-//
 //  Created by Boris Suvorov on 7/27/14.
 //  Copyright (c) 2014 Bova. All rights reserved.
 //
 
-#import "CNWelcomeViewController.h"
+#import "CNDashboardViewController.h"
 #import "CNGenericSelectionViewController.h"
 #import "CNSiongNavigationViewController.h"
 #import "CNAPIClient.h"
@@ -20,7 +17,7 @@
 
 #define SECTION_HEADER_HEIGHT       70.0
 
-@interface CNWelcomeViewController () <CourseDetailsTableViewCellProtocol>
+@interface CNDashboardViewController () <CourseDetailsTableViewCellProtocol>
 
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) CNWelcomeStatusView *statusView;
@@ -34,7 +31,7 @@
 
 @end
 
-@implementation CNWelcomeViewController
+@implementation CNDashboardViewController
 
 #pragma mark - UIViewController lifecycle
 

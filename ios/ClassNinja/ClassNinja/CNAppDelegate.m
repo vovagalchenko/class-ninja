@@ -8,7 +8,7 @@
 
 #import "CNAppDelegate.h"
 #import "CNAPIClient.h"
-#import "CNWelcomeViewController.h"
+#import "CNDashboardViewController.h"
 #import "CNInAppPurchaseManager.h"
 #import "NSData+CNAdditions.h"
 #import "CNPaywallViewController.h"
@@ -25,8 +25,8 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     configureStaticAppearance();
     
-    CNWelcomeViewController *welcomeVC = [[CNWelcomeViewController alloc] init];
-    self.window.rootViewController = welcomeVC;
+    CNDashboardViewController *dashboardVC = [[CNDashboardViewController alloc] init];
+    self.window.rootViewController = dashboardVC;
     
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
