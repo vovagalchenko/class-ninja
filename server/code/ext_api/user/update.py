@@ -57,6 +57,7 @@ class update_user(HTTP_Response_Builder):
             userProfile = UserProfile()
             userProfile.phonenumber =  user.phonenumber
             # brand new user get 3 free credits
+            # code triplication warning: if you're chaning this 3, don't forget to change sales_pitch and auth_pitch
             userProfile.credits = 3
             userProfile.email = None
             db_session.add(userProfile)
