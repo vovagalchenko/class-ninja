@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		7007B2351A101C4800169DB4 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7007B2341A101C4800169DB4 /* Social.framework */; };
+		7007B23D1A13D25800169DB4 /* CNSalesPitch.m in Sources */ = {isa = PBXBuildFile; fileRef = 7007B23C1A13D25800169DB4 /* CNSalesPitch.m */; };
 		70320134199719950032F16B /* UIFont+CNAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320133199719950032F16B /* UIFont+CNAdditions.m */; };
 		70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320136199722320032F16B /* CNCourseDetailsViewController.m */; };
 		7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320139199736EF0032F16B /* CNSiongNavigationView.m */; };
@@ -76,6 +77,8 @@
 
 /* Begin PBXFileReference section */
 		7007B2341A101C4800169DB4 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		7007B23B1A13D25800169DB4 /* CNSalesPitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSalesPitch.h; sourceTree = "<group>"; };
+		7007B23C1A13D25800169DB4 /* CNSalesPitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSalesPitch.m; sourceTree = "<group>"; };
 		70320132199719950032F16B /* UIFont+CNAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+CNAdditions.h"; sourceTree = "<group>"; };
 		70320133199719950032F16B /* UIFont+CNAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+CNAdditions.m"; sourceTree = "<group>"; };
 		70320135199722320032F16B /* CNCourseDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCourseDetailsViewController.h; sourceTree = "<group>"; };
@@ -255,6 +258,8 @@
 				80666DA019CEE071007003A2 /* NSData+CNAdditions.m */,
 				80666DA319CEE20F007003A2 /* CNLoggingViewController.h */,
 				80666DA419CEE20F007003A2 /* CNLoggingViewController.m */,
+				7007B23B1A13D25800169DB4 /* CNSalesPitch.h */,
+				7007B23C1A13D25800169DB4 /* CNSalesPitch.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -485,6 +490,7 @@
 				80F1001019C50E4300C28C32 /* CNTargetSectionHeaderView.m in Sources */,
 				80666DA119CEE071007003A2 /* NSData+CNAdditions.m in Sources */,
 				7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */,
+				7007B23D1A13D25800169DB4 /* CNSalesPitch.m in Sources */,
 				80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */,
 				705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */,
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseManager.m in Sources */,

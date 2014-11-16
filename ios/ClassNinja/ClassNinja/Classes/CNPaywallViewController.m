@@ -10,47 +10,33 @@
 #import "CNInAppPurchaseManager.h"
 #import "CNActivityIndicator.h"
 #import "CNAPIClient.h"
+#import "CNCloseButton.h"
 
 #import <FacebookSDK/FacebookSDK.h>
 #import <Social/Social.h>
 
 #define kSpinnerRadius 36
 
-#define kMessageOffsetX     30
-#define kMessageOffsetY     90
-#define KMessageMaxHeight   200
-
-#define kSignUpOffsetX  160
-
-#define kShareOffSetX 5
-#define kShareMaxWidth 310
-
-#define kSharingOffsetY kSignUpOffsetY
-
-#define kSignUpOffsetY  385
-#define kSignupMaxWidth 160
-#define kSignupMaxHeight 44
-
-#define kCancelOffsetX  245
-#define kCancelOffsetY  430
-#define kCancelMaxWidth 60
-#define kCancelMaxHeight 44
-
-#define kCancelButtonFont           [UIFont cnSystemFontOfSize:16]
-#define kSignupButtonFont           [UIFont cnBoldSystemFontOfSize:16]
-
+#define kButtonFont         [UIFont cnBoldSystemFontOfSize:14]
+#define kLabelFont          [UIFont cnSystemFontOfSize:20];
 
 @interface CNPaywallViewController ()
-@property (nonatomic) FBAppCall *call;
+@property (nonatomic) CNSalesPitch *salesPitch;
 
-
-@property (nonatomic) NSNumber *freeTargetsForTweet;
-@property (nonatomic) NSNumber *freeTargetsForFbShare;
 @property (nonatomic) UIButton *shareOnFacebook;
 @property (nonatomic) UIButton *shareOnTwitter;
 @property (nonatomic) UIButton *cancel;
 @property (nonatomic) UIButton *signUp;
-@property (nonatomic) UILabel *marketingMessage;
+
+@property (nonatomic) UILabel *reminderOfFreeTargetsForSignupLabel;
+@property (nonatomic) UILabel *marketingMessageForPurchaseLabel;
+@property (nonatomic) UILabel *sharingPitchLabel;
+
+@property (nonatomic) UIView *reminderSharingSeparator;
+@property (nonatomic) UIView *sharingUpgradeSeparator;
+
+@property (nonatomic) UIView *spacer;
+
 @property (nonatomic) CNActivityIndicator *activityIndicator;
 @property (nonatomic) SKProduct *product;
 @end
@@ -63,6 +49,11 @@
     return UIStatusBarStyleLightContent;
 }
 
+- (BOOL)doesShowSharing
+{
+    return [self isFacebookSharingEnabled] || [self isTwitterSharingEnabled];
+}
+
 - (BOOL)isFacebookSharingEnabled
 {
     CNUser *loggedInUser = [[[CNAPIClient sharedInstance] authContext] loggedInUser];
@@ -72,7 +63,7 @@
 
 - (BOOL)canPresentSystemFacebookDialog
 {
-   return [FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]];
+    return [FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]];
 }
 
 - (BOOL)isTwitterSharingEnabled
@@ -86,29 +77,106 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
     self.view.backgroundColor = [UIColor r:43 g:53 b:100];
     [self.view addSubview:self.cancel];
     [self.view addSubview:self.signUp];
-    [self.view addSubview:self.marketingMessage];
+    [self.view addSubview:self.marketingMessageForPurchaseLabel];
     [self.view addSubview:self.activityIndicator];
-    
-    if ([self isFacebookSharingEnabled]) {
-        [self.view addSubview:self.shareOnFacebook];
+    [self.view addSubview:self.spacer];
+
+    if ([self doesShowSharing]) {
+        [self.view addSubview:self.reminderOfFreeTargetsForSignupLabel];
+        [self.view addSubview:self.sharingPitchLabel];
+        
+        if ([self isFacebookSharingEnabled]) {
+            [self.view addSubview:self.shareOnFacebook];
+        }
+        
+        if ([self isTwitterSharingEnabled]) {
+            [self.view addSubview:self.shareOnTwitter];
+        }
+        
+        [self.view addSubview:self.sharingUpgradeSeparator];
+        [self.view addSubview:self.reminderSharingSeparator];
     }
+
+    [self setupViewConstraints];
+}
+
+- (void)setupViewConstraints
+{
+    NSString *format = nil;
+    NSDictionary *buttonsDict = nil;
+    NSDictionary *viewsDict = nil;
     
-    if ([self isTwitterSharingEnabled]) {
-        [self.view addSubview:self.shareOnTwitter];
+    // s0 -> special spacer view to help autolayot at the bottom of layout
+    // this essnetially adds padding at the bottom of the view and it ensures that autolayout
+    // layous things similarly on all screen sizes. Without s0 spacer view, top level view would get stretched vertically
+    // to take all of the available space, because all other views would have fixed size
+    NSString *bottomFormat = @"[marketingMessageForPurchaseLabel]-30-[signUp]-[s0]|";
+    
+    if ([self doesShowSharing]) {
+        format = @"V:|-60-[reminderOfFreeTargetsForSignupLabel]-40-[reminderSharingSeparator(==0.5)]-15-[sharingPitchLabel]";
+        if ([self isFacebookSharingEnabled]) {
+            format = [format stringByAppendingString:@"-30-[shareOnFacebook]"];
+        }
+        
+        if ([self isTwitterSharingEnabled]) {
+            format = [format stringByAppendingString:@"-30-[shareOnTwitter]"];
+        }
+        
+        format = [format stringByAppendingString:@"-40-[sharingUpgradeSeparator(==0.5)]-"];
+        format = [format stringByAppendingString:bottomFormat];
+        
+        buttonsDict = @{@"shareOnFacebook" : self.shareOnFacebook,
+                        @"shareOnTwitter" : self.shareOnTwitter,
+                        @"signUp" : self.signUp};
+        
+        viewsDict = @{@"s0" : self.spacer,
+                      @"reminderOfFreeTargetsForSignupLabel" : self.reminderOfFreeTargetsForSignupLabel,
+                      @"reminderSharingSeparator" : self.reminderSharingSeparator,
+                      @"sharingPitchLabel" : self.sharingPitchLabel,
+                      @"sharingUpgradeSeparator" : self.sharingUpgradeSeparator,
+                      @"marketingMessageForPurchaseLabel" : self.marketingMessageForPurchaseLabel};
+    } else {
+        format = [@"V:|-60-" stringByAppendingString:bottomFormat];
+        buttonsDict = @{@"signUp" : self.signUp};
+        viewsDict = @{@"s0" : self.spacer,
+                      @"marketingMessageForPurchaseLabel" : self.marketingMessageForPurchaseLabel};
     }
+
+    NSMutableDictionary *combined = [NSMutableDictionary dictionaryWithDictionary:buttonsDict];
+    [combined addEntriesFromDictionary:viewsDict];
+    
+    NSArray *vConstraints = [NSLayoutConstraint constraintsWithVisualFormat:format
+                                                                    options:(NSLayoutFormatAlignAllRight)
+                                                                    metrics:nil
+                                                                      views:combined];
+    [self.view addConstraints:vConstraints];
+    
+    [viewsDict enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        NSString *format = [NSString stringWithFormat:@"H:|-30-[%@]-30-|", key];
+        NSArray *hConstraint = [NSLayoutConstraint constraintsWithVisualFormat:format options:0 metrics:nil views:@{key:obj}];
+        [self.view addConstraints:hConstraint];
+    }];
+
 }
 
 - (void)changeElementsVisibilityWithActivityIndicatorVisible:(BOOL)showActivityIndicator
 {
     self.activityIndicator.alpha = showActivityIndicator;
-    self.cancel.alpha = !showActivityIndicator;
+
+    self.reminderOfFreeTargetsForSignupLabel.alpha = (!showActivityIndicator) * 0.9;
+    self.sharingPitchLabel.alpha = (!showActivityIndicator) * 0.9;
+    self.marketingMessageForPurchaseLabel.alpha = (!showActivityIndicator) * 0.9;
+    
     self.signUp.alpha = !showActivityIndicator;
-    self.marketingMessage.alpha = !showActivityIndicator;
     self.shareOnTwitter.alpha = !showActivityIndicator;
     self.shareOnFacebook.alpha = !showActivityIndicator;
+    
+    self.reminderSharingSeparator.alpha = (!showActivityIndicator) * 0.3;
+    self.sharingUpgradeSeparator.alpha = (!showActivityIndicator) * 0.3;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -125,7 +193,7 @@
     __block NSString *salesPitchTemplate = nil;
     __block SKProduct *tenCreditsProduct = nil;
     NSDate *beforeTime = [NSDate date];
-    void (^presentSalesPitch)(NSString *, SKProduct *) = ^(NSString *salesPitch, SKProduct *product)
+    void (^presentSalesPitch)(CNSalesPitch *, SKProduct *) = ^(CNSalesPitch *salesPitch, SKProduct *product)
     {
         if ((!salesPitch && !product)) {
             logIssue(@"sales_pitch_present_fail", nil);
@@ -133,8 +201,11 @@
         } else {
             @synchronized(self) {
                 if (salesPitch) {
-                    salesPitchTemplate = salesPitch;
+                    salesPitchTemplate =  [self doesShowSharing] ? salesPitch.shortMarketingMessage : salesPitch.longMarketingMessage;
+                    self.reminderOfFreeTargetsForSignupLabel.text = [NSString stringWithFormat:salesPitch.signup_reminder, salesPitch.freeClassesForSignup];
+                    self.sharingPitchLabel.text = [NSString stringWithFormat:salesPitch.sharing_pitch, salesPitch.freeClassesForSharing];
                 }
+                
                 if (product) {
                     tenCreditsProduct = product;
                 }
@@ -144,43 +215,32 @@
                     numberFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
                     numberFormatter.locale = tenCreditsProduct.priceLocale;
                     NSString *localizedPrice = [numberFormatter stringFromNumber:tenCreditsProduct.price];
+                    
+                    
                     NSString *salesPitchText = [NSString stringWithFormat:salesPitchTemplate, localizedPrice];
-                    self.marketingMessage.text = salesPitchText;
+                    self.marketingMessageForPurchaseLabel.text = salesPitchText;
                     self.product = tenCreditsProduct;
                     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
                         [self changeElementsVisibilityWithActivityIndicatorVisible:NO];
                     }];
                     
                     logUserAction(@"sales_pitch_present", @
-                    {
-                        @"sales_pitch" : salesPitchText,
-                        @"load_time" : @([[NSDate date] timeIntervalSinceDate:beforeTime])
-                    });
+                                  {
+                                      @"sales_pitch" : salesPitchText,
+                                      @"load_time" : @([[NSDate date] timeIntervalSinceDate:beforeTime])
+                                  });
                 }
                 
             }
         }
     };
     
-    [[CNAPIClient sharedInstance] fetchSalesPitch:^(NSString *salesPitch, NSNumber *freeTargetsForTweet, NSNumber *freeTargetsForFBShare) {
+    [[CNAPIClient sharedInstance] fetchSalesPitch:^(CNSalesPitch *salesPitch) {
         if (!salesPitch) {
-            salesPitch = @"For just %@, you will be able to track ten more classes.";
+            self.salesPitch = [CNSalesPitch defaultPitch];
+        } else {
+            self.salesPitch = salesPitch;
         }
-        if (!freeTargetsForTweet) {
-            freeTargetsForTweet = @(3);
-        }
-        if (!freeTargetsForFBShare) {
-            freeTargetsForFBShare = @(3);
-        }
-
-        // TODO: This is not final design, in fact even layout is broken. Need to get designs from Siong
-        self.freeTargetsForTweet = freeTargetsForTweet;
-        self.freeTargetsForFbShare = freeTargetsForFBShare;
-        
-        NSString *fbShareTitle = [NSString stringWithFormat:@"Share on Facebook and get %@ targets", freeTargetsForFBShare];
-        NSString *twitterShareTitle = [NSString stringWithFormat:@"Tweet and get %@ targets", freeTargetsForTweet];
-        [self.shareOnFacebook setTitle:fbShareTitle forState:UIControlStateNormal];
-        [self.shareOnTwitter setTitle:twitterShareTitle forState:UIControlStateNormal];
         
         presentSalesPitch(salesPitch, nil);
     }];
@@ -188,8 +248,6 @@
     [[CNInAppPurchaseManager sharedInstance] fetchProductForProductId:@"10_Classes" completion:^(SKProduct *product) {
         presentSalesPitch(nil, product);
     }];
-            
-    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -201,22 +259,12 @@
 - (void)viewDidLayoutSubviews
 {
     [super viewDidLayoutSubviews];
-    self.marketingMessage.frame = CGRectMake(kMessageOffsetX, kMessageOffsetY, self.view.bounds.size.width - 2 * kMessageOffsetX, KMessageMaxHeight);
-    
-    
-    CGFloat sharingYOffset = 0;
-    if ([self isFacebookSharingEnabled]) {
-        self.shareOnFacebook.frame = CGRectMake(kShareOffSetX, kSharingOffsetY, kShareMaxWidth, kSignupMaxHeight);
-        sharingYOffset += kSignupMaxHeight;
-    }
-    
-    if ([self isTwitterSharingEnabled]) {
-        self.shareOnTwitter.frame = CGRectMake(kShareOffSetX, kSharingOffsetY + sharingYOffset, kShareMaxWidth, kSignupMaxHeight);
-        sharingYOffset += kSignupMaxHeight;
-    }
-    
-    self.signUp.frame = CGRectMake(kSignUpOffsetX, kSignUpOffsetY + sharingYOffset, kSignupMaxWidth, kSignupMaxHeight);
-    self.cancel.frame = CGRectMake(kCancelOffsetX, kCancelOffsetY + sharingYOffset, kCancelMaxWidth, kCancelMaxHeight);
+    self.cancel.frame = CGRectMake(CLOSE_BUTTON_OFFSET_X, CLOSE_BUTTON_OFFSET_Y, CLOSE_BUTTON_DIMENSION, CLOSE_BUTTON_DIMENSION);
+}
+
+-(BOOL)prefersStatusBarHidden
+{
+    return YES;
 }
 
 - (void)signUpButtonPressed
@@ -265,12 +313,11 @@
         if (result == SLComposeViewControllerResultDone) {
             [self creditUserForSharingWithService:serviceType];
         }
-
-        NSNumber *freeTargets = [serviceType isEqualToString:SLServiceTypeTwitter] ? self.freeTargetsForTweet : self.freeTargetsForFbShare;
+        
         NSString *statusString = (result == SLComposeViewControllerResultCancelled) ? @"cancelled" : @"posted";
         logUserAction(@"paywall_share", @{ @"completion_status" : statusString,
                                            @"service" : serviceType,
-                                           @"free_targets_offered" : freeTargets});
+                                           @"free_targets_offered" : self.salesPitch.freeClassesForSharing});
     };
     
     [self presentViewController:vc animated:YES completion:nil];
@@ -293,7 +340,7 @@
                                           // Let's grant them their free targets anyways, because we're testing sharing to begin with.
                                           logUserAction(@"paywall_share", @{ @"completion_status" : @"unknown",
                                                                              @"service" : @"fb_app",
-                                                                             @"free_targets_offered" : self.freeTargetsForFbShare});
+                                                                             @"free_targets_offered" : self.salesPitch.freeClassesForSharing});
                                           [self creditUserForSharingWithService:SLServiceTypeFacebook];
                                       }];
     }
@@ -321,12 +368,8 @@
 - (UIButton *)cancel
 {
     if (_cancel == nil) {
-        _cancel = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_cancel setTitle:@"Cancel" forState:UIControlStateNormal];
-        _cancel.backgroundColor = [UIColor clearColor];
-        _cancel.titleLabel.textColor = [UIColor r:141 g:149 b:177];
-        _cancel.titleLabel.font = kCancelButtonFont;
-        [_cancel addTarget:self action:@selector(dismiss) forControlEvents:UIControlEventTouchUpInside];
+        _cancel = [[CNCloseButton alloc] initWithColor:[UIColor whiteColor]];
+        [_cancel addTarget:self action:@selector(cancelButtonPressed) forControlEvents:UIControlEventTouchUpInside];
     }
     return _cancel;
 }
@@ -345,6 +388,13 @@
     return _activityIndicator;
 }
 
+- (void)customizeButton:(UIButton)button
+{
+    button.backgroundColor = [UIColor clearColor];
+    button.titleLabel.textColor = [UIColor whiteColor];
+    button.titleLabel.font = kButtonFont;
+}
+
 - (UIButton *)shareOnFacebook
 {
     if (_shareOnFacebook == nil) {
@@ -352,9 +402,8 @@
         [_shareOnFacebook setTitle: @"Share on Facebook" forState:UIControlStateNormal];
         [_shareOnFacebook addTarget:self action:@selector(shareOnFacebookButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
-        _shareOnFacebook.backgroundColor = [UIColor clearColor];
-        _shareOnFacebook.titleLabel.textColor = [UIColor whiteColor];
-        _shareOnFacebook.titleLabel.font = kSignupButtonFont;
+        [self customizeButton:_shareOnFacebook];
+        [self setDefaultAutoLayoutSettings:_shareOnFacebook];
     }
     return _shareOnFacebook;
 }
@@ -366,9 +415,8 @@
         [_shareOnTwitter setTitle: @"Share on Twitter" forState:UIControlStateNormal];
         [_shareOnTwitter addTarget:self action:@selector(shareOnTwitterButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
-        _shareOnTwitter.backgroundColor = [UIColor clearColor];
-        _shareOnTwitter.titleLabel.textColor = [UIColor whiteColor];
-        _shareOnTwitter.titleLabel.font = kSignupButtonFont;
+        [self customizeButton:_shareOnTwitter];
+        [self setDefaultAutoLayoutSettings:_shareOnTwitter];
     }
     return _shareOnTwitter;
 }
@@ -380,22 +428,89 @@
         [_signUp setTitle: @"Sure, sign me up!" forState:UIControlStateNormal];
         [_signUp addTarget:self action:@selector(signUpButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
-        _signUp.backgroundColor = [UIColor clearColor];
-        _signUp.titleLabel.textColor = [UIColor whiteColor];
-        _signUp.titleLabel.font = kSignupButtonFont;
+        [self customizeButton:_signUp];
+        [self setDefaultAutoLayoutSettings:_signUp];
     }
     return _signUp;
 }
 
-- (UILabel *)marketingMessage
+- (UILabel *)marketingMessageForPurchaseLabel
 {
-    if (_marketingMessage == nil) {
-        _marketingMessage = [[UILabel alloc] init];
-        _marketingMessage.numberOfLines = 0;
-        _marketingMessage.textColor = [UIColor whiteColor];
-        _marketingMessage.font = [UIFont systemFontOfSize:20];
+    if (_marketingMessageForPurchaseLabel == nil) {
+        _marketingMessageForPurchaseLabel = [[UILabel alloc] init];
+        _marketingMessageForPurchaseLabel.numberOfLines = 0;
+        _marketingMessageForPurchaseLabel.textColor = [UIColor whiteColor];
+        _marketingMessageForPurchaseLabel.font =  kLabelFont;
+        
+        [self setDefaultAutoLayoutSettings:_marketingMessageForPurchaseLabel];
     }
-    return _marketingMessage;
+    return _marketingMessageForPurchaseLabel;
+}
+
+- (UILabel *)reminderOfFreeTargetsForSignupLabel
+{
+    if (_reminderOfFreeTargetsForSignupLabel == nil) {
+        _reminderOfFreeTargetsForSignupLabel = [[UILabel alloc] init];
+        _reminderOfFreeTargetsForSignupLabel.numberOfLines = 0;
+        _reminderOfFreeTargetsForSignupLabel.textColor = [UIColor whiteColor];
+        _reminderOfFreeTargetsForSignupLabel.textAlignment = NSTextAlignmentLeft;
+        _reminderOfFreeTargetsForSignupLabel.font = kLabelFont;
+       
+        [self setDefaultAutoLayoutSettings:_reminderOfFreeTargetsForSignupLabel];
+    }
+    return _reminderOfFreeTargetsForSignupLabel;
+}
+
+- (UILabel *)sharingPitchLabel
+{
+    if (_sharingPitchLabel == nil) {
+        _sharingPitchLabel = [[UILabel alloc] init];
+        _sharingPitchLabel.numberOfLines = 0;
+        _sharingPitchLabel.textColor = [UIColor whiteColor];
+        _sharingPitchLabel.font = kLabelFont;
+        
+        [self setDefaultAutoLayoutSettings:_sharingPitchLabel];
+    }
+    return _sharingPitchLabel;
+}
+
+- (UIView *)reminderSharingSeparator
+{
+    if (_reminderSharingSeparator == nil) {
+        _reminderSharingSeparator = [[UIView alloc] init];
+        _reminderSharingSeparator.backgroundColor = [UIColor whiteColor];
+        _reminderSharingSeparator.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    
+    return _reminderSharingSeparator;
+}
+
+- (UIView *)spacer
+{
+    if (_spacer == nil) {
+        _spacer = [[UIView alloc] init];
+        _spacer.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    return _spacer;
+}
+
+- (UIView *)sharingUpgradeSeparator
+{
+    if (_sharingUpgradeSeparator == nil) {
+        _sharingUpgradeSeparator = [[UIView alloc] init];
+        _sharingUpgradeSeparator.backgroundColor = [UIColor whiteColor];
+        _sharingUpgradeSeparator.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    
+    return _sharingUpgradeSeparator;
+}
+
+- (void)setDefaultAutoLayoutSettings:(UIView *)view
+{
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+    [view setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    [view setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    [view setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
 }
 
 @end

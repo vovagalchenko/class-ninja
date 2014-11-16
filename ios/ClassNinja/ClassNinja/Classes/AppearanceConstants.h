@@ -15,6 +15,9 @@
 #define CLOSE_BUTTON_DIMENSION      11.0
 #define INTER_ELEMENT_VERTICAL_PADDING      10.0
 
+#define CLOSE_BUTTON_OFFSET_X       17
+#define CLOSE_BUTTON_OFFSET_Y       17
+
 #define ANIMATION_DURATION      0.2
 
 #define AUTH_BLUE_COLOR         [UIColor colorWithRed:17.0/255.0 green:33.0/255.0 blue:83.0/255.0 alpha:1.0]

@@ -17,7 +17,7 @@
 
 + (UIFont *)cnBoldSystemFontOfSize:(CGFloat)fontSize
 {
-    return [UIFont fontWithName:@"HelveticaNeue-Medium" size:fontSize];
+    return [UIFont fontWithName:@"HelveticaNeue-Bold" size:fontSize];
 }
 
 @end

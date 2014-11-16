@@ -14,9 +14,6 @@
 #import "CNPaywallViewController.h"
 #import "CNActivityIndicator.h"
 
-#define kCloseButtonXOffset 17
-#define kCloseButtonYOffset 17
-
 #define kHeaderQuestionHeight  90
 #define kHeaderQuestionOffsetX 19
 
@@ -281,8 +278,8 @@
 {
     [super viewWillLayoutSubviews];
 
-    self.closeButton.frame = CGRectMake(kCloseButtonXOffset, kCloseButtonYOffset,
-                                        CLOSE_BUTTON_DIMENSION, CLOSE_BUTTON_DIMENSION);
+    self.closeButton.frame = CGRectMake(CLOSE_BUTTON_OFFSET_X, CLOSE_BUTTON_OFFSET_Y, CLOSE_BUTTON_DIMENSION, CLOSE_BUTTON_DIMENSION);
+    
     CGSize size = self.view.bounds.size;
     self.tableView.frame = CGRectMake(kTableOffsetX, kTableOffsetY, size.width - 2 * kTableOffsetX, size.height - kTableOffsetY - kTrackButtonHeight);
     self.tableView.tableHeaderView.frame = CGRectMake(0, 0, size.width - 2 * kTableOffsetX,  kTableHeaderHeight);

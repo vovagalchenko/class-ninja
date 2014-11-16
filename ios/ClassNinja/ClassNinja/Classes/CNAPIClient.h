@@ -10,6 +10,8 @@
 #import "CNAuthContext.h"
 #import "CNModels.h"
 
+#import "CNSalesPitch.h"
+
 #define CN_API_CLIENT_ERROR_DOMAIN @"API_CLIENT_ERROR_DOMAIN"
 
 typedef enum NSUInteger {
@@ -59,7 +61,7 @@ typedef enum : NSUInteger {
 
 - (void)registerDeviceForPushNotifications:(NSData *)token completion:(void (^)(BOOL success))completion;
 
-- (void)fetchSalesPitch:(void (^)(NSString *salesPitch, NSNumber *freeTargetsForTweet, NSNumber *freeTargetsForFBShare))completion;
+- (void)fetchSalesPitch:(void (^)(CNSalesPitch *salesPitch))completion;
 - (void)fetchAuthPitch:(void (^)(NSString *authPitch))completion;
 
 - (NSMutableURLRequest *)mutableURLRequestForAPIEndpoint:(NSString *)endpoint

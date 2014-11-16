@@ -466,7 +466,7 @@ authenticationRequired:(BOOL)authRequired
 
 
 
-- (void)fetchSalesPitch:(void (^)(NSString *salesPitch, NSNumber *freeTargetsForTweet, NSNumber *freeTargetsForFBShare))completion
+- (void)fetchSalesPitch:(void (^)(CNSalesPitch *salesPitch))completion
 {
     NSMutableURLRequest *req = [self mutableURLRequestForAPIEndpoint:@"sales_pitch"
                                                           HTTPMethod:@"GET"
@@ -476,13 +476,19 @@ authenticationRequired:(BOOL)authRequired
           withAuthPolicy:CNFailRequestOnAuthFailure
               completion:^(NSDictionary *response, NSError *error)
     {
-        NSString *pitch = [response objectForKey:@"sales_pitch"];
-        NSNumber *freeTargetsForTweet = [response objectForKey:@"targets_for_tweet"];
-        NSNumber *freeTargetsForFBShare = [response objectForKey:@"targets_for_fb_share"];
+        CNSalesPitch *pitch = [[CNSalesPitch alloc] init];
+        pitch.longMarketingMessage = [response objectForKey:@"sales_pitch"];
+        pitch.shortMarketingMessage = [response objectForKey:@"short_sales_pitch"];
+        pitch.signup_reminder = [response objectForKey:@"signup_reminder"];
+        pitch.sharing_pitch = [response objectForKey:@"sharing_pitch"];
+        
+        pitch.freeClassesForSharing = [response objectForKey:@"targets_for_sharing"];
+        pitch.freeClassesForSignup = [response objectForKey:@"targets_for_signup"];
+        
         if (error) {
-            completion(nil, nil, nil);
+            completion(nil);
         } else {
-            completion(pitch, freeTargetsForTweet, freeTargetsForFBShare);
+            completion(pitch);
         }
     }];
 }
