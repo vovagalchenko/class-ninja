@@ -17,9 +17,6 @@
 
 #define kSpinnerRadius 36
 
-#define kButtonFont         [UIFont cnBoldSystemFontOfSize:14]
-#define kLabelFont          [UIFont cnSystemFontOfSize:20];
-
 @interface CNPaywallViewController ()
 @property (nonatomic) CNSalesPitch *salesPitch;
 
@@ -388,11 +385,11 @@
     return _activityIndicator;
 }
 
-- (void)customizeButton:(UIButton)button
+- (void)customizeButton:(UIButton *)button
 {
     button.backgroundColor = [UIColor clearColor];
     button.titleLabel.textColor = [UIColor whiteColor];
-    button.titleLabel.font = kButtonFont;
+    button.titleLabel.font = BUTTON_FONT;
 }
 
 - (UIButton *)shareOnFacebook
@@ -403,7 +400,7 @@
         [_shareOnFacebook addTarget:self action:@selector(shareOnFacebookButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
         [self customizeButton:_shareOnFacebook];
-        [self setDefaultAutoLayoutSettings:_shareOnFacebook];
+        setDefaultAutoLayoutSettings(_shareOnFacebook);
     }
     return _shareOnFacebook;
 }
@@ -416,7 +413,7 @@
         [_shareOnTwitter addTarget:self action:@selector(shareOnTwitterButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
         [self customizeButton:_shareOnTwitter];
-        [self setDefaultAutoLayoutSettings:_shareOnTwitter];
+        setDefaultAutoLayoutSettings(_shareOnTwitter);
     }
     return _shareOnTwitter;
 }
@@ -429,7 +426,7 @@
         [_signUp addTarget:self action:@selector(signUpButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
         [self customizeButton:_signUp];
-        [self setDefaultAutoLayoutSettings:_signUp];
+        setDefaultAutoLayoutSettings(_signUp);
     }
     return _signUp;
 }
@@ -440,9 +437,9 @@
         _marketingMessageForPurchaseLabel = [[UILabel alloc] init];
         _marketingMessageForPurchaseLabel.numberOfLines = 0;
         _marketingMessageForPurchaseLabel.textColor = [UIColor whiteColor];
-        _marketingMessageForPurchaseLabel.font =  kLabelFont;
+        _marketingMessageForPurchaseLabel.font =  DESCRIPTION_FONT;
         
-        [self setDefaultAutoLayoutSettings:_marketingMessageForPurchaseLabel];
+        setDefaultAutoLayoutSettings(_marketingMessageForPurchaseLabel);
     }
     return _marketingMessageForPurchaseLabel;
 }
@@ -454,9 +451,9 @@
         _reminderOfFreeTargetsForSignupLabel.numberOfLines = 0;
         _reminderOfFreeTargetsForSignupLabel.textColor = [UIColor whiteColor];
         _reminderOfFreeTargetsForSignupLabel.textAlignment = NSTextAlignmentLeft;
-        _reminderOfFreeTargetsForSignupLabel.font = kLabelFont;
+        _reminderOfFreeTargetsForSignupLabel.font = DESCRIPTION_FONT;
        
-        [self setDefaultAutoLayoutSettings:_reminderOfFreeTargetsForSignupLabel];
+        setDefaultAutoLayoutSettings(_reminderOfFreeTargetsForSignupLabel);
     }
     return _reminderOfFreeTargetsForSignupLabel;
 }
@@ -467,9 +464,9 @@
         _sharingPitchLabel = [[UILabel alloc] init];
         _sharingPitchLabel.numberOfLines = 0;
         _sharingPitchLabel.textColor = [UIColor whiteColor];
-        _sharingPitchLabel.font = kLabelFont;
+        _sharingPitchLabel.font = DESCRIPTION_FONT;
         
-        [self setDefaultAutoLayoutSettings:_sharingPitchLabel];
+        setDefaultAutoLayoutSettings(_sharingPitchLabel);
     }
     return _sharingPitchLabel;
 }
@@ -503,14 +500,6 @@
     }
     
     return _sharingUpgradeSeparator;
-}
-
-- (void)setDefaultAutoLayoutSettings:(UIView *)view
-{
-    view.translatesAutoresizingMaskIntoConstraints = NO;
-    [view setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    [view setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-    [view setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
 }
 
 @end

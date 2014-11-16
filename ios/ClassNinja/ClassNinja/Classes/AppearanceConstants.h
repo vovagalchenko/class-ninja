@@ -32,6 +32,12 @@
 #define FOCAL_LABEL_TEXT_SIZE   30
 #define INSTRUCTION_LABEL_FONT  [UIFont cnSystemFontOfSize:18.0]
 
+
+#define DESCRIPTION_FONT        [UIFont cnSystemFontOfSize:20];
+#define HEADER_FONT             [UIFont cnSystemFontOfSize:FOCAL_LABEL_TEXT_SIZE]
+#define BUTTON_FONT             [UIFont cnBoldSystemFontOfSize:14]
+
+
 #define ASSERT_MAIN_THREAD()        CNAssert([[NSThread currentThread] isMainThread], @"main_thread", @"<%@:%d> This must be executed on the main thread.",\
 [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__)
 #define SIONG_NAVIGATION_CONTROLLER_BACKGROUND_COLOR ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:230/255.0 alpha:1.0])
@@ -47,5 +53,14 @@ static inline void configureStaticAppearance()
     appearanceOfLabelInsideTableHeader.font = headerFooterFont;
     appearanceOfLabelInsideTableHeader.textColor = DARK_GRAY_TEXT_COLOR;
 }
+
+static void setDefaultAutoLayoutSettings(UIView *view)
+{
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+    [view setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    [view setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
+    [view setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+}
+
 
 #endif
