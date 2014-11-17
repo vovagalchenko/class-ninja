@@ -22,6 +22,8 @@
     pitch.freeClassesForSharing = @(3);
     pitch.freeClassesForSignup = @(3);
     
+    pitch.classesForPurchase = @(10);
+    
     return pitch;
 }
 

@@ -483,6 +483,7 @@ authenticationRequired:(BOOL)authRequired
         
         pitch.freeClassesForSharing = [response objectForKey:@"targets_for_sharing"];
         pitch.freeClassesForSignup = [response objectForKey:@"targets_for_signup"];
+        pitch.classesForPurchase = [response objectForKey:@"targets_for_purchase"];
         
         if (error) {
             completion(nil);

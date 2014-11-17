@@ -17,6 +17,7 @@
 
 @property (nonatomic) NSNumber *freeClassesForSharing;
 @property (nonatomic) NSNumber *freeClassesForSignup;
+@property (nonatomic) NSNumber *classesForPurchase;
 
 + (CNSalesPitch *)defaultPitch;
 
