@@ -11,6 +11,7 @@
 #import "CNActivityIndicator.h"
 #import "CNAPIClient.h"
 #import "CNCloseButton.h"
+#import "CNFirstPageViewController.h"
 
 #import <FacebookSDK/FacebookSDK.h>
 #import <Social/Social.h>
@@ -184,8 +185,9 @@
     // Whenever a transaction is either finished, deferred or failed, just dismiss ourselves
     for (NSString *notificationName in @[TRANSACTION_FINISHED_NOTIFICATION_NAME,
                                          TRANSACTION_DEFERRED_NOTIFICATION_NAME,
-                                         TRANSACTION_FAILED_NOTIFICATION_NAME])
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dismiss) name:notificationName object:nil];
+                                         TRANSACTION_FAILED_NOTIFICATION_NAME]) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iapTransactionNotificationHandler:) name:notificationName object:nil];
+    }
     
     __block NSString *salesPitchTemplate = nil;
     __block SKProduct *tenCreditsProduct = nil;
@@ -285,12 +287,33 @@
         status = CNAPIClientSharedOnTwitter;
     }
 
+
+    void (^completion)(BOOL didSucceed) = ^void(BOOL didSucceed) {
+        if (didSucceed) {
+            CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
+            vc.titleLabel.text = @"Thanks";
+            vc.descriptionLabel.text = [NSString stringWithFormat:@"You will be able to track an extra %@ classes.", self.salesPitch.freeClassesForSharing];
+            __weak CNConfirmationViewController *weakVC = vc;
+            vc.completionBlock = ^{
+                [weakVC dismissViewControllerAnimated:NO completion:nil];
+                [self dismissViewControllerAnimated:NO completion:nil];
+            };
+            
+            vc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:vc animated:YES completion:nil];
+        } else {
+            [[[UIAlertView alloc] initWithTitle:@"Ooops"
+                                        message:@"Please try again! Something went wrong when we tried to credit you for sharing."
+                                       delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil] show];
+        }
+    };
+    
     if (status != CNAPIClientSharedOnNone) {
         [self changeElementsVisibilityWithActivityIndicatorVisible:YES];
         [[CNAPIClient sharedInstance] creditUserForSharing:status
-                                                completion:^(BOOL didSucceed) {
-                                                    [self dismiss];
-                                                }];
+                                                completion:completion];
     }
 }
 
@@ -346,6 +369,28 @@
 - (void)shareOnTwitterButtonPressed
 {
     [self shareWithiOSDialogForService:SLServiceTypeTwitter];
+}
+
+- (void)iapTransactionNotificationHandler:(NSNotification *)notification
+{
+    // The notifications aren't guaranteed to be sent out on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if([notification.name isEqualToString:TRANSACTION_FINISHED_NOTIFICATION_NAME]) {
+            CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
+            vc.titleLabel.text = @"Thanks!";
+            vc.descriptionLabel.text = [NSString stringWithFormat:@"You will be able to track an extra %@ classes.", self.salesPitch.classesForPurchase];
+            __weak CNConfirmationViewController *weakVC = vc;
+            vc.completionBlock = ^{
+                [weakVC dismissViewControllerAnimated:NO completion:nil];
+                [self dismissViewControllerAnimated:NO completion:nil];
+            };
+            
+            vc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:vc animated:YES completion:nil];
+        } else {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
+    });
 }
 
 - (void)dismiss

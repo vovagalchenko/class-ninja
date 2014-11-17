@@ -11,8 +11,15 @@
 // Alternatively I could call it Siongs TDB (Title, Description, Button), but ternary sounds cool
 @interface CNSiongsTernaryViewController : UIViewController
 
+@property (nonatomic, readonly) UILabel *titleLabel;
+@property (nonatomic, readonly) UILabel *descriptionLabel;
+@property (nonatomic, readonly) UIButton *button;
+
 @property (nonatomic, copy) dispatch_block_t completionBlock;
 
+@end
+
+@interface CNConfirmationViewController : CNSiongsTernaryViewController
 @end
 
 @interface CNFirstPageViewController : CNSiongsTernaryViewController

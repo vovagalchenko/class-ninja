@@ -26,6 +26,8 @@
 #define CONFIRMATION_COLOR      [UIColor colorWithRed:47.0/255.0 green:198.0/255.0 blue:183.0/255.0 alpha:1.0]
 #define DARK_CLOSE_BUTTON_COLOR [UIColor colorWithRed:32.0/255.0 green:28.0/255.0 blue:66.0/255.0 alpha:1.0]
 
+#define CN_GREEN_COLOR          [UIColor r:52 g:193 b:59]
+
 #define DARK_GRAY_TEXT_COLOR    [UIColor colorWithRed:121/255.0 green:121/255.0 blue:121/255.0 alpha:1]
 #define LIGHT_GRAY_TEXT_COLOR   [UIColor colorWithRed:185/255.0 green:185/255.0 blue:185/255.0 alpha:1]
 

@@ -12,9 +12,26 @@
 @property (nonatomic) UILabel *titleLabel;
 @property (nonatomic) UILabel *descriptionLabel;
 @property (nonatomic) UIButton *button;
+
+
+@property (nonatomic) NSLayoutFormatOptions layoutOptions;
 @end
 
 @implementation CNSiongsTernaryViewController
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _layoutOptions = NSLayoutFormatAlignAllRight;
+    }
+    return self;
+}
 
 - (void)viewDidLoad
 {
@@ -25,14 +42,14 @@
     [self setupConstraints];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-}
-
 - (void)setupConstraints
 {
-    NSString *format = @"V:|-80-[title]-40-[description]-50-[button]";
+    NSString *format = nil;
+    if (self.titleLabel.text) {
+        format = @"V:|-80-[title]-40-[description]-50-[button]";
+    } else {
+        format = @"V:|-80-[description]-50-[button]";
+    }
 
     NSDictionary *buttonsDict = @{@"button" : self.button};
     NSDictionary *viewsDict = @{@"title" : self.titleLabel,
@@ -44,7 +61,7 @@
 
     
     NSArray *vConstraints = [NSLayoutConstraint constraintsWithVisualFormat:format
-                                                                    options:0
+                                                                    options:self.layoutOptions
                                                                     metrics:nil
                                                                       views:combined];
     [self.view addConstraints:vConstraints];
@@ -97,15 +114,31 @@
 
 @end
 
+
+
+@implementation CNConfirmationViewController 
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    self.view.backgroundColor = CN_GREEN_COLOR;
+    [self.button setTitle:@"Back to Dashboard" forState:UIControlStateNormal];
+}
+
+@end
+
 @implementation CNFirstPageViewController
 - (instancetype)init
 {
     self = [super init];
     if (self) {
         self.titleLabel.text = @"Hello";
-        self.descriptionLabel.text = @"We help you keep track of classes that you want to take, but are already full, and notify you when a spot opens up so you can register immediately";
+        self.descriptionLabel.text = @"We help you keep track of classes that you want to take, but are already full, and notify you when a spot opens up so you can register immediately.";
         [self.button setTitle:@"Find Class to Track" forState:UIControlStateNormal];
     }
+    
+    self.layoutOptions = 0;
+    
     return self;
 }
 
@@ -119,11 +152,5 @@
                                                                      views:@{@"button" : self.button}];
     [self.view addConstraints:hConstraint];
 }
-
-- (UIStatusBarStyle)preferredStatusBarStyle
-{
-    return UIStatusBarStyleLightContent;
-}
-
 
 @end

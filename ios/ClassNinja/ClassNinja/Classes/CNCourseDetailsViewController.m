@@ -14,6 +14,9 @@
 #import "CNPaywallViewController.h"
 #import "CNActivityIndicator.h"
 
+#import "CNFirstPageViewController.h"
+
+
 #define kHeaderQuestionHeight  90
 #define kHeaderQuestionOffsetX 19
 
@@ -441,14 +444,23 @@
         [[CNAPIClient sharedInstance] targetEvents:self.targetEvents completionBlock:^(NSDictionary *userMsg, NSError *error){
             
             if (error == nil) {
-                [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
-                if (userMsg) {
-                    [[[UIAlertView alloc] initWithTitle:userMsg[@"title"]
-                                                message:userMsg[@"msg"]
-                                               delegate:nil
-                                      cancelButtonTitle:@"OK"
-                                      otherButtonTitles:nil] show];
-                }
+                CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
+                NSString *classesForm = (self.targetEvents.count > 1) ? @"classes" : @"the class";
+                vc.descriptionLabel.text = [NSString stringWithFormat:@"We've added %@ to your dashboard. You'll receive a notification when an available spot opens up", classesForm];
+                __weak CNConfirmationViewController *weakVC = vc;
+                vc.completionBlock = ^{
+                    [weakVC dismissViewControllerAnimated:NO completion:nil];
+                    [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:NO completion:nil];
+                    if (userMsg) {
+                        [[[UIAlertView alloc] initWithTitle:userMsg[@"title"]
+                                                    message:userMsg[@"msg"]
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil] show];
+                    }
+                };
+                vc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:vc animated:YES completion:nil];
             } else if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorPaymentRequired) {
                 CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
