@@ -49,7 +49,7 @@ object Spacetime {
         )
       )
     }).toList
-    JSONArray(jsonSerializable).toString
+    JSONArray(jsonSerializable).toString()
   }
 }
 

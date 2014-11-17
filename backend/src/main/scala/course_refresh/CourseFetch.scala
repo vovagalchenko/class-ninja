@@ -7,12 +7,14 @@ import conf.{DBConfig, Environment}
 import model.SchoolId.SchoolId
 import model._
 import notifications.{MessageExchange, NotificationQueue}
+import sjsu.SJSUCourseFetchManager
 import ucla.UCLACourseFetchManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.slick.driver.MySQLDriver.simple._
+import scala.util.control.NonFatal
 
 object CourseFetch extends LazyLogging {
   def main(args: Array[String]) = {
@@ -42,11 +44,10 @@ object CourseFetch extends LazyLogging {
       }
       logger.info(s"Finished course fetch for $school refreshing <${args(1)}>")
     } catch {
-      case e: Throwable =>
+      case NonFatal(e) =>
         logger.error("Uncaught exception", e)
         throw e
     } finally {
-      // Need to call shutdown to make sure dispatch is dead and the process can exit
       HTTPManager.shutdown()
       val endTime = System.currentTimeMillis
       val duration = Duration(endTime - startTime, TimeUnit.MILLISECONDS)
@@ -57,8 +58,10 @@ object CourseFetch extends LazyLogging {
 
   private def performCourseFetch(school: SchoolId, refreshOfferedCourses: Boolean, refreshAllEvents: Boolean)
                                 (implicit dbManager: DBManager, session: Session, messageExchange: MessageExchange) = {
+    val currentTermCode = dbManager.schools.filter(_.schoolId === school.id).first.currentTermCode
     val schoolManager: SchoolManager = school match {
-      case SchoolId.UCLA => UCLACourseFetchManager
+      case SchoolId.UCLA => new UCLACourseFetchManager(currentTermCode)
+      case SchoolId.SJSU => new SJSUCourseFetchManager(currentTermCode)
     }
 
     val departmentAndCourseFetchManager = if (refreshOfferedCourses) {
@@ -83,20 +86,22 @@ object CourseFetch extends LazyLogging {
           } yield (t, e)
           val targetEvents: Seq[(Target, Event)] = targetEventQuery.list
           val targetEventTuplesByEventId: Map[String, Seq[(Target, Event)]] = targetEvents.groupBy(_._2.primaryKey)
+          Future(targetEventTuplesByEventId)
+
+          if (refreshOfferedCourses) {
+            dbManager.departments.insertOrUpdate(department)
+            courses foreach {
+              course: Course =>
+                dbManager.courses.insertOrUpdate(course)
+            }
+          }
 
           schoolManager.fetchEvents(courses) map {
             events: Seq[(Section, Seq[Event])] =>
-              // Update the MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
+              // Update MySQL. Technically, might be nice to do this transactionally, however at this point, it's not
               // really necessary for this update to be transactional. There are rarely going to be multiple writers
               // touching the same rows, and they're all trying to do the same thing, so it's OK if they
               // step over each other.
-              if (refreshOfferedCourses) {
-                dbManager.departments.insertOrUpdate(department)
-                courses foreach {
-                  course: Course =>
-                    dbManager.courses.insertOrUpdate(course)
-                }
-              }
               events foreach {
                 case (section: Section, sectionsEvents: Seq[Event]) =>
                   dbManager.sections.insertOrUpdate(section)
@@ -147,7 +152,7 @@ object CourseFetch extends LazyLogging {
               logger.info(s"Done updating targeted event <${event.primaryKey}>")
             }
         }
-        logger.info(s"Done updating <${coursesToUpdate.size}> courses with targeted events at ${school}")
+        logger.info(s"Done updating <${coursesToUpdate.size}> courses with targeted events at $school")
       }
     }
     Await.result(allWorkFuture, Duration(1, TimeUnit.HOURS))
@@ -164,12 +169,11 @@ object CourseFetch extends LazyLogging {
           require(schoolSpecificIds.distinct.size == schoolSpecificIds.size, {
             logger.error(s"There are duplicate departments in school ${school.toString}")
           })
-          val currentTermCode = dbManager.schools.filter(_.schoolId === school.id).first.currentTermCode
           val allWork = departments map { freshDepartment: Department =>
-            val futureResultsOfWork: Future[T] = fetchManager.fetchCourses(currentTermCode, freshDepartment) flatMap { courses: Seq[Course] =>
+            val futureResultsOfWork: Future[T] = fetchManager.fetchCourses(freshDepartment) flatMap { courses: Seq[Course] =>
               val departmentSpecificCourseIds = courses.map(_.departmentSpecificCourseId)
               require(departmentSpecificCourseIds.distinct.size == departmentSpecificCourseIds.size, {
-                logger.error(s"There exist duplicate courses in ${school.toString}'s <${freshDepartment.name}> department")
+                logger.error(s"There exist duplicate courses in ${school.toString}'s <${freshDepartment.name}> department: $departmentSpecificCourseIds")
               })
               work(freshDepartment, courses)
             }
@@ -189,8 +193,9 @@ object CourseFetch extends LazyLogging {
 
 abstract class SchoolManager {
   def fetchDepartments: Future[Seq[Department]]
-  def fetchCourses(term: String, department: Department): Future[Seq[Course]]
+  def fetchCourses(department: Department): Future[Seq[Course]]
   def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]]
 
-  def shouldAlert(oldEvent: Event, newEvent: Event): Boolean
+  def shouldAlert(oldEvent: Event, newEvent: Event): Boolean = (newEvent.status == "Open" && oldEvent.status != "Open") ||
+                                                               (newEvent.status == "W-List" && oldEvent.status != "Open" && oldEvent.status != "W-List")
 }

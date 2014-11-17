@@ -14,3 +14,5 @@ libraryDependencies ++= Seq(
   "org.scala-lang" %% "scala-pickling" % "0.8.0",
   "com.notnoop.apns" % "apns" % "0.2.3"
 )
+
+scalacOptions ++= Seq("-feature")

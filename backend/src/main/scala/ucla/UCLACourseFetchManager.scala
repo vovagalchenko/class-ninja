@@ -8,15 +8,16 @@ import model._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 import scala.xml.{Node, NodeSeq}
 
 
-object UCLACourseFetchManager extends SchoolManager with LazyLogging {
+class UCLACourseFetchManager(term: String) extends SchoolManager with LazyLogging {
   private val UCLARequestFactory: HTTPRequestFactory = new HTTPRequestFactory("http://www.registrar.ucla.edu/schedule")
 
-  override def fetchDepartments: Future[Seq[Department]] = {
-    HTTPManager.execute(UCLARequestFactory("/schedulehome.aspx")) { nodeSeq: NodeSeq =>
+  override def fetchDepartments: Future[Seq[Department]] = HTTPManager.withHTTPManager { httpManager =>
+    httpManager.execute(UCLARequestFactory("/schedulehome.aspx")) { nodeSeq: NodeSeq =>
       val departmentNodes: NodeSeq = (nodeSeq \\ "select").filterByLiteralAttribute("id", "ctl00_BodyContentPlaceHolder_SOCmain_lstSubjectArea") \\ "option"
       require(departmentNodes.length > 0, "Wasn't able to find the list of departments")
       departmentNodes map { node: Node =>
@@ -27,24 +28,25 @@ object UCLACourseFetchManager extends SchoolManager with LazyLogging {
     }
   }
 
-  override def fetchCourses(term: String, department: Department): Future[Seq[Course]] = {
-    val coursesRequest = UCLARequestFactory("/crsredir.aspx", Map("termsel" -> term, "subareasel" -> department.schoolSpecificId))
-    HTTPManager.execute(coursesRequest) { nodeSeq =>
+  override def fetchCourses(department: Department): Future[Seq[Course]] = HTTPManager.withHTTPManager { httpManager =>
+    val coursesRequest = UCLARequestFactory("/crsredir.aspx", "GET", Map("termsel" -> term, "subareasel" -> department.schoolSpecificId))
+    httpManager.execute(coursesRequest) { nodeSeq =>
       val courseNodes: NodeSeq = (nodeSeq \\ "select").filterByLiteralAttribute("id", "ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal") \\ "option"
       courseNodes.zipWithIndex map { case (node: Node, index: Int) =>
         val departmentSpecificCourseId :: courseName :: _ = node.text.split(" - ", 2).toList
         val request = UCLARequestFactory(
           path = "/detselect.aspx",
+          method = "GET",
           queryParams = Map("termsel" -> term, "subareasel" -> department.schoolSpecificId, "idxcrs" -> node.attribute("value").get.text)
         )
-        Course(SchoolId.UCLA, department.primaryKey, departmentSpecificCourseId, courseName, index, HTTPManager.reqFromHTTPRequest(request).url)
+        Course(SchoolId.UCLA, department.primaryKey, departmentSpecificCourseId, courseName, index, httpManager.reqFromHTTPRequest(request).url)
       }
     }
   }
 
-  override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = {
+  override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = HTTPManager.withHTTPManager { httpManager =>
     val sectionFutures: Seq[Future[Seq[(Section, Seq[Event])]]] = courses map { course: Course =>
-      HTTPManager.get(course.context) { nodeSeq: NodeSeq =>
+      httpManager.get(course.context) { nodeSeq: NodeSeq =>
         val tables = nodeSeq \\ "table"
         val sectionNodes: NodeSeq = tables.filterByAttributePrefix("id", "dgdLectureHeader")
         val sectionNameRegex = "^ctl00_BodyContentPlaceHolder_detselect_dgdLectureHeader.*_ctl02_lblGenericMessage$"
@@ -150,12 +152,11 @@ object UCLACourseFetchManager extends SchoolManager with LazyLogging {
       }
       strings(0)
     } catch {
-      case t: Throwable =>
-        logger.error(s"Unable to get the text node inside the first node of class <$classString>. Here's the node:\n$nodeSeq")
-        throw t
+      case NonFatal(t) =>
+        logger.error(s"Unable to get the text node inside the first node of class <$classString>. Here's the node:\n$nodeSeq", t)
+      ""
     }
   }
 
-  override def shouldAlert(oldEvent: Event, newEvent: Event): Boolean = (newEvent.status == "Open" && oldEvent.status != "Open") ||
-                                                                        (newEvent.status == "W-List" && oldEvent.status != "Open" && oldEvent.status != "W-List")
+
 }

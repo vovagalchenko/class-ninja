@@ -5,6 +5,7 @@
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
         <option name="compilerLibraryName" value="SBT:: scala-compiler-bundle:2.10.4" />
+        <option name="compilerOptions" value="-feature" />
       </configuration>
     </facet>
   </component>
