@@ -134,7 +134,7 @@
     if (self) {
         self.titleLabel.text = @"Hello";
         self.descriptionLabel.text = @"We help you keep track of classes that you want to take, but are already full, and notify you when a spot opens up so you can register immediately.";
-        [self.button setTitle:@"Find Class to Track" forState:UIControlStateNormal];
+        [self.button setTitle:@"Find Classes to Track" forState:UIControlStateNormal];
     }
     
     self.layoutOptions = 0;

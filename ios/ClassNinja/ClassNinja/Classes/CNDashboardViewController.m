@@ -553,13 +553,17 @@ static void getSectionAndEventIndicesForCourse(CNTargetedCourse *course, NSUInte
 }
 
 #pragma mark - CNWelcomeStatusViewDelegate
-
-- (void)addClassesButtonPressed:(id)sender
+- (void)presentSchoolVC
 {
     CNSchoolViewController *schoolVC = [[CNSchoolViewController alloc] init];
     self.siongsNavigationController = [[CNSiongNavigationViewController alloc] initWithRootViewController:schoolVC];
     self.siongsNavigationController.searchDelegate = self;
     [self presentViewController:self.siongsNavigationController animated:YES completion:nil];
+}
+
+- (void)addClassesButtonPressed:(id)sender
+{
+    [self presentSchoolVC];
 }
 
 - (void)refreshTargetsButtonPressed:(id)sender

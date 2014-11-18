@@ -13,4 +13,6 @@
 
 @interface CNDashboardViewController : CNLoggingViewController <CNWelcomeStatusViewDelegate, CNSearchViewControllerDelegateProtocol, UITableViewDataSource, UITableViewDelegate>
 
+- (void)presentSchoolVC;
+
 @end

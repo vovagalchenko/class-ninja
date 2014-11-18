@@ -44,6 +44,9 @@
                                 [weakVC didMoveToParentViewController:nil];
 
                                 [self addChildVC:self.dashboardVC];
+
+                                // present siongs VC in the next runloop
+                                [self.dashboardVC performSelector:@selector(presentSchoolVC) withObject:nil afterDelay:0];
                             }];
         };
         
