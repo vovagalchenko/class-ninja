@@ -56,6 +56,8 @@ class update_user(HTTP_Response_Builder):
         if userProfile is None:
             userProfile = UserProfile()
             userProfile.phonenumber =  user.phonenumber
+            userProfile.didPostOnFb = False
+            userProfile.didPostOnTwitter = False
             # brand new user get 3 free credits
             # code triplication warning: if you're chaning this 3, don't forget to change sales_pitch and auth_pitch
             userProfile.credits = 3
