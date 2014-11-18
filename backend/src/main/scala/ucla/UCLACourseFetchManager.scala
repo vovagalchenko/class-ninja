@@ -8,6 +8,7 @@ import model._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 import scala.xml.{Node, NodeSeq}
 
 
@@ -68,7 +69,7 @@ object UCLACourseFetchManager extends SchoolManager with LazyLogging {
         val idLinkRegex = """^subdet\.aspx\?srs=(\d*)\&term=.*""".r
         sectionsAndEventHtml map { case (section: Section, eventTable: Node) =>
           val eventRows = (eventTable \\ "tr").filterByLackOfAttribute("class")
-          val events = eventRows map { eventRow: Node =>
+          val events = eventRows flatMap { eventRow: Node =>
             val eventAttributeCells = (eventRow \\ "td").filterByAttribute("class", _ != "dgdClassDataColumnSpacer")
             val schoolSpecificEventIdCell = eventAttributeCells.filterByLiteralAttribute("class", "dgdClassDataColumnIDNumber")
             val idLinks = schoolSpecificEventIdCell \\ "a"
@@ -86,30 +87,38 @@ object UCLACourseFetchManager extends SchoolManager with LazyLogging {
             } else {
               None
             }
-            val eventType = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataActType")
-            val sectionNo = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataSectionNumber")
-            val status = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataStatus")
-            val numEnrolled = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataEnrollTotal").safeToInt
-            val enrollmentCap = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataEnrollCap").safeToInt
-            val numWaitlisted = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataWaitListTotal").safeToInt
-            val waitlistCap = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataWaitListCap").safeToInt
-            val weekdays = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataDays")
-            val startTime = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataTimeStart")
-            val endTime = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataTimeEnd")
-            val building = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataBuilding")
-            val room = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataRoom")
-            Event(
-              id,
-              s"$eventType $sectionNo",
-              Seq(Spacetime(weekdays, s"$startTime - $endTime", s"$building $room")),
-              numEnrolled,
-              enrollmentCap,
-              numWaitlisted,
-              waitlistCap,
-              status,
-              section.primaryKey,
-              SchoolId.UCLA
-            )
+            val eventTry = Try {
+              val eventType = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataActType")
+              val sectionNo = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataSectionNumber")
+              val status = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataStatus")
+              val numEnrolled = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataEnrollTotal").safeToInt
+              val enrollmentCap = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataEnrollCap").safeToInt
+              val numWaitlisted = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataWaitListTotal").safeToInt
+              val waitlistCap = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataWaitListCap").safeToInt
+              val weekdays = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataDays")
+              val startTime = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataTimeStart")
+              val endTime = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataTimeEnd")
+              val building = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataBuilding")
+              val room = getFirstTextInsideFirstNodeOfClass(eventAttributeCells, "dgdClassDataRoom")
+              Event(
+                id,
+                s"$eventType $sectionNo",
+                Seq(Spacetime(weekdays, s"$startTime - $endTime", s"$building $room")),
+                numEnrolled,
+                enrollmentCap,
+                numWaitlisted,
+                waitlistCap,
+                status,
+                section.primaryKey,
+                SchoolId.UCLA
+              )
+            }
+            eventTry match {
+              case Success(event) => Some(event)
+              case Failure(t) =>
+                logger.warn(s"Unable to update one of the events for section $section. Event row: $eventRow.", t)
+                None
+            }
           }
 
           val finalEvents = events.foldLeft(Seq[Event]()) { (accumulator: Seq[Event], event: Event) =>
@@ -142,8 +151,8 @@ object UCLACourseFetchManager extends SchoolManager with LazyLogging {
       strings(0)
     } catch {
       case t: Throwable =>
-        logger.error(s"Unable to get the text node inside the first node of class <$classString>. Here's the node:\n$nodeSeq", t)
-      ""
+        logger.error(s"Unable to get the text node inside the first node of class <$classString>. Here's the node:\n$nodeSeq")
+        throw t
     }
   }
 
