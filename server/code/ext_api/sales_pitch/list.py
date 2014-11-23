@@ -5,7 +5,7 @@ class list_sales_pitch(HTTP_Response_Builder):
     def do_controller_specific_work(self):
         sales_pitch = {}
         sales_pitch['sales_pitch'] = 'It costs us real money to run this service. We hope you enjoy using it.\n\nFor just %@, you will be able to track another ten classes.'
-        sales_pitch['short_sales_pitch'] = 'Or track ten more classes for just %@.'
+        sales_pitch['short_sales_pitch'] = 'Or track 10 more classes for just %@.'
         sales_pitch['sharing_pitch'] = 'Track another %@ for free by helping us spread the word.'
         sales_pitch['targets_for_purchase'] = 10
         sales_pitch['targets_for_sharing'] = 10
