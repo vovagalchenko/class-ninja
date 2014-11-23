@@ -8,7 +8,7 @@ class list_sales_pitch(HTTP_Response_Builder):
         sales_pitch['short_sales_pitch'] = 'Or track ten more classes for just %@.'
         sales_pitch['sharing_pitch'] = 'Track another %@ for free by helping us spread the word.'
         sales_pitch['targets_for_purchase'] = 10
-        sales_pitch['targets_for_sharing'] = 3
+        sales_pitch['targets_for_sharing'] = 10
         sales_pitch['signup_reminder'] = 'We let you track the first %@ classes for free.'
         #if you're changing targest for signup, also change auth_pitch and user/update
         sales_pitch['targets_for_signup'] = 3
