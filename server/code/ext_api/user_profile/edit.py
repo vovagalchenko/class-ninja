@@ -27,11 +27,11 @@ class edit_user_profile(HTTP_Response_Builder):
        
         if self.didPostOnFb == True and self.user_profile.didPostOnFb == False:
             self.user_profile.didPostOnFb = True
-            self.user_profile.credits += 3
+            self.user_profile.credits += 10
 
         if self.didPostOnTwitter == True and self.user_profile.didPostOnTwitter == False:
             self.user_profile.didPostOnTwitter = True
-            self.user_profile.credits += 3
+            self.user_profile.credits += 10
 
         db_session.commit()
  
