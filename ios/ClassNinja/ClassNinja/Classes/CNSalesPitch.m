@@ -24,6 +24,10 @@
     
     pitch.classesForPurchase = @(10);
     
+    pitch.sharingLinkString = @"http://goo.gl/BakYHf";
+    pitch.sharingMessagePlaceholder = @"Get notified when classes you\'re interested in become available. ";
+    pitch.fbCaption = @"UCLA's best kept secret.";
+    
     return pitch;
 }
 

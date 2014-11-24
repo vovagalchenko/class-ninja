@@ -485,6 +485,9 @@ authenticationRequired:(BOOL)authRequired
         pitch.freeClassesForSignup = [response objectForKey:@"targets_for_signup"];
         pitch.classesForPurchase = [response objectForKey:@"targets_for_purchase"];
         
+        pitch.sharingLinkString = [response objectForKey:@"sharing_link"];
+        pitch.sharingMessagePlaceholder  = [response objectForKey:@"sharing_message_placeholder"];
+        pitch.fbCaption = [response objectForKey:@"fb_caption_header"];
         if (error) {
             completion(nil);
         } else {
