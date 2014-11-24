@@ -17,4 +17,9 @@ class list_sales_pitch(HTTP_Response_Builder):
 
         sales_pitch['short_sales_pitch'] = 'Or track ' + str(sales_pitch['targets_for_purchase'])  + ' more classes for just %@.'
     
+        # currently points to iTunes location of iOS app
+        sales_pitch['sharing_link'] = 'http://goo.gl/BakYHf'
+        sales_pitch['sharing_message_placeholder'] = 'Get notified when classes you\'re interested in become available. '
+        sales_pitch['fb_caption_header'] = 'UCLA\'s best kept secret.'
+
         return HTTP_Response('200 OK', sales_pitch)
