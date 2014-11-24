@@ -317,17 +317,16 @@
     }
 }
 
-#define kShareURL ([NSURL URLWithString:@"http://class-ninja.com"])
 #define kShareImage ([UIImage imageNamed:@"AppIcon57x57"])
-#define kShareMessage (@"Get notified when class has space to register!")
-
 - (void)shareWithiOSDialogForService:(NSString *)serviceType
 {
     SLComposeViewController *vc = [SLComposeViewController composeViewControllerForServiceType:serviceType];
-    [vc addImage:kShareImage];
-    [vc addURL:kShareURL];
 
-    [vc setInitialText:kShareMessage];
+    NSURL *shareURL = [NSURL URLWithString:self.salesPitch.sharingLinkString];
+    [vc addURL:shareURL];
+    [vc setInitialText:self.salesPitch.sharingMessagePlaceholder];
+
+    [vc addImage:kShareImage];
     
     vc.completionHandler = ^(SLComposeViewControllerResult result) {
         if (result == SLComposeViewControllerResultDone) {
@@ -348,10 +347,11 @@
     if ([self canPresentSystemFacebookDialog]) {
         [self shareWithiOSDialogForService:SLServiceTypeFacebook];
     } else {
-        [FBDialogs presentShareDialogWithLink:kShareURL
+        NSURL *shareURL = [NSURL URLWithString:self.salesPitch.sharingLinkString];
+        [FBDialogs presentShareDialogWithLink:shareURL
                                          name:nil
-                                      caption:@"Never miss class spots again!"
-                                  description:kShareMessage
+                                      caption:self.salesPitch.fbCaption
+                                  description:self.salesPitch.sharingMessagePlaceholder
                                       picture:nil
                                   clientState:nil
                                       handler:^(FBAppCall *call, NSDictionary *results, NSError *error) {

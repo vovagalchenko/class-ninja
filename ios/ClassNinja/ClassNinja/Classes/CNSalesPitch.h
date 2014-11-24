@@ -19,6 +19,10 @@
 @property (nonatomic) NSNumber *freeClassesForSignup;
 @property (nonatomic) NSNumber *classesForPurchase;
 
+@property (nonatomic) NSString *sharingLinkString;
+@property (nonatomic) NSString *sharingMessagePlaceholder;
+@property (nonatomic) NSString *fbCaption;
+
 + (CNSalesPitch *)defaultPitch;
 
 @end
