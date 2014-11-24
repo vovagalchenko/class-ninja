@@ -4,6 +4,7 @@ from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
 from ext_api.parameter import Parameter, Boolean_Parameter_Type
 from model.user_model import User
 from model.user_profile import UserProfile
+from lib.cfg import CFG
 
 import requests
 import json
@@ -24,14 +25,17 @@ class edit_user_profile(HTTP_Response_Builder):
 
         if self.user_profile is None:
             raise API_Exception("500 Server Error", "User profile does not exist")
-       
+
+
+        cfg = CFG.get_instance()
+        targets_for_sharing = int(cfg.get('sales_pitch', 'targets_for_sharing'))
         if self.didPostOnFb == True and self.user_profile.didPostOnFb == False:
             self.user_profile.didPostOnFb = True
-            self.user_profile.credits += 10
+            self.user_profile.credits += targets_for_sharing
 
         if self.didPostOnTwitter == True and self.user_profile.didPostOnTwitter == False:
             self.user_profile.didPostOnTwitter = True
-            self.user_profile.credits += 10
+            self.user_profile.credits += targets_for_sharing
 
         db_session.commit()
  

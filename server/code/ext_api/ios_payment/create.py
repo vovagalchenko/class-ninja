@@ -5,6 +5,8 @@ from ext_api.parameter import Parameter, String_Parameter_Type
 
 from model.user_model import User
 from model.user_profile import UserProfile
+from lib.cfg import CFG
+
 
 import requests
 import json
@@ -25,7 +27,9 @@ class create_ios_payment(HTTP_Response_Builder):
         # This throws if the check fails.
         self.checkVerificationService()
         # The check succeeded. Let's give a lot of credits to user profile.
-        user_profile.credits += 10
+        cfg = CFG.get_instance()
+        targets_for_purchase = int(cfg.get('sales_pitch', 'targets_for_purchase'))
+        user_profile.credits += targets_for_purchase
         db_session.commit()
         return HTTP_Response('200 OK', {'credits' : user_profile.credits})
 

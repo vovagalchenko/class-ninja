@@ -4,6 +4,7 @@ from ext_api.http_response_builder import HTTP_Response_Builder, HTTP_Response
 from ext_api.parameter import Parameter, String_Parameter_Type
 from model.user_model import User
 from model.user_profile import UserProfile
+from lib.cfg import CFG
 
 from datetime import datetime, timedelta
 import re
@@ -58,9 +59,8 @@ class update_user(HTTP_Response_Builder):
             userProfile.phonenumber =  user.phonenumber
             userProfile.didPostOnFb = False
             userProfile.didPostOnTwitter = False
-            # brand new user get 3 free credits
-            # code triplication warning: if you're chaning this 3, don't forget to change sales_pitch and auth_pitch
-            userProfile.credits = 3
+            cfg = CFG.get_instance()
+            userProfile.credits = int(cfg.get('sales_pitch', 'targets_for_signup'))
             userProfile.email = None
             db_session.add(userProfile)
         
