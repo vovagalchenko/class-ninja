@@ -627,6 +627,7 @@
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
 				PROVISIONING_PROFILE = "";
+				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -647,6 +648,7 @@
 				GCC_PREFIX_HEADER = "ClassNinja/ClassNinja-Prefix.pch";
 				INFOPLIST_FILE = "ClassNinja/ClassNinja-Info.plist";
 				PROVISIONING_PROFILE = "";
+				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
