@@ -62,6 +62,15 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
     }
   }
 
+  private val daysOfWeekMap = Map(
+    "Mo" -> "M",
+    "Tu"  -> "T",
+    "We"  -> "W",
+    "Th"  -> "R",
+    "Fr"  -> "F",
+    "Sa" -> "S"
+  )
+
   override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = {
     val departments = dbManager.departments
       .filter(_.departmentId inSet courses.map(_.departmentId).distinct)
@@ -111,7 +120,10 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
                 val weekdayAndTime = weekdayAndTimeText.split(" ", 2)
                 val room = scheduleSpans.filterByAttributePrefix("id", "MTG_LOC$").text
                 if (weekdayAndTime.length == 2) {
-                  Some(Spacetime(weekdayAndTime(0), weekdayAndTime(1), room))
+                  val weekdays = daysOfWeekMap.foldLeft(weekdayAndTime(0)) { case (acc: String, replacement: (String, String)) =>
+                    acc.replaceFirst(replacement._1, replacement._2)
+                  }
+                  Some(Spacetime(weekdays, weekdayAndTime(1), room))
                 } else {
                   None
                 }
