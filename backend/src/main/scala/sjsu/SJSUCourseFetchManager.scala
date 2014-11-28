@@ -90,7 +90,7 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
                 case Some(regexMatch) => regexMatch.subgroups(0)
                 case None             => "00"
               }
-              val sectionType = subtitle.split(" \\| ", 3)(2)
+              val sectionType = subtitle.split(" \\| ", 3)(2).substring(0, 3).toUpperCase
               val sectionName = s"$sectionType $sectionNumber"
               val staff = sanitizeString(spans.filterByLiteralAttribute("id", "MTG_INSTR$0").text)
               val section = Section(
@@ -131,7 +131,7 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
 
               val event = Event(
                 Some(schoolSpecificEventId),
-                sectionType,
+                sectionName,
                 timesAndLocations,
                 numEnrolled,
                 enrollmentCap,
