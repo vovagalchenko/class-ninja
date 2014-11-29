@@ -442,25 +442,21 @@
                      completion:^(BOOL finished)
     {
         [[CNAPIClient sharedInstance] targetEvents:self.targetEvents completionBlock:^(NSDictionary *userMsg, NSError *error){
-            
             if (error == nil) {
-                CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
-                NSString *classesForm = (self.targetEvents.count > 1) ? @"classes" : @"the class";
-                vc.descriptionLabel.text = [NSString stringWithFormat:@"We've added %@ to your dashboard. You'll receive a notification when an available spot opens up", classesForm];
-                __weak CNConfirmationViewController *weakVC = vc;
-                vc.completionBlock = ^{
-                    [weakVC dismissViewControllerAnimated:NO completion:nil];
+                if (userMsg) {
+                    CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
+                    vc.descriptionLabel.text = userMsg[@"msg"];
+                    vc.titleLabel.text = userMsg[@"title"];
+                    __weak CNConfirmationViewController *weakVC = vc;
+                    vc.completionBlock = ^{
+                        [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:NO completion:nil];
+                        [weakVC dismissViewControllerAnimated:NO completion:nil];
+                    };
+                    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    [self presentViewController:vc animated:YES completion:nil];
+                } else {
                     [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:NO completion:nil];
-                    if (userMsg) {
-                        [[[UIAlertView alloc] initWithTitle:userMsg[@"title"]
-                                                    message:userMsg[@"msg"]
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil] show];
-                    }
-                };
-                vc.modalPresentationStyle = UIModalPresentationFormSheet;
-                [self presentViewController:vc animated:YES completion:nil];
+                }
             } else if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorPaymentRequired) {
                 CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;
