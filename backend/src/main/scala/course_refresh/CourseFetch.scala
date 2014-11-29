@@ -126,7 +126,7 @@ object CourseFetch extends LazyLogging {
     } else {
       val allTargetsQuery = for {
         t <- dbManager.targets
-        e <- dbManager.events if t.eventId === e.eventId
+        e <- dbManager.events if t.eventId === e.eventId && e.schoolId === school.id
       } yield (t, e)
       val targetEvents: Seq[(Target, Event)] = allTargetsQuery.list
       val targetEventTuplesByEvent: Map[Event, Seq[(Target, Event)]] = targetEvents.groupBy(_._2)

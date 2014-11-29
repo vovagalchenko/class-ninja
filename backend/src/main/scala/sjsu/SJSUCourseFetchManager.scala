@@ -74,6 +74,7 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
   override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = {
     val departments = dbManager.departments
       .filter(_.departmentId inSet courses.map(_.departmentId).distinct)
+      .filter(_.schoolId === SchoolId.SJSU.id)
       .list
     val sequenceOfFutureSequences = departments map { department =>
       withDepartmentCookies(department) { case (httpManager, courseListing) =>
