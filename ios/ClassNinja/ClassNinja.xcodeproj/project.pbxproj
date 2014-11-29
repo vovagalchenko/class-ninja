@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		7007B2351A101C4800169DB4 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7007B2341A101C4800169DB4 /* Social.framework */; };
 		7007B23D1A13D25800169DB4 /* CNSalesPitch.m in Sources */ = {isa = PBXBuildFile; fileRef = 7007B23C1A13D25800169DB4 /* CNSalesPitch.m */; };
-		7007B2421A18896900169DB4 /* CNFirstPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7007B2411A18896900169DB4 /* CNFirstPageViewController.m */; };
+		7007B2421A18896900169DB4 /* CNSiongsTernaryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7007B2411A18896900169DB4 /* CNSiongsTernaryViewController.m */; };
 		70320137199722320032F16B /* CNCourseDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320136199722320032F16B /* CNCourseDetailsViewController.m */; };
 		7032013A199736EF0032F16B /* CNSiongNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 70320139199736EF0032F16B /* CNSiongNavigationView.m */; };
 		7032013D1997F8C40032F16B /* CNCourseDetailsTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7032013C1997F8C40032F16B /* CNCourseDetailsTableViewCell.m */; };
@@ -79,8 +79,8 @@
 		7007B2341A101C4800169DB4 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		7007B23B1A13D25800169DB4 /* CNSalesPitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSalesPitch.h; sourceTree = "<group>"; };
 		7007B23C1A13D25800169DB4 /* CNSalesPitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSalesPitch.m; sourceTree = "<group>"; };
-		7007B2401A18896900169DB4 /* CNFirstPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNFirstPageViewController.h; sourceTree = "<group>"; };
-		7007B2411A18896900169DB4 /* CNFirstPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNFirstPageViewController.m; sourceTree = "<group>"; };
+		7007B2401A18896900169DB4 /* CNSiongsTernaryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSiongsTernaryViewController.h; sourceTree = "<group>"; };
+		7007B2411A18896900169DB4 /* CNSiongsTernaryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNSiongsTernaryViewController.m; sourceTree = "<group>"; };
 		70320135199722320032F16B /* CNCourseDetailsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNCourseDetailsViewController.h; sourceTree = "<group>"; };
 		70320136199722320032F16B /* CNCourseDetailsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CNCourseDetailsViewController.m; sourceTree = "<group>"; };
 		70320138199736EF0032F16B /* CNSiongNavigationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CNSiongNavigationView.h; sourceTree = "<group>"; };
@@ -290,8 +290,8 @@
 				80F1000F19C50E4300C28C32 /* CNTargetSectionHeaderView.m */,
 				80666DAB19D5B4D3007003A2 /* CNGradientView.h */,
 				80666DAC19D5B4D3007003A2 /* CNGradientView.m */,
-				7007B2401A18896900169DB4 /* CNFirstPageViewController.h */,
-				7007B2411A18896900169DB4 /* CNFirstPageViewController.m */,
+				7007B2401A18896900169DB4 /* CNSiongsTernaryViewController.h */,
+				7007B2411A18896900169DB4 /* CNSiongsTernaryViewController.m */,
 			);
 			name = Welcome;
 			sourceTree = "<group>";
@@ -491,7 +491,7 @@
 				7007B23D1A13D25800169DB4 /* CNSalesPitch.m in Sources */,
 				80F1000D19C4ED7500C28C32 /* CNCloseButton.m in Sources */,
 				705571271988BC7B008F66F1 /* CNGenericSelectionViewController.m in Sources */,
-				7007B2421A18896900169DB4 /* CNFirstPageViewController.m in Sources */,
+				7007B2421A18896900169DB4 /* CNSiongsTernaryViewController.m in Sources */,
 				70557118197B1F1E008F66F1 /* CNInAppPurchaseManager.m in Sources */,
 				7055712419861A85008F66F1 /* CNSiongNavigationViewController.m in Sources */,
 				80666DA519CEE20F007003A2 /* CNLoggingViewController.m in Sources */,

@@ -9,7 +9,7 @@
 #import "CNContainerViewController.h"
 #import "CNUserProfile.h"
 #import "CNDashboardViewController.h"
-#import "CNFirstPageViewController.h"
+#import "CNSiongsTernaryViewController.h"
 
 @interface CNContainerViewController ()
 @property (nonatomic) CNDashboardViewController *dashboardVC;

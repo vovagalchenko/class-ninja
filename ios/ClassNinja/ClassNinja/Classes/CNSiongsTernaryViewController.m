@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Bova. All rights reserved.
 //
 
-#import "CNFirstPageViewController.h"
+#import "CNSiongsTernaryViewController.h"
 
 @interface CNSiongsTernaryViewController ()
 @property (nonatomic) UILabel *titleLabel;
@@ -122,7 +122,7 @@
 {
     [super viewDidLoad];
     self.view.backgroundColor = CN_GREEN_COLOR;
-    [self.button setTitle:@"Back to Dashboard" forState:UIControlStateNormal];
+    [self.button setTitle:@"Done" forState:UIControlStateNormal];
 }
 
 @end

@@ -11,7 +11,7 @@
 #import "CNActivityIndicator.h"
 #import "CNAPIClient.h"
 #import "CNCloseButton.h"
-#import "CNFirstPageViewController.h"
+#import "CNSiongsTernaryViewController.h"
 
 #import <FacebookSDK/FacebookSDK.h>
 #import <Social/Social.h>

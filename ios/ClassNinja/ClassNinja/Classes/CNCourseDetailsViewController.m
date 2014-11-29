@@ -14,7 +14,7 @@
 #import "CNPaywallViewController.h"
 #import "CNActivityIndicator.h"
 
-#import "CNFirstPageViewController.h"
+#import "CNSiongsTernaryViewController.h"
 
 
 #define kHeaderQuestionHeight  90
