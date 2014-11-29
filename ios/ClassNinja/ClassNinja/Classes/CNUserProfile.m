@@ -37,7 +37,7 @@ static CNSchool *currentSchool = nil;
         currentSchool = school;
         NSDictionary *dict = [CNSchoolAPIResource dictionaryFromSchool:school];
         [dict writeToFile:[self defaultSchoolFilePath] atomically:NO];
-        logUserAction(@"default_school_selected", @{@"default_school_name" : school.name});
+        logUserAction(@"default_school_selected", @{@"selected_school_name" : school.name});
     }
 }
 

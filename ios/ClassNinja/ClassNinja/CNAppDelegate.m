@@ -28,13 +28,12 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [[Analytics sharedInstance] setDelegate:self];
-    self.didLaunchFromNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] != nil;
     
     logAppLifecycleEvent(@"launch", nil);
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    if ([userDefaults objectForKey:@"fresh_install"]) {
-        logAppLifecycleEvent(@"fresh_install", nil);
+    if (([userDefaults objectForKey:kFreshInstallKey] == NO) && ([CNUserProfile defaultSchool] == nil)) {
+        logAppLifecycleEvent(kFreshInstallKey, nil);
         [userDefaults setObject:[NSNumber numberWithBool:NO] forKey:kFreshInstallKey];
         [userDefaults synchronize];
     }
@@ -216,6 +215,9 @@
     }
     
     [data setObject:@(self.didLaunchFromNotification) forKey:@"launched_from_notification"];
+    [data setObject:[CNUserProfile defaultSchool].name forKey:@"default_school"];
+    
+    
     return data;
 }
 
