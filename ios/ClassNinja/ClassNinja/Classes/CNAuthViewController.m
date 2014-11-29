@@ -324,14 +324,19 @@ static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
                      receivedConfirmationCode:self.textField.text
                                forPhoneNumber:self.phoneNumber
                        doneProcessingCallback:^(BOOL success) {
+
                         if (!success) {
+                            logUserAction(@"failed_authorization_code_verification", nil);
                             self.phoneNumber = nil;
-                            [self changeState:CNAuthViewControllerStatePhoneNumberEntry animated:YES];
+                            [self changeState:CNAuthViewControllerStateVerificationCodeEntry animated:YES];
                             [[[UIAlertView alloc] initWithTitle:@"Error"
                                                         message:@"Unable to confirm your phone number with Class Ninja"
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil] show];
+                        } else {
+                            // also means that user was able to register with the app
+                            logUserAction(@"succeeded_authorization_code_verification", nil);
                         }
                     }];
             break;
