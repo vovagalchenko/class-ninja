@@ -307,7 +307,7 @@ static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
                            if (!processingSucceeded) {
                                [self changeState:CNAuthViewControllerStatePhoneNumberEntry animated:YES];
                                [[[UIAlertView alloc] initWithTitle:@"Error"
-                                                           message:@"Unable to send the phone number to Class Ninja"
+                                                           message:@"Unable to send the phone number to Class Radar"
                                                           delegate:nil
                                                  cancelButtonTitle:@"OK"
                                                  otherButtonTitles:nil] show];
@@ -330,7 +330,7 @@ static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
                             self.phoneNumber = nil;
                             [self changeState:CNAuthViewControllerStateVerificationCodeEntry animated:YES];
                             [[[UIAlertView alloc] initWithTitle:@"Error"
-                                                        message:@"Unable to confirm your phone number with Class Ninja"
+                                                        message:@"Unable to confirm your verification code Class Radar"
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil] show];

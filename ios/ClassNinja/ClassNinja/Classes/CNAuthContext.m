@@ -42,9 +42,11 @@
     }
     
     self.authenticationCompletionBlock = ^(BOOL succeeded){
-        [topController dismissViewControllerAnimated:YES completion:^{
-            completionBlock(succeeded);
-        }];
+        if (succeeded) {
+            [topController dismissViewControllerAnimated:YES completion:^{
+                completionBlock(succeeded);
+            }];
+        }
     };
     
     CNAuthViewController *authVC = [[CNAuthViewController alloc] initWithDelegate:self];
