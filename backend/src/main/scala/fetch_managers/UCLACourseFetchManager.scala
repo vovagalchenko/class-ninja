@@ -1,9 +1,9 @@
-package ucla
+package fetch_managers
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import course_refresh.NodeSeqUtilities._
 import course_refresh.StringUtilities._
-import course_refresh.{SchoolManager, HTTPManager, HTTPRequestFactory}
+import course_refresh.{HTTPManager, HTTPRequestFactory, SchoolManager}
 import model._
 
 import scala.concurrent.ExecutionContext.Implicits.global

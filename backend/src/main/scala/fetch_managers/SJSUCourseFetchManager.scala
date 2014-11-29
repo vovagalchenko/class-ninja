@@ -1,15 +1,15 @@
-package sjsu
+package fetch_managers
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
-import course_refresh.{HTTPRequestFactory, HTTPManager, SchoolManager}
 import course_refresh.NodeSeqUtilities._
-import model.SchoolId
-import model._
-import scala.slick.driver.MySQLDriver.simple._
+import course_refresh.StringUtilities._
+import course_refresh.{HTTPManager, HTTPRequestFactory, SchoolManager}
+import model.{SchoolId, _}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.slick.driver.MySQLDriver.simple._
 import scala.xml.NodeSeq
-import course_refresh.StringUtilities._
 
 class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSession: Session) extends SchoolManager with LazyLogging {
   private val SJSURequestFactory: HTTPRequestFactory = new HTTPRequestFactory("https://cmshr.cms.sjsu.edu/psc/HSJPRDF/EMPLOYEE/HSJPRD/c/COMMUNITY_ACCESS.CLASS_SEARCH.GBL")

@@ -4,11 +4,10 @@ import java.util.concurrent.TimeUnit
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import conf.{DBConfig, Environment}
+import fetch_managers.{SJSUCourseFetchManager, UCLACourseFetchManager}
 import model.SchoolId.SchoolId
 import model._
 import notifications.{MessageExchange, NotificationQueue}
-import sjsu.SJSUCourseFetchManager
-import ucla.UCLACourseFetchManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
