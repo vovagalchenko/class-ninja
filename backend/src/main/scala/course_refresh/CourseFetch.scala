@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import conf.{DBConfig, Environment}
-import fetch_managers.{SJSUCourseFetchManager, UCLACourseFetchManager}
+import fetch_managers.{DavisCourseFetchManager, SJSUCourseFetchManager, UCLACourseFetchManager}
 import model.SchoolId.SchoolId
 import model._
 import notifications.{MessageExchange, NotificationQueue}
@@ -57,10 +57,18 @@ object CourseFetch extends LazyLogging {
 
   private def performCourseFetch(school: SchoolId, refreshOfferedCourses: Boolean, refreshAllEvents: Boolean)
                                 (implicit dbManager: DBManager, session: Session, messageExchange: MessageExchange) = {
-    val currentTermCode = dbManager.schools.filter(_.schoolId === school.id).first.currentTermCode
+    val currentTermCode = dbManager.schools
+      .filter(_.schoolId === school.id)
+      .map(_.currentTermCode)
+      .firstOption
+      .getOrElse {
+      throw new IllegalArgumentException(s"There is no school for id ${school.id} in MySQL")
+    }
     val schoolManager: SchoolManager = school match {
-      case SchoolId.UCLA => new UCLACourseFetchManager(currentTermCode)
-      case SchoolId.SJSU => new SJSUCourseFetchManager(currentTermCode)
+      case SchoolId.UCLA  => new UCLACourseFetchManager(currentTermCode)
+      case SchoolId.SJSU  => new SJSUCourseFetchManager(currentTermCode)
+      case SchoolId.Davis => new DavisCourseFetchManager(currentTermCode)
+      case _              => throw new IllegalArgumentException(s"There is no fetch manager for school with id: $school")
     }
 
     val departmentAndCourseFetchManager = if (refreshOfferedCourses) {

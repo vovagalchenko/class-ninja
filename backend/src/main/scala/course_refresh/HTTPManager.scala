@@ -167,6 +167,10 @@ class HTTPManager extends LazyLogging {
 }
 
 class HTTPRequestFactory(root: String) {
+  def apply(): HTTPRequest = HTTPRequest(root, "", "GET", Map[String, String](), None)
+
+  def apply(path: String): HTTPRequest = HTTPRequest(root, path, "GET", Map[String, String](), None)
+
   def apply(path: String, method: String = "GET", queryParams: Map[String, String] = Map.empty): HTTPRequest =
     HTTPRequest(root, path, method, queryParams, None)
 
