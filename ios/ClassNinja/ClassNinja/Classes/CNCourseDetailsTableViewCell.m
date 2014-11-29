@@ -10,12 +10,13 @@
 #import "CNCloseButton.h"
 #import "CNActivityIndicator.h"
 
-#define  kDisclousureWidthAndHeight 22
+#define kDisclousureWidthAndHeight 22
+#define kDisclousureRightPadding 6
 
 #define kTargetButtonWidthAndHeight 43
 #define kTargetOffsetX 7.0
 
-#define kLeftShiftForMainScreen 31
+#define kLeftShiftForMainScreen 35
 
 #define kCellBackgroundColor            ([UIColor colorWithWhite:250/255.0 alpha:1])
 #define kBorderHairlineColor            ([UIColor colorWithRed:230/255.0 green:230/255.0 blue:229/255.0 alpha:1])
@@ -23,7 +24,7 @@
 #define kStatusLEDWidth 12
 #define kStatusLEDHeight 12
 
-#define kDateTimeLabelXOffset 56.0
+#define kDateTimeLabelXOffset 18
 #define kDateTimeLabelYOffset 0
 #define kDateTimeLabelXRightMargin (kTargetButtonWidthAndHeight + 3)
 
@@ -51,7 +52,7 @@
 #define kStatusDetailsPadding 10
 
 #define kScheduleSlotOffsetX 90
-#define kScheduleSlotRightPadding 40
+#define kScheduleSlotRightPadding (2 * kDisclousureRightPadding + kDisclousureRightPadding)
 #define kScheduleFirstSlotOffsetY 16
 #define kScheduleYDistanceBetweenSlots 10
 #define kSlotViewHeight 12
@@ -190,22 +191,22 @@
     CGRect boundingRect = [stringToSize boundingRectWithSize:CGSizeMake(kDetailsFieldWidth, kDetailsFieldMaxHeight)
                                                      options:NSStringDrawingUsesLineFragmentOrigin
                                                      context:nil];
-    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset - leftShift,
+    self.multilineDetailsLeftFieldLabel.frame = CGRectMake(kDateTimeLabelXOffset,
                                                            yOffset,
                                                            ceilf(boundingRect.size.width),
                                                            ceilf(boundingRect.size.height));
     
     stringToSize = self.multilineDetailsRightFieldLabel.attributedText;
-    CGFloat width = self.bounds.size.width - (kStatusDetailsXOffset - leftShift) - kStatusDetailsPadding;
+    CGFloat width = self.bounds.size.width - kStatusDetailsXOffset - kStatusDetailsPadding;
     boundingRect = [stringToSize boundingRectWithSize:CGSizeMake(width, kDetailsFieldMaxHeight)
                                               options:NSStringDrawingUsesLineFragmentOrigin
                                               context:nil];
-    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset - leftShift,
+    self.multilineDetailsRightFieldLabel.frame = CGRectMake(kStatusDetailsXOffset,
                                                             yOffset,
                                                             ceilf(boundingRect.size.width),
                                                             ceilf(boundingRect.size.height));
 
-    self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight*2, 11, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
+    self.expandAccessoryView.frame = CGRectMake(self.bounds.size.width - kDisclousureWidthAndHeight - kDisclousureRightPadding, 11, kDisclousureWidthAndHeight, kDisclousureWidthAndHeight);
     self.activityIndicatorAccessoryView.frame = self.expandAccessoryView.frame;
 }
 
