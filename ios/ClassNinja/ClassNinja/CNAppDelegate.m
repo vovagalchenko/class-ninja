@@ -16,13 +16,29 @@
 
 #import <FacebookSDK/FacebookSDK.h>
 
+@interface CNAppDelegate()
+@property (nonatomic) BOOL didLaunchFromNotification;
+@end
+
 @implementation CNAppDelegate
 
+
+#define kFreshInstallKey @"fresh_install"
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [[Analytics sharedInstance] setDelegate:self];
+    self.didLaunchFromNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] != nil;
+    
     logAppLifecycleEvent(@"launch", nil);
+    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    if ([userDefaults objectForKey:@"fresh_install"]) {
+        logAppLifecycleEvent(@"fresh_install", nil);
+        [userDefaults setObject:[NSNumber numberWithBool:NO] forKey:kFreshInstallKey];
+        [userDefaults synchronize];
+    }
+    
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     configureStaticAppearance();
@@ -141,6 +157,7 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
+    self.didLaunchFromNotification = YES;
     [[[UIAlertView alloc] initWithTitle:@"Class Alert"
                                 message:userInfo[@"aps"][@"alert"][@"body"]
                                delegate:nil
@@ -183,16 +200,22 @@
 }
 
 #pragma mark - AnalyticsDelegate
+- (void)analyticsStartedNewSession
+{
+    // if analytics start new session, ensure that we reset tracking
+    // if app was opened from the notification last time.
+    self.didLaunchFromNotification = NO;
+}
 
 - (NSDictionary *)supplementalData
 {
-    NSDictionary *data = nil;
+    NSMutableDictionary *data = [NSMutableDictionary dictionary];
     CNUser *loggedInUser = [[[CNAPIClient sharedInstance] authContext] loggedInUser];
     if (loggedInUser) {
-        data = @{
-            @"logged_in_user" : loggedInUser.phoneNumber
-        };
+        [data setObject:loggedInUser.phoneNumber forKey:@"logged_in_user"];
     }
+    
+    [data setObject:@(self.didLaunchFromNotification) forKey:@"launched_from_notification"];
     return data;
 }
 
