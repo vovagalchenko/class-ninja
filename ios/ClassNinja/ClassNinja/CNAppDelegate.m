@@ -32,7 +32,7 @@
     logAppLifecycleEvent(@"launch", nil);
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    if (([userDefaults objectForKey:kFreshInstallKey] == NO) && ([CNUserProfile defaultSchool] == nil)) {
+    if (([userDefaults objectForKey:kFreshInstallKey] == nil) && ([CNUserProfile defaultSchool] == nil)) {
         logAppLifecycleEvent(kFreshInstallKey, nil);
         [userDefaults setObject:[NSNumber numberWithBool:NO] forKey:kFreshInstallKey];
         [userDefaults synchronize];
