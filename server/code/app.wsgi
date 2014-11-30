@@ -2,10 +2,11 @@ from json import dumps
 import sys
 import re
 import traceback
+import os
 from urlparse import urlparse
 
 def basic_application(environ, start_response):
-    document_root = environ.get('CONTEXT_DOCUMENT_ROOT', '')
+    document_root = os.path.dirname(os.path.realpath(__file__))
     if document_root not in sys.path:
         sys.path.insert(0, document_root)
     else:
