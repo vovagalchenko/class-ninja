@@ -18,6 +18,15 @@ object NodeSeqUtilities {
       nodeSeq.filter(_.attribute(attrName).isEmpty)
     }
 
+    def filterByPresenceOfAttributes(attrNames: Seq[String]): NodeSeq = filterByPresenceOfAttributesHelper(nodeSeq, attrNames)
+
+    private def filterByPresenceOfAttributesHelper(nodeSeqToFilter: NodeSeq, attrNames: Seq[String]): NodeSeq = {
+      if (attrNames.length == 0)
+        nodeSeqToFilter
+      else
+        filterByPresenceOfAttributesHelper(nodeSeqToFilter.filterNot(_.attribute(attrNames.head).isEmpty), attrNames.tail)
+    }
+
     def filterByAttribute(attrName: String, filter: (String => Boolean)): NodeSeq = {
       nodeSeq filter { node: Node =>
         node.attribute(attrName) match {

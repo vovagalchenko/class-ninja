@@ -31,8 +31,8 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
       val spans = deptNode \\ "span"
       val schoolSpecificIdNode = spans.filterByAttributePrefix("id", "SSR_CLSRCH_SUBJ_SUBJECT$")
       val departmentNameNode = spans.filterByAttributePrefix("id", "SUBJECT_TBL_DESCRFORMAL$")
-      val sanitizedDepartmentName = sanitizeString(departmentNameNode.text)
-      val sanitizedSchoolSpecificId = sanitizeString(schoolSpecificIdNode.text)
+      val sanitizedDepartmentName = departmentNameNode.text.removeExtraneousSpacing
+      val sanitizedSchoolSpecificId = schoolSpecificIdNode.text.removeExtraneousSpacing
       if (schoolSpecificIdNode.size == 1 && departmentNameNode.size == 1)
         Some(Department(
           SchoolId.SJSU,
@@ -48,7 +48,7 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
     Future {
       val courseNodes = (courseListNodeSeq \\ "div").filterByAttributePrefix("id", "win0divSSR_CLSRSLT_WRK_GROUPBOX2GP$")
       val courses = courseNodes.zipWithIndex map { case (courseNode, index) =>
-        val departmentSpecificCourseId :: courseName :: _ = courseNode.text.split(" - ", 2).toList.map(sanitizeString)
+        val departmentSpecificCourseId :: courseName :: _ = courseNode.text.split(" - ", 2).toList.map(_.removeExtraneousSpacing)
         Course(
           department.schoolId,
           department.primaryKey,
@@ -86,14 +86,14 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
               val spans = eventsNodeSeq \\ "span"
               val title = spans.filterByLiteralAttribute("id", "DERIVED_CLSRCH_DESCR200").text
               val subtitle = spans.filterByLiteralAttribute("id", "DERIVED_CLSRCH_SSS_PAGE_KEYDESCR").text
-              val departmentSpecificCourseId = sanitizeString("^(.*)? - ".r.findFirstMatchIn(title).get.subgroups(0))
+              val departmentSpecificCourseId = "^(.*)? - ".r.findFirstMatchIn(title).get.subgroups(0).removeExtraneousSpacing
               val sectionNumber = "\u00A0.+ - (\\d+)\u00A0{2}".r.findFirstMatchIn(title) match {
                 case Some(regexMatch) => regexMatch.subgroups(0)
                 case None             => "00"
               }
               val sectionType = subtitle.split(" \\| ", 3)(2).substring(0, 3).toUpperCase
               val sectionName = s"$sectionType $sectionNumber"
-              val staff = sanitizeString(spans.filterByLiteralAttribute("id", "MTG_INSTR$0").text)
+              val staff = spans.filterByLiteralAttribute("id", "MTG_INSTR$0").text.removeExtraneousSpacing
               val section = Section(
                 sectionName,
                 staff,
@@ -151,12 +151,6 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
     }
     Future.sequence(sequenceOfFutureSequences).map(_.flatten)
   }
-
-  private def sanitizeString(str: String) = str
-    .replaceAll("<br>", " ")
-    .replaceAll("\u00A0", " ")
-    .trim
-    .replaceAll("\\s{2,}", " ")
 
   private def withDepartmentCookies[T](department: Department)(work: (HTTPManager, NodeSeq) => Future[T]): Future[T] = {
     withCookies { httpManager =>

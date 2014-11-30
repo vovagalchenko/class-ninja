@@ -141,7 +141,11 @@ class HTTPManager extends LazyLogging {
 
   def reqFromHTTPRequest(request: HTTPRequest): Req = {
     val fullURLString: String = {
-      val qualifiedPath = request.root + request.path
+      val qualifiedPath = if (request.root.last == '/' || (request.path.length > 0 && request.path.charAt(0) == '/')) {
+        request.root + request.path
+      } else {
+        s"${request.root}/${request.path}"
+      }
       if (request.queryParams.size > 0) {
         val urlEncodedQueryParams: String = mapToURLEncodedString(request.queryParams)
         qualifiedPath + "?" + urlEncodedQueryParams
