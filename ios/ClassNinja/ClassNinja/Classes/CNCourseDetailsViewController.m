@@ -443,19 +443,19 @@
     {
         [[CNAPIClient sharedInstance] targetEvents:self.targetEvents completionBlock:^(NSDictionary *userMsg, NSError *error){
             if (error == nil) {
-                [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:^{
-                    if (userMsg) {
-                        CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
-                        vc.modalPresentationStyle = UIModalPresentationFormSheet;
-                        vc.descriptionLabel.text = userMsg[@"msg"];
-                        vc.titleLabel.text = userMsg[@"title"];
-                        __weak CNConfirmationViewController *weakVC = vc;
-                        vc.completionBlock = ^{
-                            [weakVC dismissViewControllerAnimated:YES completion:nil];
-                        };
-                        [APP_DELEGATE.window.rootViewController presentViewController:vc animated:YES completion:nil];
-                    }
-                }];
+                if (userMsg) {
+                    CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
+                    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    vc.descriptionLabel.text = userMsg[@"msg"];
+                    vc.titleLabel.text = userMsg[@"title"];
+                    vc.completionBlock = ^{
+                        [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
+                    };
+                    
+                    [self presentViewController:vc animated:YES completion:nil];
+                } else {
+                    [APP_DELEGATE.window.rootViewController dismissViewControllerAnimated:YES completion:nil];
+                }
             } else if ([error.domain isEqualToString:CN_API_CLIENT_ERROR_DOMAIN] && error.code == CNAPIClientErrorPaymentRequired) {
                 CNPaywallViewController *paywallVC = [[CNPaywallViewController alloc] init];
                 paywallVC.modalPresentationStyle = UIModalPresentationFullScreen;

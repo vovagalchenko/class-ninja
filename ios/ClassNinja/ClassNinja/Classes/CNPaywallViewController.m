@@ -289,18 +289,9 @@
 
 
     void (^completion)(BOOL didSucceed) = ^void(BOOL didSucceed) {
-        if (didSucceed) {
-            CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
-            vc.titleLabel.text = @"Thanks";
-            vc.descriptionLabel.text = [NSString stringWithFormat:@"You will be able to track an extra %@ classes.", self.salesPitch.freeClassesForSharing];
-            __weak CNConfirmationViewController *weakVC = vc;
-            vc.completionBlock = ^{
-                [weakVC dismissViewControllerAnimated:NO completion:nil];
-                [self dismissViewControllerAnimated:NO completion:nil];
-            };
-            
-            vc.modalPresentationStyle = UIModalPresentationFormSheet;
-            [self presentViewController:vc animated:YES completion:nil];
+        if (didSucceed) {            
+            NSString *description = [NSString stringWithFormat:@"You will be able to track an extra %@ classes.", self.salesPitch.freeClassesForSharing];
+            [self presentConfirmationVCWithDescription:description];
         } else {
             [[[UIAlertView alloc] initWithTitle:@"Ooops"
                                         message:@"Please try again! Something went wrong when we tried to credit you for sharing."
@@ -371,22 +362,26 @@
     [self shareWithiOSDialogForService:SLServiceTypeTwitter];
 }
 
+- (void)presentConfirmationVCWithDescription:(NSString *)descriptionString
+{
+    CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
+    vc.titleLabel.text = @"Thanks!";
+    vc.descriptionLabel.text = descriptionString;
+    vc.completionBlock = ^{
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    };
+    
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
 - (void)iapTransactionNotificationHandler:(NSNotification *)notification
 {
     // The notifications aren't guaranteed to be sent out on the main thread
     dispatch_async(dispatch_get_main_queue(), ^{
         if([notification.name isEqualToString:TRANSACTION_FINISHED_NOTIFICATION_NAME]) {
-            CNConfirmationViewController *vc = [[CNConfirmationViewController alloc] init];
-            vc.titleLabel.text = @"Thanks!";
-            vc.descriptionLabel.text = [NSString stringWithFormat:@"You will be able to track an extra %@ classes.", self.salesPitch.classesForPurchase];
-            __weak CNConfirmationViewController *weakVC = vc;
-            vc.completionBlock = ^{
-                [weakVC dismissViewControllerAnimated:NO completion:nil];
-                [self dismissViewControllerAnimated:NO completion:nil];
-            };
-            
-            vc.modalPresentationStyle = UIModalPresentationFormSheet;
-            [self presentViewController:vc animated:YES completion:nil];
+            NSString *description = [NSString stringWithFormat:@"You will be able to track an extra %@ classes.", self.salesPitch.classesForPurchase];
+            [self presentConfirmationVCWithDescription:description];
         } else {
             [self dismissViewControllerAnimated:YES completion:nil];
         }
