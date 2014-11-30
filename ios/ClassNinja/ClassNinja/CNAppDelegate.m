@@ -215,8 +215,8 @@
     }
     
     [data setObject:@(self.didLaunchFromNotification) forKey:@"launched_from_notification"];
-    [data setObject:[CNUserProfile defaultSchool].name forKey:@"default_school"];
-    
+
+    [data setValue:[CNUserProfile defaultSchool].name forKey:@"default_school"];
     
     return data;
 }
