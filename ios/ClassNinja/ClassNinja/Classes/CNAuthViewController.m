@@ -327,7 +327,6 @@ static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
 
                         if (!success) {
                             logUserAction(@"failed_authorization_code_verification", nil);
-                            self.phoneNumber = nil;
                             [self changeState:CNAuthViewControllerStateVerificationCodeEntry animated:YES];
                             [[[UIAlertView alloc] initWithTitle:@"Error"
                                                         message:@"Unable to confirm your verification code Class Radar"
