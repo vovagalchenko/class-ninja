@@ -1,6 +1,6 @@
 [submodule "ios-analytics"]
   path = submodules/ios-analytics
   url = https://github.com/vovagalchenko/ios-analytics.git
-[submodule "webapp"]
-	path = webapp
+[submodule "server/webapp"]
+	path = server/webapp
 	url = https://github.com/DianaSuvorova/Nja.git
