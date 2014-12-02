@@ -1,7 +1,6 @@
 package model
 
 import model.SchoolId.SchoolId
-
 import scala.slick.driver.MySQLDriver.simple._
 
 object School {
