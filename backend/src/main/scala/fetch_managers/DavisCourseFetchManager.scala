@@ -9,6 +9,7 @@ import scala.concurrent.Future
 import scala.xml.Node
 import scala.pickling._
 import json._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class DavisCourseFetchManager(term: String) extends SchoolManager with LazyLogging {
   private val DavisRequestFactory: HTTPRequestFactory = new HTTPRequestFactory("https://registrar.ucdavis.edu/courses/search/")
@@ -79,8 +80,8 @@ class DavisCourseFetchManager(term: String) extends SchoolManager with LazyLoggi
       }
       eventTuplesDeduped.groupBy(_._1).zipWithIndex.toSeq map { case (courseTuplesWithGroupBy, courseIndex) =>
         val courseTuples = courseTuplesWithGroupBy._2
-        val contextMap = courseTuples.foldLeft(Map[String, String]()) { (acc, nextTuple) =>
-          acc ++ Map(nextTuple._2 -> nextTuple._4)
+        val contextSeq= courseTuples.foldLeft(Seq[(String, String)]()) { (acc, nextTuple) =>
+          acc :+ (nextTuple._2, nextTuple._4)
         }
         val sampleTuple = courseTuples.head
         Course(
@@ -89,11 +90,68 @@ class DavisCourseFetchManager(term: String) extends SchoolManager with LazyLoggi
           departmentSpecificCourseId = sampleTuple._1,
           name = sampleTuple._3,
           indexWithinDepartment = courseIndex,
-          context = contextMap.pickle.value
+          context = contextSeq.pickle.value
         )
       }
     }
   }
 
-  override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = ???
+  override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = HTTPManager.withHTTPManager { httpManager =>
+    val t = courses flatMap { course =>
+      val eventUrls = JSONPickle(course.context).unpickle[Seq[(String, String)]]
+      eventUrls map { case (sectionName, eventUrl) =>
+        httpManager.execute(DavisRequestFactory(eventUrl)) { eventPage =>
+          def getEventProperty(property: String) = {
+            val regexStr = """<strong>""" + property + """:<\/strong>"""
+            val propertyTagStr = (eventPage \\ "td").filter(_.text.matches(regexStr)).head.text
+            (regexStr + """(.*)$""").r.findFirstMatchIn(propertyTagStr) match {
+              case Some(regexMatch) => regexMatch.subgroups(0).removeExtraneousSpacing
+              case None => throw new IllegalStateException(s"Unable to find event property $property for course: $course")
+            }
+          }
+
+          val availableSeats = getEventProperty("Available Seats").toInt
+          val maxEnrollment = getEventProperty("Maximum Enrollment").toInt
+
+          val meetingTimesTable = (eventPage \\ "table").filterByPresenceOfAttributes("width" :: Nil)
+          val meetingTimesRows = (meetingTimesTable \\ "tr").tail // the first row is the legend
+          val timesAndLocations = meetingTimesRows flatMap { meetingTimeRow =>
+            val Seq(days, times, location) = (meetingTimeRow \\ "td")
+              .toSeq
+              .map(_.text.replaceAllLiterally("TBA", "").removeExtraneousSpacing)
+            // Filter out the case of everything saying "TBA"
+            if (days.length > 0 || times.length > 0 || location.length > 0) {
+              Some(Spacetime(days, times, location))
+            } else {
+              None
+            }
+          }
+          val sectionType = s"SEC $sectionName"
+
+          val section = Section(
+            sectionName = sectionType,
+            staffName = getEventProperty("Instructor"),
+            courseId = course.primaryKey,
+            schoolId = SchoolId.Davis
+          )
+
+          val event = Event(
+            schoolSpecificEventId = Some(getEventProperty("CRN")),
+            eventType = sectionType,
+            timesAndLocations = timesAndLocations,
+            numberEnrolled = maxEnrollment - availableSeats,
+            enrollmentCapacity = maxEnrollment,
+            numWaitlisted = 0,
+            waitlistCapacity = 0,
+            status = if (availableSeats > 0) "Open" else "Closed",
+            sectionId = section.primaryKey,
+            schoolId = SchoolId.Davis
+          )
+
+          (section, event :: Nil)
+        }
+      }
+    }
+    Future sequence t
+  }
 }

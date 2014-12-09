@@ -153,7 +153,7 @@ class UCLACourseFetchManager(term: String) extends SchoolManager with LazyLoggin
       strings(0)
     } catch {
       case NonFatal(t) =>
-        logger.error(s"Unable to get the text node inside the first node of class <$classString>. Here's the node:\n$nodeSeq", t)
+        logger.warn(s"Unable to get the text node inside the first node of class <$classString>. Here's the node:\n$nodeSeq", t)
       ""
     }
   }

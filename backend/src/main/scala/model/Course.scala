@@ -25,7 +25,7 @@ class Courses(tag: Tag) extends Table[Course](tag, "courses") {
   def departmentSpecificCourseId = column[String]("department_specific_course_id")
   def name = column[String]("name")
   def indexWithinDepartment = column[Int]("index_within_department")
-  def context = column[String]("context")
+  def context = column[String]("context", O.DBType("TEXT"))
 
   def schoolDerivedIndex = index("crs_school_derived_index", (departmentId, departmentSpecificCourseId), unique = true)
   def departmentIdAndIndexWithinDepartmentIndex = index("department_id_index_within_department_index", (departmentId, indexWithinDepartment))

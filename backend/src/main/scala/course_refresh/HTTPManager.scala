@@ -1,7 +1,9 @@
 package course_refresh
 
 import java.net.{HttpCookie, URLEncoder}
+import javax.net.ssl.SSLContext
 import com.ning.http.client.AsyncHttpClientConfig.Builder
+import com.ning.http.client.providers.netty.NettyAsyncHttpProviderConfig
 import com.ning.http.client.{RequestBuilder, Request}
 import com.ning.http.client.cookie.Cookie
 import com.ning.http.client.filter.{ResponseFilter, FilterContext, RequestFilter}
@@ -21,7 +23,10 @@ object HTTPManager extends LazyLogging {
 
   val httpExecutor: Http = Http configure { builder: Builder =>
     val timeoutInMs = 360000
+    val nettyProvider = new NettyAsyncHttpProviderConfig()
+    nettyProvider.setHandshakeTimeoutInMillis(timeoutInMs)
     val configuredBuilder = builder
+      .setAsyncHttpClientProviderConfig(nettyProvider)
       .setConnectionTimeoutInMs(timeoutInMs)
       .setRequestTimeoutInMs(timeoutInMs)
       .setFollowRedirects(true)

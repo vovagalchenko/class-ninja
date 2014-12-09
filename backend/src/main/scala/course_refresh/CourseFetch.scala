@@ -2,6 +2,7 @@ package course_refresh
 
 import java.util.concurrent.TimeUnit
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import conf.{DBConfig, Environment}
 import fetch_managers.{DavisCourseFetchManager, SJSUCourseFetchManager, UCLACourseFetchManager}
@@ -111,10 +112,20 @@ object CourseFetch extends LazyLogging {
               // step over each other.
               events foreach {
                 case (section: Section, sectionsEvents: Seq[Event]) =>
-                  dbManager.sections.insertOrUpdate(section)
+                  try {
+                    dbManager.sections.insertOrUpdate(section)
+                  } catch {
+                    case e: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException =>
+                      logger.warn(s"Unable to insert or update section: $section", e)
+                  }
                   sectionsEvents foreach {
                     event: Event =>
-                      dbManager.events.insertOrUpdate(event)
+                      try {
+                        dbManager.events.insertOrUpdate(event)
+                      } catch {
+                        case e: com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException =>
+                          logger.warn(s"Unable to insert or update event: $event", e)
+                      }
                       targetEventTuplesByEventId.get(event.primaryKey) map {
                         targetEventTuples: Seq[(Target, Event)] =>
                           targetEventTuples foreach {
