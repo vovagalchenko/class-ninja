@@ -9,6 +9,7 @@ import model.{SchoolId, _}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.slick.driver.MySQLDriver.simple._
+import scala.util.control.NonFatal
 import scala.xml.NodeSeq
 
 class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSession: Session) extends SchoolManager with LazyLogging {
@@ -79,77 +80,82 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
     val sequenceOfFutureSequences = departments map { department =>
       withDepartmentCookies(department) { case (httpManager, courseListing) =>
         val eventLinks = (courseListing \\ "a").filterByAttributePrefix("id", "MTG_CLASS_NBR$")
-        val sequenceOfFutureSectionsAndEvents: Seq[Future[(Section, Seq[Event])]] = eventLinks map { eventLink =>
+        val sequenceOfFutureSectionsAndEvents: Seq[Future[Option[(Section, Seq[Event])]]] = eventLinks map { eventLink =>
           val classEventId = eventLink.attribute("id").get.head.text
           withDepartmentCookies(department) { case (eventHttpManager, _) =>
             eventHttpManager.execute(SJSURequestFactory("", Map("ICAction" -> classEventId))) { eventsNodeSeq =>
-              val spans = eventsNodeSeq \\ "span"
-              val title = spans.filterByLiteralAttribute("id", "DERIVED_CLSRCH_DESCR200").text
-              val subtitle = spans.filterByLiteralAttribute("id", "DERIVED_CLSRCH_SSS_PAGE_KEYDESCR").text
-              val departmentSpecificCourseId = "^(.*)? - ".r.findFirstMatchIn(title).get.subgroups(0).removeExtraneousSpacing
-              val sectionNumber = "\u00A0.+ - (\\d+)\u00A0{2}".r.findFirstMatchIn(title) match {
-                case Some(regexMatch) => regexMatch.subgroups(0)
-                case None             => "00"
-              }
-              val sectionType = subtitle.split(" \\| ", 3)(2).substring(0, 3).toUpperCase
-              val sectionName = s"$sectionType $sectionNumber"
-              val staff = spans.filterByLiteralAttribute("id", "MTG_INSTR$0").text.removeExtraneousSpacing
-              val section = Section(
-                sectionName,
-                staff,
-                s"${department.primaryKey}_$departmentSpecificCourseId".toSafeId,
-                SchoolId.SJSU
-              )
-              val schoolSpecificEventId = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_CLASS_NBR").text
-              val enrollmentCap = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_ENRL_CAP").text.toInt
-              val numEnrolled = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_ENRL_TOT").text.toInt
-              val waitListCap = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_WAIT_CAP").text.toInt
-              val numWaitlisted = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_WAIT_TOT").text.toInt
-              val statusImageAlt = ((eventsNodeSeq \\ "div").filterByLiteralAttribute("id", "win0divSSR_CLS_DTL_WRK_SSR_STATUS_LONG") \\ "img")
-                .head
-                .attribute("alt")
-                .get
-                .head
-                .text
-              val status = if (statusImageAlt == "Open" || statusImageAlt == "Closed") statusImageAlt
-              else if (statusImageAlt == "Wait List") "W-List"
-              else "Unknown"
-              val scheduleTable = (eventsNodeSeq \\ "table").filterByLiteralAttribute("id", "SSR_CLSRCH_MTG$scroll$0")
-              val timesAndLocations = (scheduleTable \\ "tr").filterByAttributePrefix("id", "trSSR_CLSRCH_MTG$0_") flatMap { scheduleRow =>
-                val scheduleSpans = scheduleRow \\ "span"
-                val weekdayAndTimeText = scheduleSpans.filterByAttributePrefix("id", "MTG_SCHED$").text
-                val weekdayAndTime = weekdayAndTimeText.split(" ", 2)
-                val room = scheduleSpans.filterByAttributePrefix("id", "MTG_LOC$").text
-                if (weekdayAndTime.length == 2) {
-                  val weekdays = daysOfWeekMap.foldLeft(weekdayAndTime(0)) { case (acc: String, replacement: (String, String)) =>
-                    acc.replaceFirst(replacement._1, replacement._2)
-                  }
-                  Some(Spacetime(weekdays, weekdayAndTime(1), room))
-                } else {
-                  None
+              try {
+                val spans = eventsNodeSeq \\ "span"
+                val title = spans.filterByLiteralAttribute("id", "DERIVED_CLSRCH_DESCR200").text
+                val subtitle = spans.filterByLiteralAttribute("id", "DERIVED_CLSRCH_SSS_PAGE_KEYDESCR").text
+                val departmentSpecificCourseId = "^(.*)? - ".r.findFirstMatchIn(title).get.subgroups(0).removeExtraneousSpacing
+                val sectionNumber = "\u00A0.+ - (\\d+)\u00A0{2}".r.findFirstMatchIn(title) match {
+                  case Some(regexMatch) => regexMatch.subgroups(0)
+                  case None => "00"
                 }
-              }
+                val sectionType = subtitle.split(" \\| ", 3)(2).substring(0, 3).toUpperCase
+                val sectionName = s"$sectionType $sectionNumber"
+                val staff = spans.filterByLiteralAttribute("id", "MTG_INSTR$0").text.removeExtraneousSpacing
+                val section = Section(
+                  sectionName,
+                  staff,
+                  s"${department.primaryKey}_$departmentSpecificCourseId".toSafeId,
+                  SchoolId.SJSU
+                )
+                val schoolSpecificEventId = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_CLASS_NBR").text
+                val enrollmentCap = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_ENRL_CAP").text.toInt
+                val numEnrolled = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_ENRL_TOT").text.toInt
+                val waitListCap = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_WAIT_CAP").text.toInt
+                val numWaitlisted = spans.filterByLiteralAttribute("id", "SSR_CLS_DTL_WRK_WAIT_TOT").text.toInt
+                val statusImageAlt = ((eventsNodeSeq \\ "div").filterByLiteralAttribute("id", "win0divSSR_CLS_DTL_WRK_SSR_STATUS_LONG") \\ "img")
+                  .head
+                  .attribute("alt")
+                  .get
+                  .head
+                  .text
+                val status = if (statusImageAlt == "Open" || statusImageAlt == "Closed") statusImageAlt
+                else if (statusImageAlt == "Wait List") "W-List"
+                else "Unknown"
+                val scheduleTable = (eventsNodeSeq \\ "table").filterByLiteralAttribute("id", "SSR_CLSRCH_MTG$scroll$0")
+                val timesAndLocations = (scheduleTable \\ "tr").filterByAttributePrefix("id", "trSSR_CLSRCH_MTG$0_") flatMap { scheduleRow =>
+                  val scheduleSpans = scheduleRow \\ "span"
+                  val weekdayAndTimeText = scheduleSpans.filterByAttributePrefix("id", "MTG_SCHED$").text
+                  val weekdayAndTime = weekdayAndTimeText.split(" ", 2)
+                  val room = scheduleSpans.filterByAttributePrefix("id", "MTG_LOC$").text
+                  if (weekdayAndTime.length == 2) {
+                    val weekdays = daysOfWeekMap.foldLeft(weekdayAndTime(0)) { case (acc: String, replacement: (String, String)) =>
+                      acc.replaceFirst(replacement._1, replacement._2)
+                    }
+                    Some(Spacetime(weekdays, weekdayAndTime(1), room))
+                  } else {
+                    None
+                  }
+                }
 
-              val event = Event(
-                Some(schoolSpecificEventId),
-                sectionName,
-                timesAndLocations,
-                numEnrolled,
-                enrollmentCap,
-                numWaitlisted,
-                waitListCap,
-                status,
-                section.primaryKey,
-                SchoolId.SJSU
-              )
-              (section, Seq(event))
+                val event = Event(
+                  Some(schoolSpecificEventId),
+                  sectionName,
+                  timesAndLocations,
+                  numEnrolled,
+                  enrollmentCap,
+                  numWaitlisted,
+                  waitListCap,
+                  status,
+                  section.primaryKey,
+                  SchoolId.SJSU
+                )
+                Some((section, Seq(event)))
+              } catch {
+                case NonFatal(e) =>
+                  logger.warn(s"Unable to process section and events for classEventId $classEventId, department: $department", e)
+              }
             }
           }
         }
         Future sequence sequenceOfFutureSectionsAndEvents
       }
     }
-    Future.sequence(sequenceOfFutureSequences).map(_.flatten)
+    Future.sequence(sequenceOfFutureSequences).map(_.flatten.flatten)
   }
 
   private def withDepartmentCookies[T](department: Department)(work: (HTTPManager, NodeSeq) => Future[T]): Future[T] = {

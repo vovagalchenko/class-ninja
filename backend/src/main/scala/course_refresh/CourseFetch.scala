@@ -2,7 +2,6 @@ package course_refresh
 
 import java.util.concurrent.TimeUnit
 
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import conf.{DBConfig, Environment}
 import fetch_managers.{DavisCourseFetchManager, SJSUCourseFetchManager, UCLACourseFetchManager}
