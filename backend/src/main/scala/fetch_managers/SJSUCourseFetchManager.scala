@@ -148,6 +148,7 @@ class SJSUCourseFetchManager(term: String)(implicit dbManager: DBManager, dbSess
               } catch {
                 case NonFatal(e) =>
                   logger.warn(s"Unable to process section and events for classEventId $classEventId, department: $department", e)
+                  None
               }
             }
           }
