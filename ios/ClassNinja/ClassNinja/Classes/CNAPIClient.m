@@ -22,7 +22,7 @@
 static inline NSString *baseURLString()
 {
     // TODO: Get this from info plist
-    return @"http://class-ninja.com/api";
+    return @"http://class-radar.com/api";
 }
 
 static inline NSTimeInterval urlRequestTimeoutInterval()
