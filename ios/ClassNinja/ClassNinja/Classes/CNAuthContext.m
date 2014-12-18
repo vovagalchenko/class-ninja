@@ -101,12 +101,11 @@
                            user.accessToken = accessToken;
                            self.loggedInUser = user;
                            completionCallback(YES);
-                           if (self.authenticationCompletionBlock)
+                           if (self.authenticationCompletionBlock) {
                                self.authenticationCompletionBlock(YES);
+                           }
                            self.authenticationCompletionBlock = nil;
                        } else {
-                           if (self.authenticationCompletionBlock)
-                               self.authenticationCompletionBlock(NO);
                            completionCallback(NO);
                        }
                    }];
