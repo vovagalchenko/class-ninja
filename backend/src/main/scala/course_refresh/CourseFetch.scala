@@ -57,6 +57,7 @@ object CourseFetch extends LazyLogging {
 
   def performCourseFetch(school: SchoolId, refreshOfferedCourses: Boolean, refreshAllEvents: Boolean, messageExchangeOption: Option[MessageExchange])
                                 (implicit dbManager: DBManager, session: Session): Unit = {
+    logger.info(s"Performing the course fetch for $school. Will refresh offered courses? $refreshOfferedCourses Will refresh all events? $refreshAllEvents")
     val currentTermCode = dbManager.schools
       .filter(_.schoolId === school.id)
       .map(_.currentTermCode)
@@ -151,6 +152,8 @@ object CourseFetch extends LazyLogging {
       val courseIds = dbManager.sections.filter(_.sectionId inSet sectionIds).map(_.courseId).list.distinct
       val coursesToUpdate = dbManager.courses.filter(_.courseId inSet courseIds).list
       val targetEventTuplesByEventId: Map[String, Seq[(Target, Event)]] = targetEvents.groupBy(_._2.primaryKey)
+
+      logger.info(s"${coursesToUpdate.size} courses will be updated.")
 
       schoolManager.fetchEvents(coursesToUpdate) map { events: Seq[(Section, Seq[Event])] =>
         events foreach {

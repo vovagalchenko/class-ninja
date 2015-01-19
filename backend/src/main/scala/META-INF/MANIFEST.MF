@@ -1,2 +1,11 @@
 Manifest-Version: 1.0
-Class-Path: .
+Class-Path: async-http-client-1.8.10.jar h2-1.4.185.jar scala-pickling
+ _2.10-0.8.0.jar scala-reflect.jar jackson-annotations-2.1.4.jar dispa
+ tch-tagsoup_2.10-0.11.2.jar logback-classic-1.1.2.jar logback-core-1.
+ 1.2.jar amqp-client-3.4.3.jar scala-library.jar quasiquotes_2.10-2.0.
+ 0-M8.jar slick_2.10-3.0.0-M1.jar netty-3.9.2.Final.jar tagsoup-1.2.1.
+ jar dispatch-core_2.10-0.11.2.jar reactive-streams-1.0.0.M3.jar confi
+ g-1.2.1.jar slf4j-api-1.7.7.jar apns-0.2.3.jar jackson-databind-2.1.4
+ .jar jackson-core-2.1.4.jar mysql-connector-java-5.1.34.jar scala-log
+ ging-slf4j_2.10-2.1.2.jar scala-logging-api_2.10-2.1.2.jar2.1.2
+
