@@ -41,6 +41,10 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ROLLING"/>
     </logger>
+    <logger name="term_switch" level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ROLLING"/>
+    </logger>
     <logger name="model" level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ROLLING"/>

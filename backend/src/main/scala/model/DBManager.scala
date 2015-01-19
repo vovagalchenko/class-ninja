@@ -43,6 +43,7 @@ class DBManager(dbConfig: DBConfig) extends LazyLogging {
   }
 
   def withSession[T](work: Session => T) = db withSession work
+  def withTransaction[T](work: Session => T) = db withTransaction work
 }
 
 

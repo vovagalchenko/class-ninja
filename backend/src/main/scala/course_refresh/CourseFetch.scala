@@ -37,8 +37,8 @@ object CourseFetch extends LazyLogging {
       val databaseConf = courseFetchConf.getConfig("database")
       implicit val dbManager = new DBManager(DBConfig(databaseConf))
       dbManager withSession { implicit session =>
-        NotificationQueue withMessageExchange { implicit messageExchange =>
-          performCourseFetch(school, shouldRefreshOfferedCourses, shouldRefreshAllEvents)
+        NotificationQueue withMessageExchange { messageExchange =>
+          performCourseFetch(school, shouldRefreshOfferedCourses, shouldRefreshAllEvents, Some(messageExchange))
         }
       }
       logger.info(s"Finished course fetch for $school refreshing <${args(1)}>")
@@ -55,8 +55,8 @@ object CourseFetch extends LazyLogging {
     }
   }
 
-  private def performCourseFetch(school: SchoolId, refreshOfferedCourses: Boolean, refreshAllEvents: Boolean)
-                                (implicit dbManager: DBManager, session: Session, messageExchange: MessageExchange) = {
+  def performCourseFetch(school: SchoolId, refreshOfferedCourses: Boolean, refreshAllEvents: Boolean, messageExchangeOption: Option[MessageExchange])
+                                (implicit dbManager: DBManager, session: Session): Unit = {
     val currentTermCode = dbManager.schools
       .filter(_.schoolId === school.id)
       .map(_.currentTermCode)
@@ -131,7 +131,7 @@ object CourseFetch extends LazyLogging {
                             case (target: Target, oldEvent: Event) =>
                               if (schoolManager.shouldAlert(oldEvent, event)) {
                                 logger.info(s"Queuing notifications about $target")
-                                messageExchange.sendNotification(target, event)
+                                messageExchangeOption.map { _.sendNotification(target, event) }
                               }
                           }
                       }
@@ -162,7 +162,7 @@ object CourseFetch extends LazyLogging {
                   case (target: Target, oldEvent: Event) =>
                     if (schoolManager.shouldAlert(oldEvent, event)) {
                       logger.info(s"Queuing notifications about $target")
-                      messageExchange.sendNotification(target, event)
+                      messageExchangeOption.map { _.sendNotification(target, event) }
                     }
                 }
               }

@@ -29,12 +29,8 @@
     <orderEntry type="library" name="SBT: ch.qos.logback:logback-core:1.1.2" level="project" />
     <orderEntry type="library" name="SBT: com.typesafe:config:1.2.1" level="project" />
     <orderEntry type="library" name="SBT: org.scalamacros:quasiquotes_2.10:2.0.0-M8" level="project" />
-    <orderEntry type="library" name="SBT: com.h2database:h2:1.4.181" level="project" />
     <orderEntry type="library" name="SBT: com.ning:async-http-client:1.8.10" level="project" />
-    <orderEntry type="library" name="SBT: com.rabbitmq:amqp-client:3.3.5" level="project" />
-    <orderEntry type="library" name="SBT: com.typesafe.slick:slick_2.10:2.1.0" level="project" />
     <orderEntry type="library" name="SBT: io.netty:netty:3.9.2.Final" level="project" />
-    <orderEntry type="library" name="SBT: mysql:mysql-connector-java:5.1.32" level="project" />
     <orderEntry type="library" name="SBT: net.databinder.dispatch:dispatch-core_2.10:0.11.2" level="project" />
     <orderEntry type="library" name="SBT: net.databinder.dispatch:dispatch-tagsoup_2.10:0.11.2" level="project" />
     <orderEntry type="library" name="SBT: com.fasterxml.jackson.core:jackson-annotations:2.1.4" level="project" />
@@ -42,5 +38,10 @@
     <orderEntry type="library" name="SBT: com.fasterxml.jackson.core:jackson-databind:2.1.4" level="project" />
     <orderEntry type="library" name="SBT: com.notnoop.apns:apns:0.2.3" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-pickling_2.10:0.8.0" level="project" />
+    <orderEntry type="library" name="SBT: com.h2database:h2:1.4.185" level="project" />
+    <orderEntry type="library" name="SBT: com.rabbitmq:amqp-client:3.4.3" level="project" />
+    <orderEntry type="library" name="SBT: com.typesafe.slick:slick_2.10:3.0.0-M1" level="project" />
+    <orderEntry type="library" name="SBT: mysql:mysql-connector-java:5.1.34" level="project" />
+    <orderEntry type="library" name="SBT: org.reactivestreams:reactive-streams:1.0.0.M3" level="project" />
   </component>
 </module>
