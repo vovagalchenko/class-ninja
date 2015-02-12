@@ -32,7 +32,7 @@ object APNSManager extends LazyLogging {
     }
   }
 
-  def payload(message: String, customFields: Map[String, String] = Map.empty()): APNSPayload = {
+  def payload(message: String, customFields: Map[String, String] = Map.empty): APNSPayload = {
     val payloadBuilder = APNS.newPayload()
       .alertBody(message)
       .sound("course_alert.aiff")
