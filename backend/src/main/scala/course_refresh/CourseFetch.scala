@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import conf.{DBConfig, Environment}
-import fetch_managers.{DavisCourseFetchManager, SJSUCourseFetchManager, UCLACourseFetchManager}
+import fetch_managers.{DavisCourseFetchManager, SJSUCourseFetchManager, UCLACourseFetchManager, AlbanyCourseFetchManager}
 import model.SchoolId.SchoolId
 import model._
 import notifications.{MessageExchange, NotificationQueue}
@@ -69,6 +69,7 @@ object CourseFetch extends LazyLogging {
       case SchoolId.UCLA  => new UCLACourseFetchManager(currentTermCode)
       case SchoolId.SJSU  => new SJSUCourseFetchManager(currentTermCode)
       case SchoolId.Davis => new DavisCourseFetchManager(currentTermCode)
+      case SchoolId.Albany => new AlbanyCourseFetchManager(currentTermCode)
       case _              => throw new IllegalArgumentException(s"There is no fetch manager for school with id: $school")
     }
 
