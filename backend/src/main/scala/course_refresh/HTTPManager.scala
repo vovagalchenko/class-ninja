@@ -194,7 +194,7 @@ class HTTPRequestFactory(root: String) {
     HTTPRequest(root, path, method, queryParams, None)
 
   def apply(path: String, bodyMap: Map[String, String]): HTTPRequest =
-    HTTPRequest(root, path, "POST", Map[String, String](), Some(bodyMap))
+    HTTPRequest(root, path, "POST", Map[String, String](), Some(bodyMap.toSeq))
 }
 
 case class HTTPRequest(
@@ -202,5 +202,5 @@ case class HTTPRequest(
   path: String,
   method: String,
   queryParams: Map[String, String],
-  body: Option[Map[String, String]]
+  body: Option[Seq[(String, String)]]
 )
