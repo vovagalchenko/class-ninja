@@ -17,6 +17,16 @@ xcuserdata
 *.pyc
 
 # sbt specific
+backend/.idea/scopes/
+backend/.idea/dictionaries/
+backend/.idea/inspectionProfiles/
+backend/.idea/libraries/
+backend/.idea/modules/*
+backend/.idea/.name
+backend/.idea/*.xml
+!backend/.idea/vcs.xml
+!backend/.idea/uiDesigner.xml
+
 .cache/
 .history/
 .lib/
