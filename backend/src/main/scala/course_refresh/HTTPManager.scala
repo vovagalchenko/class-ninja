@@ -56,6 +56,10 @@ object HTTPManager extends LazyLogging {
     cookies += (httpManager.hashCode.toString -> List[HttpCookie]())
   }
 
+  private def isRegisteredForCookies(httpManager: HTTPManager) = synchronized {
+    !cookies.get(httpManager.hashCode.toString).isEmpty
+  }
+
   private def cleanupCookieStorage(httpManager: HTTPManager) = synchronized {
     cookies -= httpManager.hashCode.toString
   }
@@ -158,12 +162,18 @@ class HTTPManager extends LazyLogging {
         qualifiedPath
       }
     }
-    val req = url(fullURLString)
-      .setMethod(request.method)
-      .setParameters(Map("httpManager" -> Seq(this.hashCode().toString)))
+
+
+    val req = url(fullURLString).setMethod(request.method)
+    val reqWithHTTPManager = if (HTTPManager.isRegisteredForCookies(this)) {
+      req.setParameters(Map("httpManager" -> Seq(this.hashCode().toString)))
+    } else {
+      req
+    }
+
     request.body match {
-      case Some(b) => addParametersHelper(req, b.toSeq)
-      case None    => req
+      case Some(b) => addParametersHelper(reqWithHTTPManager, b.toSeq)
+      case None    => reqWithHTTPManager
     }
   }
 
@@ -184,7 +194,7 @@ class HTTPRequestFactory(root: String) {
     HTTPRequest(root, path, method, queryParams, None)
 
   def apply(path: String, bodyMap: Map[String, String]): HTTPRequest =
-    HTTPRequest(root, path, "POST", Map[String, String](), Some(bodyMap))
+    HTTPRequest(root, path, "POST", Map[String, String](), Some(bodyMap.toSeq))
 }
 
 case class HTTPRequest(
@@ -192,5 +202,5 @@ case class HTTPRequest(
   path: String,
   method: String,
   queryParams: Map[String, String],
-  body: Option[Map[String, String]]
+  body: Option[Seq[(String, String)]]
 )
