@@ -2,11 +2,19 @@ package fetch_managers
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
 import course_refresh.{HTTPRequest, HTTPManager, SchoolManager}
+import model.SchoolId
+import model.SchoolId._
 import model._
 
 import scala.concurrent.Future
 import scala.xml.{Node, NodeSeq}
 import scala.concurrent.ExecutionContext.Implicits.global
+
+case class MeetingInfo(
+  daysOfWeek : String,
+  timeOfDay : String,
+  location : String,
+  staffName :String)
 
 class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogging {
   lazy val allCoursesAndEvents: Future[String] = {
@@ -73,17 +81,47 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
     }.toSeq
   }
 
-  private val daysOfWeekMap = Map(
-    "Mo" -> "M",
-    "Tu"  -> "T",
-    "We"  -> "W",
-    "Th"  -> "R",
-    "Fr"  -> "F",
-    "Sa" -> "S"
-  )
+  def parseOutTimeDaysLocationStaff(meetingInfo: String) : (MeetingInfo) = {
+    // <day of week> <times> <location> <staff>
+    val mostCommonMeetingInfoRX = "^([MTWTHFSA]{1,8}) (\\d{2}:\\d{2}_.{2}-\\d{2}:\\d{2}_.{2}) (.*?) (.*$)".r
+
+    // <day of week> <times> <location>
+    val mostCommonMeetingInfoWithoutStaffRX = "^([MTWTHFSA]{1,8}) (\\d{2}:\\d{2}_.{2}-\\d{2}:\\d{2}_.{2}) (.*?)$".r
+
+    //<times> <location> <staff>
+    val noDayOfWeekMeetingInfoRX = "^(\\d{2}:\\d{2}_.{2}-\\d{2}:\\d{2}_.{2}) (.*?) (.*$)".r
+
+    //<times> <location>
+    val timeAndLocationOnlyRX = "^(\\d{2}:\\d{2}_.{2}-\\d{2}:\\d{2}_.{2}) (.*?)".r
+
+    // - ARR <potentially staff name here because of .*)
+    val undefinedTimeLocationWithPotentialStaff = "^- ARR(.*)".r
+
+    val tmpMeetingInfo = mostCommonMeetingInfoRX.findFirstMatchIn(meetingInfo) match {
+      case Some(m) => MeetingInfo(m.group(1), m.group(2), m.group(3), m.group(4))
+      case None => mostCommonMeetingInfoWithoutStaffRX.findFirstMatchIn(meetingInfo) match {
+        case Some(m) => MeetingInfo(m.group(1), m.group(2), m.group(3), "")
+        case None => (noDayOfWeekMeetingInfoRX.findFirstMatchIn(meetingInfo)) match {
+          case Some(m) => MeetingInfo("", m.group(1), m.group(2), m.group(3))
+          case None => (undefinedTimeLocationWithPotentialStaff.findFirstMatchIn(meetingInfo)) match {
+            case Some(m) => MeetingInfo("", "-", "ARR", m.group(1).trim())
+            case None => timeAndLocationOnlyRX.findFirstMatchIn(meetingInfo) match {
+              case Some(m) => MeetingInfo("", m.group(1), m.group(2), "")
+              case None =>
+                println("Albany parsing failure")
+                println(meetingInfo)
+                MeetingInfo("-", "-", "-", "-")
+            }
+          }
+        }
+      }
+    }
+
+    val standardizedToUCLADaysOfWeek = tmpMeetingInfo.daysOfWeek.replaceAll("TH", "R").replaceAll("SA", "S")
+    MeetingInfo(standardizedToUCLADaysOfWeek, tmpMeetingInfo.timeOfDay, tmpMeetingInfo.location, tmpMeetingInfo.staffName)
+  }
 
   override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = allCoursesAndEvents map { allCoursesAndEventsString : String =>
-
     courses flatMap { course =>
       val courseName = course.name
       val eventInfoString =
@@ -103,16 +141,25 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
       val eventsInfoIterator = for (m <- eventInfoRegex findAllMatchIn allCoursesAndEventsString) yield ((m.group(1), m.group(2), m.group(3), m.group(4)))
 
       val sectionAndEvent = eventsInfoIterator.zipWithIndex.map {
-        case ((classNumber : String, meetingInfo : String, eventType : String, seatsRemaining : String), schoolSpecificEventId : Int) =>
+        case ((classNumber: String, meetingInfoFullString: String, eventType: String, seatsRemaining: String), schoolSpecificEventId: Int) =>
           val sectionType = if (eventType.trim() == "") "LEC" else eventType.trim()
 
-          val timesAndLocations = Seq(Spacetime("F", "1:00PM - 4:45PM", "BBB006"))
-          val enrollmentCap = 0
-          val status = "Open"
+          val meetingInfoTimesLocations = meetingInfoFullString.trim().split(" AND ")
+          val lastMeetingInfoString = meetingInfoTimesLocations.last.trim()
 
-          val sectionName = course.departmentSpecificCourseId + "_" + sectionType +"_" + classNumber.trim()
-          val staffName = "staff name here"
-          val section = Section(sectionName, staffName, course.primaryKey, SchoolId.Albany)
+
+          val lastMeetingInfo = parseOutTimeDaysLocationStaff(lastMeetingInfoString)
+          val sectionName = course.departmentSpecificCourseId + "_" + sectionType + "_" + classNumber.trim()
+          val section = Section(sectionName, lastMeetingInfo.staffName, course.primaryKey, SchoolId.Albany)
+
+          val timesAndLocations = meetingInfoTimesLocations.map { meetingInfoString : String =>
+            val meetingInfo = parseOutTimeDaysLocationStaff(meetingInfoString.trim())
+            Spacetime(meetingInfo.daysOfWeek, meetingInfo.timeOfDay, meetingInfo.location)
+          }.toSeq
+
+          val enrollmentCap = seatsRemaining.toInt
+          val status = if (enrollmentCap > 0)  "Open" else "Closed"
+
           val event = Event(Some("ALBANY_"+classNumber), sectionType, timesAndLocations,
             0, enrollmentCap, 0, 0, status, section.primaryKey, SchoolId.Albany)
           (section, event :: Nil)
