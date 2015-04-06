@@ -5,7 +5,7 @@ version := "1.0"
 libraryDependencies ++= Seq(
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
   "net.databinder.dispatch" %% "dispatch-tagsoup" % "latest.integration",
-  "com.typesafe.slick" %% "slick" % "latest.integration",
+  "com.typesafe.slick" %% "slick" % "2.1.0",
   "com.h2database" % "h2" % "latest.integration",
   "mysql" % "mysql-connector-java" % "latest.integration",
   "ch.qos.logback" % "logback-classic" % "latest.integration",
