@@ -127,14 +127,13 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
       val eventInfoString =
         """Class Number: <b>(.*?)<\/b><br clear="none"\/>\n""" +
           """Grading: <b>.*?<\/b><br clear="none"\/>\n""" +
-          """Course Info: <b>""" + s"$courseName" + """</b><br clear="none"\/>\n""" +
+          """Course Info: <b>""" + s"$courseName" + """<\/b><br clear="none"\/>\n""" +
           """Meeting Info: <b>(.*?)<\/b><br clear="none"\/>\n""" +
-          """Comments: <b>.*?<\/b><br clear="none"\/>\n""" +
+          """Comments: <b\/>.*?<br clear="none"\/>\n""" +
           """Credit Range: <b>.*?<\/b><br clear="none"\/>\n""" +
           """Component is blank if lecture: <b>(.*?)<\/b><br clear="none"\/>\n""" +
           """Topic if applicable: <b>.*?<\/b><br clear="none"\/>\n""" +
           """Seats remaining as of last update: <b>(.*?)<\/b><br clear="none"\/>\n"""
-
 
       val eventInfoRegex = eventInfoString.r
 
@@ -149,7 +148,7 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
 
 
           val lastMeetingInfo = parseOutTimeDaysLocationStaff(lastMeetingInfoString)
-          val sectionName = course.departmentSpecificCourseId + "_" + sectionType + "_" + classNumber.trim()
+          val sectionName = sectionType + " " + classNumber.trim()
           val section = Section(sectionName, lastMeetingInfo.staffName, course.primaryKey, SchoolId.Albany)
 
           val timesAndLocations = meetingInfoTimesLocations.map { meetingInfoString : String =>
