@@ -129,27 +129,25 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
           """Grading: <b>.*?<\/b><br clear="none"\/>\n""" +
           """Course Info: <b>""" + s"$courseName" + """<\/b><br clear="none"\/>\n""" +
           """Meeting Info: <b>(.*?)<\/b><br clear="none"\/>\n""" +
-          """Comments: <b\/>.*?<br clear="none"\/>\n""" +
+          """Comments: <b\/{0,1}>.*?<br clear="none"\/>\n""" +
           """Credit Range: <b>.*?<\/b><br clear="none"\/>\n""" +
           """Component is blank if lecture: <b>(.*?)<\/b><br clear="none"\/>\n""" +
           """Topic if applicable: <b>.*?<\/b><br clear="none"\/>\n""" +
           """Seats remaining as of last update: <b>(.*?)<\/b><br clear="none"\/>\n"""
 
       val eventInfoRegex = eventInfoString.r
-
       val eventsInfoIterator = for (m <- eventInfoRegex findAllMatchIn allCoursesAndEventsString) yield ((m.group(1), m.group(2), m.group(3), m.group(4)))
 
       val sectionAndEvent = eventsInfoIterator.zipWithIndex.map {
         case ((classNumber: String, meetingInfoFullString: String, eventType: String, seatsRemaining: String), schoolSpecificEventId: Int) =>
-          val sectionType = if (eventType.trim() == "") "LEC" else eventType.trim()
+          val sectionType = if (eventType.trim() == "") ("LEC " + classNumber.trim()) else (eventType.trim().substring(0, 3).toUpperCase() + " " + classNumber.trim())
 
           val meetingInfoTimesLocations = meetingInfoFullString.trim().split(" AND ")
           val lastMeetingInfoString = meetingInfoTimesLocations.last.trim()
 
 
           val lastMeetingInfo = parseOutTimeDaysLocationStaff(lastMeetingInfoString)
-          val sectionName = sectionType + " " + classNumber.trim()
-          val section = Section(sectionName, lastMeetingInfo.staffName, course.primaryKey, SchoolId.Albany)
+          val section = Section(sectionType, lastMeetingInfo.staffName, course.primaryKey, SchoolId.Albany)
 
           val timesAndLocations = meetingInfoTimesLocations.map { meetingInfoString : String =>
             val meetingInfo = parseOutTimeDaysLocationStaff(meetingInfoString.trim())
