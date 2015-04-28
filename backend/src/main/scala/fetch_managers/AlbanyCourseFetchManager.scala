@@ -50,7 +50,6 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
             val headText = schoolSpecificId.head.text
             if (headText.length > 0) {
               val schoolSpecificId: String = name.replaceAll(" ", "_")
-              println(schoolSpecificId)
               Some(Department(SchoolId.Albany, schoolSpecificId, name))
             } else {
               None
@@ -123,17 +122,18 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
 
   override def fetchEvents(courses: Seq[Course]): Future[Seq[(Section, Seq[Event])]] = allCoursesAndEvents map { allCoursesAndEventsString : String =>
     courses flatMap { course =>
-      val courseName = course.name
+      import java.util.regex.Pattern
+      val courseName = Pattern.quote(course.name)
       val eventInfoString =
         """Class Number: <b>(.*?)<\/b><br clear="none"\/>\n""" +
           """Grading: <b>.*?<\/b><br clear="none"\/>\n""" +
-          """Course Info: <b>""" + s"$courseName" + """<\/b><br clear="none"\/>\n""" +
-          """Meeting Info: <b>(.*?)<\/b><br clear="none"\/>\n""" +
+          """Course Info: <b\/{0,1}>""" + s"$courseName" + """<\/b><br clear="none"\/>\n""" +
+          """Meeting Info: <b\/{0,1}>(.*?)<\/b><br clear="none"\/>\n""" +
           """Comments: <b\/{0,1}>.*?<br clear="none"\/>\n""" +
           """Credit Range: <b>.*?<\/b><br clear="none"\/>\n""" +
-          """Component is blank if lecture: <b>(.*?)<\/b><br clear="none"\/>\n""" +
-          """Topic if applicable: <b>.*?<\/b><br clear="none"\/>\n""" +
-          """Seats remaining as of last update: <b>(.*?)<\/b><br clear="none"\/>\n"""
+          """Component is blank if lecture: <b\/{0,1}>(.*?)[<\/b>]{0,1}<br clear="none"\/>\n""" +
+          """Topic if applicable: .*?<br clear="none"\/>\n""" +
+          """Seats remaining as of last update: <b>(.*?)<\/b><br clear="none"\/>"""
 
       val eventInfoRegex = eventInfoString.r
       val eventsInfoIterator = for (m <- eventInfoRegex findAllMatchIn allCoursesAndEventsString) yield ((m.group(1), m.group(2), m.group(3), m.group(4)))
@@ -141,7 +141,6 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
       val sectionAndEvent = eventsInfoIterator.zipWithIndex.map {
         case ((classNumber: String, meetingInfoFullString: String, eventType: String, seatsRemaining: String), schoolSpecificEventId: Int) =>
           val sectionType = if (eventType.trim() == "") ("LEC " + classNumber.trim()) else (eventType.trim().substring(0, 3).toUpperCase() + " " + classNumber.trim())
-
           val meetingInfoTimesLocations = meetingInfoFullString.trim().split(" AND ")
           val lastMeetingInfoString = meetingInfoTimesLocations.last.trim()
 
@@ -156,12 +155,19 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
 
           val enrollmentCap = seatsRemaining.toInt
           val status = if (enrollmentCap > 0)  "Open" else "Closed"
-
           val event = Event(Some("ALBANY_"+classNumber), sectionType, timesAndLocations,
             0, enrollmentCap, 0, 0, status, section.primaryKey, SchoolId.Albany)
           (section, event :: Nil)
       }
+
+      if (sectionAndEvent.length == 0) {
+        println("Error in regexp")
+        println(courseName)
+        println(eventInfoString)
+      }
+
       sectionAndEvent.toSeq
+
     }
   }
 
