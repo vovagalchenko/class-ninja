@@ -58,18 +58,17 @@ object CourseFetch extends LazyLogging {
   def performCourseFetch(school: SchoolId, refreshOfferedCourses: Boolean, refreshAllEvents: Boolean, messageExchangeOption: Option[MessageExchange])
                                 (implicit dbManager: DBManager, session: Session): Unit = {
     logger.info(s"Performing the course fetch for $school. Will refresh offered courses? $refreshOfferedCourses Will refresh all events? $refreshAllEvents")
-    val currentTermCode = dbManager.schools
+    val schoolRow = dbManager.schools
       .filter(_.schoolId === school.id)
-      .map(_.currentTermCode)
       .firstOption
       .getOrElse {
       throw new IllegalArgumentException(s"There is no school for id ${school.id} in MySQL")
     }
     val schoolManager: SchoolManager = school match {
-      case SchoolId.UCLA  => new UCLACourseFetchManager(currentTermCode)
-      case SchoolId.SJSU  => new SJSUCourseFetchManager(currentTermCode)
-      case SchoolId.Davis => new DavisCourseFetchManager(currentTermCode)
-      case SchoolId.Albany => new AlbanyCourseFetchManager(currentTermCode)
+      case SchoolId.UCLA  => new UCLACourseFetchManager(schoolRow)
+      case SchoolId.SJSU  => new SJSUCourseFetchManager(schoolRow.currentTermCode)
+      case SchoolId.Davis => new DavisCourseFetchManager(schoolRow.currentTermCode)
+      case SchoolId.Albany => new AlbanyCourseFetchManager(schoolRow)
       case _              => throw new IllegalArgumentException(s"There is no fetch manager for school with id: $school")
     }
 

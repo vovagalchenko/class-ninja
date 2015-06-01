@@ -8,7 +8,7 @@ object StringUtilities {
     }
 
     def safeToInt: Int = {
-      if (string == "") {
+      if (string == "" || string == "UNL") {
         0
       } else {
         string.toInt

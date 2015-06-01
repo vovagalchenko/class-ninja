@@ -13,8 +13,10 @@ import scala.util.{Failure, Success, Try}
 import scala.xml.{Node, NodeSeq}
 
 
-class UCLACourseFetchManager(term: String) extends SchoolManager with LazyLogging {
+class UCLACourseFetchManager(school: School) extends SchoolManager with LazyLogging {
   private val UCLARequestFactory: HTTPRequestFactory = new HTTPRequestFactory("http://www.registrar.ucla.edu/schedule")
+
+  private val nowIsSummerTerm: Boolean = school.currentTermName.contains("Summer")
 
   override def fetchDepartments: Future[Seq[Department]] = HTTPManager.withHTTPManager { httpManager =>
     httpManager.execute(UCLARequestFactory("/schedulehome.aspx")) { nodeSeq: NodeSeq =>
@@ -29,17 +31,20 @@ class UCLACourseFetchManager(term: String) extends SchoolManager with LazyLoggin
   }
 
   override def fetchCourses(department: Department): Future[Seq[Course]] = HTTPManager.withHTTPManager { httpManager =>
-    val coursesRequest = UCLARequestFactory("/crsredir.aspx", "GET", Map("termsel" -> term, "subareasel" -> department.schoolSpecificId))
+    val coursesRequest = UCLARequestFactory("/crsredir.aspx", "GET", Map("termsel" -> school.currentTermCode, "subareasel" -> department.schoolSpecificId))
     httpManager.execute(coursesRequest) { nodeSeq =>
-      val courseNodes: NodeSeq = (nodeSeq \\ "select").filterByLiteralAttribute("id", "ctl00_BodyContentPlaceHolder_crsredir1_lstCourseNormal") \\ "option"
+      val courseNodes: NodeSeq = (nodeSeq \\ "select").filterByAttributePrefix("id", "ctl00_BodyContentPlaceHolder_crsredir1_lstCourse") \\ "option"
       courseNodes.zipWithIndex map { case (node: Node, index: Int) =>
-        val departmentSpecificCourseId :: courseName :: _ = node.text.split(" - ", 2).toList
+        val value = node.attribute("value").get.text
+        val nonUniqueDepartmentSpecificCourseId :: courseName :: _ = node.text.split(" - ", 2).toList
+        val uniqueDepartmentSpecificCourseId = s"$nonUniqueDepartmentSpecificCourseId $value"
+        val urlPath = if (nowIsSummerTerm) "/detselect_summer.aspx" else "/detselect.aspx"
         val request = UCLARequestFactory(
-          path = "/detselect.aspx",
+          path = urlPath,
           method = "GET",
-          queryParams = Map("termsel" -> term, "subareasel" -> department.schoolSpecificId, "idxcrs" -> node.attribute("value").get.text)
+          queryParams = Map("termsel" -> school.currentTermCode, "subareasel" -> department.schoolSpecificId, "idxcrs" -> value)
         )
-        Course(SchoolId.UCLA, department.primaryKey, departmentSpecificCourseId, courseName, index, httpManager.reqFromHTTPRequest(request).url)
+        Course(SchoolId.UCLA, department.primaryKey, uniqueDepartmentSpecificCourseId, courseName, index, httpManager.reqFromHTTPRequest(request).url)
       }
     }
   }
@@ -49,8 +54,11 @@ class UCLACourseFetchManager(term: String) extends SchoolManager with LazyLoggin
       httpManager.get(course.context) { nodeSeq: NodeSeq =>
         val tables = nodeSeq \\ "table"
         val sectionNodes: NodeSeq = tables.filterByAttributePrefix("id", "dgdLectureHeader")
-        val sectionNameRegex = "^ctl00_BodyContentPlaceHolder_detselect_dgdLectureHeader.*_ctl02_lblGenericMessage$"
-        val staffRegex = "^ctl00_BodyContentPlaceHolder_detselect_dgdLectureHeader.*_ctl02_lblGenericMessage2$"
+        val (sectionNameRegex, staffRegex) =
+          if (nowIsSummerTerm)
+            ("^ctl00_BodyContentPlaceHolder_detselect_summer_dgdLectureHeader.*_ctl02_lblGenericMessage$", "^ctl00_BodyContentPlaceHolder_detselect_summer_dgdLectureHeader.*_ctl02_lblGenericMessage2$")
+          else
+            ("^ctl00_BodyContentPlaceHolder_detselect_dgdLectureHeader.*_ctl02_lblGenericMessage$", "^ctl00_BodyContentPlaceHolder_detselect_dgdLectureHeader.*_ctl02_lblGenericMessage2$")
         val sections = sectionNodes map { sectionNode: Node =>
           val sectionNodes: NodeSeq = sectionNode \\ "span"
           val sectionName: String = sectionNodes.filterByAttribute("id", _.matches(sectionNameRegex))(0).text

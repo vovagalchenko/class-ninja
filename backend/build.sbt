@@ -2,6 +2,7 @@ name := "class-ninja-backend"
 
 version := "1.0"
 
+
 libraryDependencies ++= Seq(
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
   "net.databinder.dispatch" %% "dispatch-tagsoup" % "latest.integration",
@@ -15,4 +16,3 @@ libraryDependencies ++= Seq(
   "com.notnoop.apns" % "apns" % "0.2.3"
 )
 
-scalacOptions ++= Seq("-feature")

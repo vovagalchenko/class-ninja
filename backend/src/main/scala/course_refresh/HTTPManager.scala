@@ -1,7 +1,6 @@
 package course_refresh
 
 import java.net.{HttpCookie, URLEncoder}
-import javax.net.ssl.SSLContext
 import com.ning.http.client.AsyncHttpClientConfig.Builder
 import com.ning.http.client.providers.netty.NettyAsyncHttpProviderConfig
 import com.ning.http.client.{RequestBuilder, Request}
@@ -15,6 +14,7 @@ import dispatch.{Http, Req, url}
 import scala.language.implicitConversions
 import scala.collection.mutable
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 import scala.xml.NodeSeq
 
 object HTTPManager extends LazyLogging {
@@ -129,6 +129,10 @@ class HTTPManager extends LazyLogging {
 
   private def execute[T](req: Req)(onSuccess: NodeSeq => T): Future[T] = {
     val futureResult: Future[NodeSeq] = HTTPManager.httpExecutor(req.OK(DNodeSeq(_)))
+    futureResult.onFailure { case NonFatal(t) =>
+      logger.error(s"Error occurred trying to go to: ${req.url}", t)
+      throw t
+    }
     futureResult.map(onSuccess)
   }
 

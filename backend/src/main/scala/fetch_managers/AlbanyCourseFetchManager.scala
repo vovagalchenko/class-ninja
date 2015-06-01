@@ -16,7 +16,7 @@ case class MeetingInfo(
   location : String,
   staffName :String)
 
-class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogging {
+class AlbanyCourseFetchManager(school: School) extends SchoolManager with LazyLogging {
   lazy val allCoursesAndEvents: Future[String] = {
     HTTPManager.withHTTPManager { httpManager =>
       httpManager.execute(HTTPRequest(
@@ -35,7 +35,7 @@ class AlbanyCourseFetchManager(term: String) extends SchoolManager with LazyLogg
     HTTPManager.withHTTPManager { httpManager =>
       httpManager.execute(HTTPRequest(
         root = "http://www.albany.edu",
-        path = "registrar/schedule-of-classes-spring.php",
+        path = "registrar/schedule-of-classes-summer.php",
         method = "GET",
         queryParams = Map[String, String](),
         body = None
