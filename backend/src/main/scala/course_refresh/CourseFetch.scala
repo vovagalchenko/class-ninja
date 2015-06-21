@@ -187,7 +187,7 @@ object CourseFetch extends LazyLogging {
           logger.info(s"Fetched the list of <${departments.length}> departments from ${school.toString}'s website")
           val schoolSpecificIds = departments.map(_.schoolSpecificId)
           require(schoolSpecificIds.distinct.size == schoolSpecificIds.size, {
-            logger.error(s"There are duplicate departments in school ${school.toString}")
+            logger.error(s"There are duplicate departments in school ${school.toString}: ${schoolSpecificIds.diff(schoolSpecificIds.distinct)}")
           })
           val allWork = departments map { freshDepartment: Department =>
             val futureResultsOfWork: Future[T] = fetchManager.fetchCourses(freshDepartment) flatMap { courses: Seq[Course] =>

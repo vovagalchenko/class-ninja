@@ -22,11 +22,15 @@ class UCLACourseFetchManager(school: School) extends SchoolManager with LazyLogg
     httpManager.execute(UCLARequestFactory("/schedulehome.aspx")) { nodeSeq: NodeSeq =>
       val departmentNodes: NodeSeq = (nodeSeq \\ "select").filterByLiteralAttribute("id", "ctl00_BodyContentPlaceHolder_SOCmain_lstSubjectArea") \\ "option"
       require(departmentNodes.length > 0, "Wasn't able to find the list of departments")
-      departmentNodes map { node: Node =>
+      val nonUniqueDepartments = departmentNodes map { node: Node =>
         val schoolSpecificId = node.attribute("value").get.text
         val name = node.text
         Department(SchoolId.UCLA, schoolSpecificId, name)
       }
+      nonUniqueDepartments
+        .groupBy(_.schoolSpecificId)
+        .map(_._2.head)
+        .toSeq
     }
   }
 
