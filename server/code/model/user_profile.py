@@ -11,5 +11,7 @@ class UserProfile(Base, Ninja_Model_Mixin):
     didPostOnFb = Column('didPostOnFb', Boolean, nullable = True)
     didPostOnTwitter = Column('didPostOnTwitter', Boolean, nullable = True)
     
+    referred_by = Column('referred_by', String(254))
+
     email = Column('email', String(254))
     first_target_timestamp = Column('first_target_timestamp', mysql.TIMESTAMP, nullable = True)

@@ -12,6 +12,7 @@ import uuid
 
 class update_user(HTTP_Response_Builder): 
     confirmation_token = Parameter("confirmation_token", required = True, parameter_type = String_Parameter_Type)    
+    referred_by = Parameter("referred_by", required = False, parameter_type = String_Parameter_Type)
 
     def do_controller_specific_work(self):
         phonenumber_regex = re.compile(r"\d{10}")
@@ -59,6 +60,7 @@ class update_user(HTTP_Response_Builder):
             userProfile.phonenumber =  user.phonenumber
             userProfile.didPostOnFb = False
             userProfile.didPostOnTwitter = False
+            userProfile.referred_by = self.referred_by
             cfg = CFG.get_instance()
             userProfile.credits = int(cfg.get('sales_pitch', 'targets_for_signup'))
             userProfile.email = None
