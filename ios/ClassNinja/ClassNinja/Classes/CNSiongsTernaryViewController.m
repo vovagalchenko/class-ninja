@@ -173,7 +173,7 @@
 - (void)logTextFieldDataWithUserAction:(NSString *)action
 {
     if (self.textField.text != nil) {
-        [ANALYTICS logEventWithName:@"school_request"
+        [ANALYTICS logEventWithName:@"missing_school_request"
                                type:AnalyticsEventTypeUserAction
                          attributes:@{@"school_named" : self.textField.text,
                                       @"user_action" : action}];
