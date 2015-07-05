@@ -41,6 +41,9 @@ typedef enum : NSUInteger {
 @property (nonatomic, readonly) CNAuthContext *authContext;
 
 + (instancetype)sharedInstance;
+
+- (void)authenticateUserReferredBy:(NSString *)referredBy
+                    withCompletion:(void (^)(BOOL authenticationCompleted))completionBlock;
 - (void)list:(Class<CNModel>)model completion:(void (^)(NSArray *children, NSError *error))completionBlock;
 - (void)listChildren:(id<CNModel>)parentModel
           completion:(void (^)(NSArray *, NSError *error))completionBlock;

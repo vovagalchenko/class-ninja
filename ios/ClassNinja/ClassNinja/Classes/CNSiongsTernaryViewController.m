@@ -7,12 +7,12 @@
 //
 
 #import "CNSiongsTernaryViewController.h"
+#import "CNCloseButton.h"
 
 @interface CNSiongsTernaryViewController ()
 @property (nonatomic) UILabel *titleLabel;
 @property (nonatomic) UILabel *descriptionLabel;
 @property (nonatomic) UIButton *button;
-
 
 @property (nonatomic) NSLayoutFormatOptions layoutOptions;
 @end
@@ -115,6 +115,60 @@
 @end
 
 
+@implementation CNCollegeUnderDevelopmentViewController
+
+- (BOOL)prefersStatusBarHidden
+{
+    return YES;
+}
+
+- (instancetype)initWithCollegeName:(NSString *)collegeName
+{
+    self = [super init];
+    if (self) {
+        self.titleLabel.text = @"Hello";
+        self.view.backgroundColor = CN_GREEN_COLOR;
+        self.descriptionLabel.text =  [NSString stringWithFormat:@"We're hard at work adding %@ to Class Radar. You can register now to get 10 free class targets to use for %@ once it is added. We'll notify you as soon as we're done.", collegeName, collegeName];
+        [self.button setTitle:@"Sign up"
+                     forState:UIControlStateNormal];
+    }
+    
+    self.layoutOptions = 0;
+    
+    return self;
+}
+
+- (void)closeButtonTapped:(id)button
+{
+    if (self.dissmissalCompletionBlock) {
+        self.dissmissalCompletionBlock();
+    }
+}
+
+- (void)setupConstraints
+{
+    [super setupConstraints];
+    CNCloseButton *closeButton = [[CNCloseButton alloc] initWithColor:[UIColor whiteColor]];
+    [self.view addSubview:closeButton];
+    
+    NSArray *hConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-30-[closeButton]"
+                                                                    options:0
+                                                                    metrics:nil
+                                                                      views:NSDictionaryOfVariableBindings(closeButton)];
+    
+    NSArray *vConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-17-[closeButton]"
+                                                                    options:0
+                                                                    metrics:nil
+                                                                      views:NSDictionaryOfVariableBindings(closeButton)];
+    [self.view addConstraints:vConstraints];
+    [self.view addConstraints:hConstraints];
+    
+    [closeButton addTarget:self action:@selector(closeButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    closeButton.translatesAutoresizingMaskIntoConstraints = NO;
+    
+}
+
+@end
 
 @implementation CNConfirmationViewController 
 

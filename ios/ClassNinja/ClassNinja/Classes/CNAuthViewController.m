@@ -261,7 +261,11 @@ static inline NSArray *textFieldGroupArray(CNAuthViewControllerState state)
     NSString *result = @"UNKNOWN_STATE";
     switch (state) {
         case CNAuthViewControllerStatePhoneNumberEntry:
-            result = self.authPitch.length > 0 ? self.authPitch : @"Please register with Class Radar to start tracking classes you are interested in. You can track 3 classes for free after you register. We don't use your phone number for anything other than keeping track of your targets.";
+            if ([self.delegate isGoingThroughReferral]) {
+                result = @"Please register with Class Radar to get notified once we're done adding your universtiy. We're also going to give you bonus targets once we're done!";
+            } else {
+                result = self.authPitch.length > 0 ? self.authPitch : @"Please register with Class Radar to start tracking classes you are interested in. You can track 3 classes for free after you register. We don't use your phone number for anything other than keeping track of your targets.";
+            }
             break;
         case CNAuthViewControllerStateVerificationCodeEntry:
             result = @"We’ve just sent you a text message with code to verify that this is your phone number. Please enter it.";

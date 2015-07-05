@@ -13,6 +13,7 @@
 @interface CNAuthContext : NSObject <CNAuthViewControllerDelegate>
 
 @property (nonatomic, readonly) CNUser *loggedInUser;
+@property (nonatomic) NSString *referredBy;
 
 - (void)authenticateWithCompletion:(void (^)(BOOL))completionBlock;
 - (void)logUserOut;

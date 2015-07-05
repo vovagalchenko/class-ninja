@@ -27,5 +27,6 @@
             forPhoneNumber:(NSString *)phoneNumber
     doneProcessingCallback:(void (^)(BOOL))completionCallback;
 - (void)authViewControllerCancelledAuthentication:(CNAuthViewController *)authViewController;
+- (BOOL)isGoingThroughReferral;
 
 @end

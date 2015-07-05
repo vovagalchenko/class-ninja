@@ -14,6 +14,8 @@
 #import "CNActivityIndicator.h"
 #import "CNUserProfile.h"
 
+#import "CNSiongsTernaryViewController.h"
+
 #define kTitleViewHeight 90
 #define kTitleLabelXOffset 20
 
@@ -109,12 +111,68 @@
                                               activityIndicatorDimension, activityIndicatorDimension);
 }
 
+- (void)handleCollegeUnderDevelopmentWithCollegeName:(NSString *)collegeName
+{
+
+    CNAPIClient *client = [CNAPIClient sharedInstance];
+    
+    dispatch_block_t dismissalBlock = ^{
+        [self.siongNavigationController dismissViewControllerAnimated:YES completion:nil];
+        [self.siongNavigationController popViewControllerAnimated:YES];
+    };
+    
+    if (client.authContext.loggedInUser) {
+        CNConfirmationViewController *confirmationVC = [[CNConfirmationViewController alloc] init];
+        confirmationVC.titleLabel.text = @"Thanks for checking!";
+
+        confirmationVC.descriptionLabel.text = [NSString stringWithFormat:@"We're still hard at work adding %@ to Class Radar. "
+                                                                            "We will notify you once we're done adding %@ to Class Radar.",
+                                                                            collegeName, collegeName];
+        confirmationVC.completionBlock = dismissalBlock;
+        [self.siongNavigationController presentViewController:confirmationVC animated:YES completion:nil];
+    } else {
+        
+        CNCollegeUnderDevelopmentViewController *underDevelopmentVC = [[CNCollegeUnderDevelopmentViewController alloc]
+                                                                       initWithCollegeName:collegeName];
+        underDevelopmentVC.modalPresentationStyle = UIModalPresentationFormSheet;
+        
+        
+        underDevelopmentVC.dissmissalCompletionBlock = dismissalBlock;
+        
+        dispatch_block_t authenticationSuccessBlock = ^{
+            CNConfirmationViewController *confirmationVC = [[CNConfirmationViewController alloc] init];
+            confirmationVC.titleLabel.text = @"Thanks for registering!";
+            confirmationVC.descriptionLabel.text = [NSString stringWithFormat:@"We will notify you as soon as we're done adding %@ to Class Radar.", collegeName];
+            confirmationVC.completionBlock = dismissalBlock;
+            [underDevelopmentVC presentViewController:confirmationVC animated:YES completion:nil];
+        };
+        
+        underDevelopmentVC.completionBlock = ^{
+            [[CNAPIClient sharedInstance] authenticateUserReferredBy:collegeName
+                                                      withCompletion:^(BOOL authenticationCompleted) {
+                                                          if (authenticationCompleted) {
+                                                              authenticationSuccessBlock();
+                                                          } else {
+                                                              dismissalBlock();
+                                                          }
+                                                      }];
+        };
+        
+        [self.siongNavigationController presentViewController:underDevelopmentVC animated:YES completion:nil];
+    }
+    
+}
+
 - (void)loadContent
 {
     self.activityIndicator.alpha = 1.0;
+    
     [[CNAPIClient sharedInstance] listChildren:self.rootModel
                                     completion:^(NSArray*children, NSError *error) {
-                                        if (children) {
+                                        if (children.count == 0 && error == nil && [self.rootModel isKindOfClass:[CNSchool class]]) {
+                                            NSString *collegeName = self.rootModel.name;
+                                            [self handleCollegeUnderDevelopmentWithCollegeName:collegeName];
+                                        } else if (children) {
                                             [UIView animateWithDuration:ANIMATION_DURATION animations:^{
                                                 self.activityIndicator.alpha = 0.0;
                                             }];

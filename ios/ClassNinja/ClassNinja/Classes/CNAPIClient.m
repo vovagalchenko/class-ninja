@@ -188,6 +188,18 @@ static inline NSTimeInterval urlRequestTimeoutInterval()
     return urlRequest;
 }
 
+- (void)authenticateUserReferredBy:(NSString *)referredBy
+                    withCompletion:(void (^)(BOOL authenticationCompleted))completionBlock
+{
+    self.authContext.referredBy = referredBy;
+    [self.authContext authenticateWithCompletion:^(BOOL authenticationCompleted){
+        self.authContext.referredBy = nil;
+        if (completionBlock) {
+            completionBlock(authenticationCompleted);
+        }
+    }];
+}
+
 - (void)makeURLRequest:(NSMutableURLRequest *)request
 authenticationRequired:(BOOL)authRequired
         withAuthPolicy:(CNAuthenticationPolicy)authPolicy

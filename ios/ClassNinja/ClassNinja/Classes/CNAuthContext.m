@@ -65,10 +65,12 @@
     doneProcessingCallback:(void (^)(BOOL))completionCallback
 {
     CNAPIClient *apiClient = [CNAPIClient sharedInstance];
-    NSMutableURLRequest *request = [apiClient mutableURLRequestForAPIEndpoint:@"user" HTTPMethod:@"POST" HTTPBodyParameters:@{
-                                                                                                                              @"phone" : phoneNumber,
-                                                                                                                              @"device_vendor_id" : [[[UIDevice currentDevice] identifierForVendor] UUIDString]
-                                                                                                                              }];
+    NSString *deviceVendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    NSMutableURLRequest *request = [apiClient mutableURLRequestForAPIEndpoint:@"user"
+                                                                   HTTPMethod:@"POST"
+                                                           HTTPBodyParameters:@{@"phone" : phoneNumber,
+                                                                                @"device_vendor_id" : deviceVendorID
+                                                                                }];
     [apiClient makeURLRequest:request
        authenticationRequired:NO
                withAuthPolicy:CNFailRequestOnAuthFailure
@@ -77,17 +79,26 @@
                    }];
 }
 
+- (BOOL)isGoingThroughReferral
+{
+    return self.referredBy != nil;
+}
+
 - (void)authViewController:(CNAuthViewController *)authViewController
   receivedConfirmationCode:(NSString *)confirmationCode
             forPhoneNumber:(NSString *)phoneNumber
     doneProcessingCallback:(void (^)(BOOL))completionCallback
 {
     CNAPIClient *apiClient = [CNAPIClient sharedInstance];
+    
+
+    NSMutableDictionary *bodyParams = [NSMutableDictionary dictionaryWithObject:confirmationCode forKey:@"confirmation_token"];
+    // setValue is failsafe when self.referredBy is nil
+    [bodyParams setValue:self.referredBy forKey:@"referred_by"];
+    
     NSMutableURLRequest *request = [apiClient mutableURLRequestForAPIEndpoint:[@"user" stringByAppendingPathComponent:phoneNumber]
                                                                    HTTPMethod:@"POST"
-                                                           HTTPBodyParameters:@{
-                                                                                @"confirmation_token" : confirmationCode,
-                                                                                }];
+                                                           HTTPBodyParameters:bodyParams];
     [apiClient makeURLRequest:request
        authenticationRequired:NO
                withAuthPolicy:CNFailRequestOnAuthFailure
