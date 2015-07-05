@@ -98,14 +98,14 @@
 {
     if (_button == nil) {
         _button = [UIButton cnTextButton];
-        [_button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
+        [_button addTarget:self action:@selector(doneButtonPressed) forControlEvents:UIControlEventTouchUpInside];
         
         setDefaultAutoLayoutSettings(_button);
     }
     return _button;
 }
 
-- (void)buttonPressed
+- (void)doneButtonPressed
 {
     if (self.completionBlock) {
         self.completionBlock();
@@ -114,28 +114,10 @@
 
 @end
 
-
-@implementation CNCollegeUnderDevelopmentViewController
-
+@implementation CNScreenWithCloseButtonAndActionButton
 - (BOOL)prefersStatusBarHidden
 {
     return YES;
-}
-
-- (instancetype)initWithCollegeName:(NSString *)collegeName
-{
-    self = [super init];
-    if (self) {
-        self.titleLabel.text = @"Hello";
-        self.view.backgroundColor = CN_GREEN_COLOR;
-        self.descriptionLabel.text =  [NSString stringWithFormat:@"We're hard at work adding %@ to Class Radar. You can register now to get 10 free class targets to use for %@ once it is added. We'll notify you as soon as we're done.", collegeName, collegeName];
-        [self.button setTitle:@"Sign up"
-                     forState:UIControlStateNormal];
-    }
-    
-    self.layoutOptions = 0;
-    
-    return self;
 }
 
 - (void)closeButtonTapped:(id)button
@@ -165,7 +147,120 @@
     
     [closeButton addTarget:self action:@selector(closeButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     closeButton.translatesAutoresizingMaskIntoConstraints = NO;
+}
+
+@end
+
+@interface CNRequestSchoolViewController () <UITextFieldDelegate>
+@property (nonatomic) UITextField *textField;
+@end
+
+
+@implementation CNRequestSchoolViewController
+
+- (NSUInteger)topOffset
+{
+    return 50;
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.textField becomeFirstResponder];
+}
+
+- (void)logTextFieldDataWithUserAction:(NSString *)action
+{
+    if (self.textField.text != nil) {
+        [ANALYTICS logEventWithName:@"school_request"
+                               type:AnalyticsEventTypeUserAction
+                         attributes:@{@"school_named" : self.textField.text,
+                                      @"user_action" : action}];
+    }
     
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [self logTextFieldDataWithUserAction:@"hit_return"];
+    if (self.completionBlock) {
+        self.completionBlock();
+    }
+    return YES;
+}
+
+- (void)doneButtonPressed
+{
+    [self logTextFieldDataWithUserAction:@"done_btn_pressed"];
+    [super doneButtonPressed];
+}
+
+- (void)closeButtonTapped:(id)button
+{
+    [self logTextFieldDataWithUserAction:@"close_btn_pressed"];
+    if (self.dissmissalCompletionBlock) {
+        self.dissmissalCompletionBlock();
+    }
+}
+
+- (void)setupConstraints
+{
+    [super setupConstraints];
+    
+    UITextField *textField = [[UITextField alloc] init];
+    textField.backgroundColor = [UIColor whiteColor];
+    textField.delegate = self;
+    textField.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:textField];
+
+    self.textField = textField;
+    NSArray *hConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-30-[textField]-30-|"
+                                                                    options:0
+                                                                    metrics:nil
+                                                                      views:NSDictionaryOfVariableBindings(textField)];
+    UILabel *descriptionLabel = self.descriptionLabel;
+    NSArray *vConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[descriptionLabel]-10-[textField(==30)]"
+                                                                    options:0
+                                                                    metrics:nil
+                                                                      views:NSDictionaryOfVariableBindings(descriptionLabel, textField)];
+    [self.view addConstraints:vConstraints];
+    [self.view addConstraints:hConstraints];
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.view.backgroundColor = WELCOME_BLUE_COLOR;
+        self.descriptionLabel.text =  @"What school do you want us to add to the Class Radar?";
+        [self.button setTitle:@"Done"
+                     forState:UIControlStateNormal];
+    }
+    
+    
+    return self;
+}
+
+
+@end
+
+@implementation CNCollegeUnderDevelopmentViewController
+
+- (instancetype)initWithCollegeName:(NSString *)collegeName
+{
+    self = [super init];
+    if (self) {
+        self.titleLabel.text = @"Hello";
+        self.view.backgroundColor = WELCOME_BLUE_COLOR;
+        self.descriptionLabel.text =  [NSString stringWithFormat:@"We're hard at work adding %@ to Class Radar. You can register now to get 10 free class targets to use for %@ once it is added. We'll notify you as soon as we're done.", collegeName, collegeName];
+        [self.button setTitle:@"Sign up"
+                     forState:UIControlStateNormal];
+    }
+    
+    self.layoutOptions = 0;
+    
+    return self;
 }
 
 @end

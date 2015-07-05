@@ -123,7 +123,7 @@
     
     if (client.authContext.loggedInUser) {
         CNConfirmationViewController *confirmationVC = [[CNConfirmationViewController alloc] init];
-        confirmationVC.titleLabel.text = @"Thanks for checking!";
+        confirmationVC.titleLabel.text = @"Hello";
 
         confirmationVC.descriptionLabel.text = [NSString stringWithFormat:@"We're still hard at work adding %@ to Class Radar. "
                                                                             "We will notify you once we're done adding %@ to Class Radar.",
@@ -308,9 +308,36 @@
 
 @implementation CNSchoolViewController
 
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (section == 0) {
+        return [super tableView:tableView numberOfRowsInSection:section];
+    } else {
+        return 1;
+    }
+
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 2;
+}
+
+
 - (NSString *)title
 {
     return @"Track a class";
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.section == 0) {
+        return [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    } else {
+        UITableViewCell *cell = [[CNGenericSelectionTableViewCell alloc] initWithReuseIdentifier:@"genericcell"];
+        cell.textLabel.text =  @"Don't see your school?";
+        return cell;
+    }
 }
 
 - (void)tryNavigatingToDefaultSchool
@@ -366,10 +393,34 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    CNSchool *school = [self modelForIndexPath:indexPath];
-    [CNUserProfile  setDefaultSchool:school];
-    self.didNavigateToDefaultSchool = YES;
-    [super tableView:tableView didSelectRowAtIndexPath:indexPath];
+    if (indexPath.section == 0) {
+        CNSchool *school = [self modelForIndexPath:indexPath];
+        [CNUserProfile  setDefaultSchool:school];
+        self.didNavigateToDefaultSchool = YES;
+        [super tableView:tableView didSelectRowAtIndexPath:indexPath];
+    } else {
+        CNRequestSchoolViewController *schoolRequestVC = [[CNRequestSchoolViewController alloc] init];
+        
+        dispatch_block_t dismissalBlock = ^{
+            [self.siongNavigationController dismissViewControllerAnimated:YES completion:nil];
+        };
+        
+        
+        __weak typeof(schoolRequestVC) weakSchoolRequestVC = schoolRequestVC;
+        schoolRequestVC.dissmissalCompletionBlock = dismissalBlock;
+        schoolRequestVC.completionBlock = ^{
+            CNConfirmationViewController *confirmationVC = [[CNConfirmationViewController alloc] init];
+            confirmationVC.titleLabel.text = @"Thanks!";
+            confirmationVC.descriptionLabel.text = @"Thanks for letting us know! Tell your friends to sign up to Class Radar while you wait.";
+            confirmationVC.completionBlock = dismissalBlock;
+
+            [weakSchoolRequestVC presentViewController:confirmationVC
+                                              animated:YES
+                                            completion:nil];
+        };
+        
+        [self.siongNavigationController presentViewController:schoolRequestVC animated:YES completion:nil];
+    }
 }
 
 @end

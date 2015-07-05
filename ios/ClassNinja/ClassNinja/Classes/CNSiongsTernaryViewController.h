@@ -19,9 +19,15 @@
 
 @end
 
-@interface CNCollegeUnderDevelopmentViewController : CNSiongsTernaryViewController
-- (instancetype)initWithCollegeName:(NSString *)collegeName;
+@interface CNScreenWithCloseButtonAndActionButton : CNSiongsTernaryViewController
 @property (nonatomic, copy) dispatch_block_t dissmissalCompletionBlock;
+@end
+
+@interface CNCollegeUnderDevelopmentViewController : CNScreenWithCloseButtonAndActionButton
+- (instancetype)initWithCollegeName:(NSString *)collegeName;
+@end
+
+@interface CNRequestSchoolViewController : CNScreenWithCloseButtonAndActionButton
 @end
 
 @interface CNConfirmationViewController : CNSiongsTernaryViewController
