@@ -141,7 +141,7 @@
         
         dispatch_block_t authenticationSuccessBlock = ^{
             CNConfirmationViewController *confirmationVC = [[CNConfirmationViewController alloc] init];
-            confirmationVC.titleLabel.text = @"Thanks for registering!";
+            confirmationVC.titleLabel.text = @"Thanks!";
             confirmationVC.descriptionLabel.text = [NSString stringWithFormat:@"We will notify you as soon as we're done adding %@ to Class Radar.", collegeName];
             confirmationVC.completionBlock = dismissalBlock;
             [underDevelopmentVC presentViewController:confirmationVC animated:YES completion:nil];
@@ -171,6 +171,7 @@
                                     completion:^(NSArray*children, NSError *error) {
                                         if (children.count == 0 && error == nil && [self.rootModel isKindOfClass:[CNSchool class]]) {
                                             NSString *collegeName = self.rootModel.name;
+                                            [CNUserProfile removeDefaultSchoolInfo];
                                             [self handleCollegeUnderDevelopmentWithCollegeName:collegeName];
                                         } else if (children) {
                                             [UIView animateWithDuration:ANIMATION_DURATION animations:^{
@@ -420,6 +421,7 @@
         };
         
         [self.siongNavigationController presentViewController:schoolRequestVC animated:YES completion:nil];
+        [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     }
 }
 

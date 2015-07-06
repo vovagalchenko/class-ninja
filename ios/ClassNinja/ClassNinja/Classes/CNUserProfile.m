@@ -25,10 +25,14 @@ static CNSchool *currentSchool = nil;
     if (currentSchool == nil) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:[self defaultSchoolFilePath]];
         currentSchool = [CNSchoolAPIResource modelWithDictionary:dict];
-
     }
 
     return currentSchool;
+}
+
++ (void)removeDefaultSchoolInfo
+{
+    [[NSFileManager defaultManager] removeItemAtPath:[self defaultSchoolFilePath] error:nil];
 }
 
 + (void)setDefaultSchool:(CNSchool *)school
@@ -39,6 +43,19 @@ static CNSchool *currentSchool = nil;
         [dict writeToFile:[self defaultSchoolFilePath] atomically:NO];
         logUserAction(@"default_school_selected", @{@"selected_school_name" : school.name});
     }
+}
+
++ (BOOL)isFreshInstall
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    return [userDefaults objectForKey:kFreshInstallKey] == nil;
+}
+
++ (void)setInstallIsNotFresh
+{
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:[NSNumber numberWithBool:NO] forKey:kFreshInstallKey];
+    [userDefaults synchronize];
 }
 
 @end

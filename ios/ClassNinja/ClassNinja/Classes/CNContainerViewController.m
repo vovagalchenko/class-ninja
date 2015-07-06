@@ -28,7 +28,7 @@
     self = [super init];
     self.dashboardVC = [[CNDashboardViewController alloc] init];
     
-    if ([CNUserProfile defaultSchool] == nil) {
+    if ([CNUserProfile isFreshInstall]) {
         CNFirstPageViewController *firstPageVC = [[CNFirstPageViewController alloc] init];
         __weak CNFirstPageViewController *weakVC = firstPageVC;
 

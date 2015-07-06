@@ -22,20 +22,15 @@
 
 @implementation CNAppDelegate
 
-
-#define kFreshInstallKey @"fresh_install"
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [[Analytics sharedInstance] setDelegate:self];
     
     logAppLifecycleEvent(@"launch", nil);
     
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    if (([userDefaults objectForKey:kFreshInstallKey] == nil) && ([CNUserProfile defaultSchool] == nil)) {
+    if ([CNUserProfile isFreshInstall]) {
         logAppLifecycleEvent(kFreshInstallKey, nil);
-        [userDefaults setObject:[NSNumber numberWithBool:NO] forKey:kFreshInstallKey];
-        [userDefaults synchronize];
+        [CNUserProfile setInstallIsNotFresh];
     }
     
     
