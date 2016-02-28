@@ -160,16 +160,10 @@
 {
     if (_backButton == nil) {
         _backButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        _backButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         [_backButton setImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
         [_backButton addTarget:self.navigationDelegate
                         action:@selector(backButtonPressed:)
-              forControlEvents:UIControlEventTouchUpInside];
-        
-        _backButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [_backButton setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisVertical];
-        [_backButton setContentCompressionResistancePriority:UILayoutPriorityRequired
-                                                     forAxis:UILayoutConstraintAxisVertical];
+              forControlEvents:UIControlEventTouchUpInside];        
     }
     return _backButton;
 }
